@@ -10,6 +10,8 @@ __pycache__/
 # Los reportes de ronda SÍ se versionan: son el archivo, y el archivo no es
 # opcional. Solo se ignora lo que es puramente local.
 runs/*.tmp
+# bitácora de depuración del modelo guionizado: ruido, no archivo
+runs/modelo-falso.log
 
 # La bandeja es un buzón, no corpus. Lo ingerido vive en artefactos/corpus/.
 artefactos/entrada/*
