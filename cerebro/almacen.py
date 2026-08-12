@@ -127,6 +127,97 @@ create table if not exists {ESQUEMA}.consulta (
 );
 create index if not exists consulta_ts on {ESQUEMA}.consulta (ts desc);
 create index if not exists consulta_voto on {ESQUEMA}.consulta (ts desc) where voto is not null;
+
+-- ── FASE 3 · el grafo ──────────────────────────────────────────────────────
+--
+-- Dos tablas, no un motor de grafos. En CVs-SaaS esto era Apache AGE, y AGE 1.5
+-- descartaba en silencio un SET que seguía a un MERGE que crea relación: todas
+-- las aristas nacieron con properties vacías y el modelo bi-temporal quedó
+-- decorativo. Aquí las aristas son filas con columnas, y una columna que no se
+-- escribe se ve con un SELECT.
+--
+-- El nodo es el ARTEFACTO, no el fragmento. Un grafo de fragmentos tendría diez
+-- veces más nodos y sus aristas no significarían nada: «este párrafo se parece
+-- a ese» no es una relación, es una coincidencia de embedding.
+create table if not exists {ESQUEMA}.arista (
+  origen        text        not null,
+  destino       text        not null,
+  tipo          text        not null,
+  peso          real        not null default 1.0,
+  -- de dónde salió: 'declarada' (el frontmatter la dice), 'derivada' (temas o
+  -- dominio compartidos), 'inferida' (co-recuperación en tráfico real).
+  procedencia   text        not null,
+  epoca         int         not null,
+  detalle       jsonb       not null default '{{}}',
+  -- bi-temporal, igual que el artefacto: una arista no se borra, se cierra.
+  valido_desde  timestamptz not null default now(),
+  valido_hasta  timestamptz,
+  primary key (origen, destino, tipo)
+);
+create index if not exists arista_origen on {ESQUEMA}.arista (origen)
+  where valido_hasta is null;
+create index if not exists arista_destino on {ESQUEMA}.arista (destino)
+  where valido_hasta is null;
+create index if not exists arista_epoca on {ESQUEMA}.arista (epoca);
+
+-- Las comunidades detectadas sobre el grafo, con su resumen. Se recalculan
+-- enteras en cada avance de época: son una VISTA del grafo, no un dato propio,
+-- y mantenerlas incrementalmente sería inventar un problema.
+create table if not exists {ESQUEMA}.comunidad (
+  id            int         not null,
+  epoca         int         not null,
+  miembros      text[]      not null,
+  etiqueta      text,
+  resumen       text,
+  -- modularidad de ESTA comunidad, no la global: sirve para saber cuáles son
+  -- de verdad y cuáles son ruido de la partición.
+  cohesion      real,
+  calculada_en  timestamptz not null default now(),
+  primary key (id, epoca)
+);
+
+-- ── FASE 3 · las propuestas ────────────────────────────────────────────────
+--
+-- Nada que un modelo proponga entra al corpus sin firma. La cola es una tabla y
+-- no un fichero porque el estado —pendiente, aceptada, rechazada— es lo que
+-- hace que la revisión no se repita, y porque un rechazo con motivo es el dato
+-- más caro de conseguir y el primero que se pierde.
+create table if not exists {ESQUEMA}.propuesta (
+  id            bigserial   primary key,
+  ts            timestamptz not null default now(),
+  clase         text        not null,   -- 'analogia' | 'arista' | 'probe' | 'instruccion'
+  epoca         int         not null,
+  sujeto        text        not null,
+  objeto        text,
+  cuerpo        jsonb       not null,
+  -- por qué el sistema cree que esto vale: la distancia, el modelo, el motivo.
+  evidencia     jsonb       not null default '{{}}',
+  estado        text        not null default 'pendiente',
+  resuelta_en   timestamptz,
+  motivo        text
+);
+create index if not exists propuesta_pendiente on {ESQUEMA}.propuesta (ts desc)
+  where estado = 'pendiente';
+
+-- ── FASE 4 · la topología, época a época ───────────────────────────────────
+--
+-- Una foto de la forma del grafo en cada época. No sirve para responder
+-- preguntas: sirve para responder «¿en qué está cambiando mi investigación?»,
+-- que es la única pregunta que un corpus puede contestar y un documento no.
+create table if not exists {ESQUEMA}.topologia (
+  epoca         int         primary key,
+  n_nodos       int         not null,
+  n_aristas     int         not null,
+  n_componentes int         not null,
+  densidad      real        not null,
+  modularidad   real,
+  -- los artefactos que unen comunidades que si no estarían separadas
+  puentes       jsonb       not null default '[]',
+  -- pares de comunidades sin ninguna arista entre ellas: los huecos donde una
+  -- analogía tendría más valor, porque nadie la ha escrito todavía
+  agujeros      jsonb       not null default '[]',
+  medida_en     timestamptz not null default now()
+);
 """
 
 

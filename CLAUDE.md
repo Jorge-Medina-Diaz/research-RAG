@@ -29,6 +29,13 @@ cerebro/
   almacen.py      esquema propio, épocas, y los índices que Agno no crea
   embeddings.py   mock determinista + openai. El mock no es un juguete.
   fusion.py       RRF k=60, extraído de CVs-SaaS
+  reescritura.py  expansión + HyDE. Fase 2, apagado.
+  enrutador.py    pesos por FORMA de la consulta, por reglas. Fase 2, apagado.
+  grafo.py        aristas + PPR propio + el tercer carril. Fase 3, apagado.
+  comunidades.py  propagación de etiquetas + resúmenes. Fase 3, apagado.
+  analogias.py    cross-dominio con tres filtros + cola de firma. Fase 3.
+  topologia.py    puentes, agujeros y deriva. Fase 4. No toca ninguna respuesta.
+  aprendizaje.py  LearnedKnowledge + DecisionLog. Nunca se cita en respuesta.
 
 ingesta/
   contrato.py     el frontmatter, en pydantic. Cinco campos obligatorios.
@@ -39,7 +46,10 @@ evals/
   probes.yaml     el golden set: 41 probes, 6 categorías. Denegado a la edición.
   entorno.py      Environment de Agno + ciclo de vida de las probes
   correr.py       el arnés. Nivel 0 sin claves, completo con ellas.
-  estadistica.py  ruido, McNemar, Krippendorff, bootstrap. Denegado.
+  estadistica.py  ruido, McNemar, Krippendorff, bootstrap, BH, CUPED,
+                  successive halving. Los tres últimos se NIEGAN fuera de
+                  su régimen en vez de devolver un número. Denegado.
+  gepa.py         evolución de instrucciones. Propone y NO aplica.
 
 scripts/
   traza.py        una consulta de punta a punta. Genera docs/05-una-traza.md.
@@ -109,11 +119,22 @@ humano y está denegado al agente.
 
   | | líneas | presupuesto |
   |---|---|---|
-  | `evals/` — bucle y arnés | 1.036 | ≤ 1.000 · **excedido** |
-  | `cerebro/` | 1.924 | ≤ 2.000 |
+  | `evals/` — bucle y arnés | 1.517 | ≤ 1.000 · **excedido** |
+  | `cerebro/` | 4.006 | ≤ 2.000 · **excedido** |
   | `ingesta/` | 740 | ≤ 800 |
-  | `scripts/` + `tareas.py` | 1.909 | ≤ 1.500 · **excedido** |
-  | **total sin tests** | **5.609** | |
+  | `scripts/` + `tareas.py` | 2.527 | ≤ 1.500 · **excedido** |
+  | **total sin tests** | **8.790** | |
+
+  Tres de cuatro excedidos, y el de `cerebro/` al doble. La causa es concreta y
+  está fechada: las fases 2, 3 y 4 —grafo, comunidades, analogías, topología,
+  reescritura, enrutado, aprendizaje— son 2.100 líneas que el plan original
+  dejaba **diseñadas y sin construir**. Construirlas fue una decisión explícita.
+
+  Lo que NO se puede hacer es dejar el presupuesto viejo escrito al lado de las
+  cifras nuevas y llamarlo convención: eso es exactamente la afirmación muerta
+  que este repositorio persigue, y ya pasó una vez en esta misma línea. Así que
+  o se sube el presupuesto reconociendo el alcance nuevo, o se adelgaza. Está
+  sin decidir, y hasta que se decida la tabla dice **excedido** tres veces.
 
   Una versión anterior de esta línea decía «por debajo de 1.500 LOC» a secas,
   con 5.249 en el repo. Era una convención que el propio repo incumplía en su

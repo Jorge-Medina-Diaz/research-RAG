@@ -220,16 +220,84 @@ def _guardar_traza(
     )
 
 
-def _expandir(consulta: str, p: Palancas) -> str:
-    """Hook de reescritura. En v1 solo existe la identidad.
+def _reescribir(consulta: str, p: Palancas):
+    """Aplica la reescritura configurada. Ver `cerebro/reescritura.py`.
 
-    No es una omisión: la reescritura solapa con el contexto situacional (los dos
-    añaden texto tipo-documento, uno por el lado de la consulta y otro por el del
-    corpus) y cuesta una llamada en el camino crítico. Peso bajo, no exclusión:
-    la palanca existe y el bucle puede encenderla cuando `single_hop` falle por
-    formulación y no por cobertura.
+    Solo los modos sin llamada se resuelven aquí: abrir un bucle de eventos
+    dentro del recuperador rompería el que Agno ya tiene abierto para el turno.
+    Los modos HyDE se resuelven arriba y llegan ya reescritos, y el modo se
+    registra igual para que la traza no mienta sobre lo que pasó.
     """
-    return consulta
+    from cerebro.reescritura import reescribir_sinc
+
+    return reescribir_sinc(consulta, p)
+
+
+def _semillas_de(ranking: list[Hit], cuantas: int) -> dict[str, float]:
+    """Los artefactos mejor colocados del carril denso, con peso por puesto.
+
+    Por puesto y no por score: el score del carril denso es una distancia coseno
+    cuya escala no significa nada fuera de su propia consulta, y meterla como
+    peso de reinicio del PPR sería el mismo error de escalas incomparables que
+    RRF existe para evitar. `1/(1+rango)` es monótono y adimensional.
+    """
+    peso: dict[str, float] = {}
+    for h in ranking:
+        art = (h.meta or {}).get("artefacto_id")
+        if not art or art in peso:
+            continue
+        peso[art] = 1.0 / (1.0 + len(peso))
+        if len(peso) >= cuantas:
+            break
+    return peso
+
+
+def _carril_grafo(p: Palancas, semillas: dict[str, float], epoca: int | None) -> list[Hit]:
+    """El tercer carril: PPR sobre el grafo de artefactos.
+
+    Devuelve **fragmentos**, no artefactos, porque la fusión trabaja en
+    fragmentos y devolver artefactos obligaría a una segunda unidad de cuenta.
+    De cada artefacto vecino se toma su primer fragmento, que por construcción
+    del troceado es el que lleva la cabecera con título, tipo y temas — o sea el
+    más representativo del artefacto entero.
+    """
+    from cerebro.grafo import cargar, ppr
+
+    if not semillas:
+        return []
+    g = cargar(epoca=epoca)
+    puntuados = ppr(g, semillas, alfa=p.grafo_alfa)
+    if not puntuados:
+        return []
+
+    mejores = sorted(puntuados.items(), key=lambda kv: -kv[1])[: p.grafo_top_k]
+    ids = [a for a, _ in mejores]
+    tabla = tabla_fragmentos(p)
+
+    hits: list[Hit] = []
+    with conexion(autocommit=True) as con:
+        for rango, (art, score) in enumerate(mejores, start=1):
+            fila = con.execute(
+                f"""select id, content, meta_data from {ESQUEMA}.{tabla}
+                    where meta_data->>'artefacto_id' = %s
+                      and coalesce((meta_data->>'vigente')::bool, true)
+                    order by (meta_data->>'indice')::int nulls last
+                    limit 1""",
+                (art,),
+            ).fetchone()
+            if fila is None:
+                continue
+            hits.append(Hit(
+                doc_id=fila["id"],
+                contenido=fila["content"],
+                score=float(score),
+                score_tipo="ppr",
+                rango=rango,
+                carril="grafo",
+                meta=fila["meta_data"] or {},
+            ))
+    _ = ids
+    return hits
 
 
 def construir_recuperador(
@@ -250,23 +318,37 @@ def construir_recuperador(
     embedder = construir_embedder(p)
 
     def recuperar(query: str, num_documents: int | None = None, **kwargs: Any) -> list[dict]:
-        top_k = num_documents or p.top_k
+        # El enrutado decide ANTES de nada: puede cambiar top_k, los pesos y el
+        # modo del FTS. Devuelve unas palancas nuevas y su motivo, y el motivo
+        # va a la traza — una decisión de enrutado que no se puede leer después
+        # es una palanca cuyo efecto nadie puede diagnosticar.
+        from cerebro.enrutador import enrutar
+
+        ruta = enrutar(query, p)
+        pr = ruta.palancas
+
+        top_k = num_documents or pr.top_k
         ms: dict[str, float] = {}
         t0 = time.perf_counter()
 
-        efectiva = _expandir(query, p)
+        rw = _reescribir(query, pr)
+        efectiva = rw.para_denso
         vector = embedder.get_embedding(efectiva)
         ms["embed"] = round((time.perf_counter() - t0) * 1000, 2)
 
         rankings: list[list[Hit]] = []
+        nombres: list[str] = []
         with conexion(autocommit=True) as con:
             for nombre, fn in (("denso", _carril_denso), ("lexico", _carril_lexico)):
-                if nombre not in p.carriles:
+                if nombre not in pr.carriles:
                     continue
                 t = time.perf_counter()
                 try:
-                    arg = vector if nombre == "denso" else efectiva
-                    rankings.append(fn(con, p, arg, epoca))  # type: ignore[arg-type]
+                    # Cada carril busca lo SUYO. El denso quiere prosa (el
+                    # señuelo de HyDE); el léxico quiere los símbolos exactos
+                    # que escribiste, que una nota generada casi nunca trae.
+                    arg = vector if nombre == "denso" else rw.para_lexico
+                    rankings.append(fn(con, pr, arg, epoca))  # type: ignore[arg-type]
                 except Exception as exc:
                     # Un carril caído degrada la recuperación; no la mata. Pero
                     # se registra: un carril que lleva semanas caído y nadie lo
@@ -274,20 +356,39 @@ def construir_recuperador(
                     ms[f"{nombre}_error"] = 1.0
                     rankings.append([])
                     print(f"  carril {nombre} caído: {type(exc).__name__}: {exc}")
+                nombres.append(nombre)
                 ms[nombre] = round((time.perf_counter() - t) * 1000, 2)
 
-            t = time.perf_counter()
-            pesos = dict(zip(p.carriles, p.peso_carril, strict=False))
-            pool = rrf(rankings, k=p.k_rrf, top_k=p.pool_fusion, pesos=pesos)
-            ms["fusion"] = round((time.perf_counter() - t) * 1000, 2)
+            # --- el tercer carril, el de grafo. Va DESPUÉS de los otros dos
+            # porque se siembra con lo que el denso encontró: no busca, amplía.
+            if pr.grafo_activo and rankings:
+                t = time.perf_counter()
+                try:
+                    semillas = _semillas_de(rankings[0], pr.grafo_semillas)
+                    rankings.append(_carril_grafo(pr, semillas, epoca))
+                    nombres.append("grafo")
+                except Exception as exc:  # noqa: BLE001
+                    ms["grafo_error"] = 1.0
+                    rankings.append([])
+                    nombres.append("grafo")
+                    print(f"  carril grafo caído: {type(exc).__name__}: {exc}")
+                ms["grafo"] = round((time.perf_counter() - t) * 1000, 2)
 
             t = time.perf_counter()
-            devueltos = _reordenar(p, pool, efectiva)
+            pesos = dict(zip(pr.carriles, pr.peso_carril, strict=False))
+            pesos.setdefault("grafo", 1.0)
+            pool = rrf(rankings, k=pr.k_rrf, top_k=pr.pool_fusion, pesos=pesos)
+            ms["fusion"] = round((time.perf_counter() - t) * 1000, 2)
+            ms["_ruta"] = ruta.regla  # type: ignore[assignment]
+            ms["_reescritura"] = rw.modo  # type: ignore[assignment]
+
+            t = time.perf_counter()
+            devueltos = _reordenar(pr, pool, query)
             ms["rerank"] = round((time.perf_counter() - t) * 1000, 2)
             ms["total"] = round((time.perf_counter() - t0) * 1000, 2)
 
             _guardar_traza(
-                con, p, consulta=query, consulta_efectiva=efectiva, epoca=epoca,
+                con, pr, consulta=query, consulta_efectiva=efectiva, epoca=epoca,
                 pool=pool, devueltos=devueltos, ms=ms, es_probe=es_probe,
                 probe_id=probe_id,
             )

@@ -92,6 +92,41 @@ def eval() -> None:  # noqa: A001 — es el nombre del comando, no del builtin
     _correr(PY, "evals/correr.py", *sys.argv[2:])
 
 
+def grafo() -> None:
+    """Construye el grafo de artefactos y lo describe. --explicar <id>."""
+    _correr(PY, "scripts/fase3.py", "grafo", *sys.argv[2:])
+
+
+def comunidades() -> None:
+    """Detecta comunidades sobre el grafo. --resumir gasta LLM."""
+    _correr(PY, "scripts/fase3.py", "comunidades", *sys.argv[2:])
+
+
+def analogias() -> None:
+    """La cola de analogias cross-dominio. --minar propone; --aceptar N firma."""
+    _correr(PY, "scripts/fase3.py", "analogias", *sys.argv[2:])
+
+
+def topologia() -> None:
+    """La forma del corpus y su deriva entre epocas. Cero llamadas."""
+    _correr(PY, "scripts/fase3.py", "topologia", *sys.argv[2:])
+
+
+def jobs() -> None:
+    """Los trabajos periodicos. --nocturno no gasta LLM; --mensual si."""
+    _correr(PY, "scripts/jobs.py", *sys.argv[2:])
+
+
+def gepa() -> None:
+    """Evolucion de instrucciones por reflexion. Propone; no aplica."""
+    _correr(PY, "scripts/gepa_cli.py", *sys.argv[2:])
+
+
+def propuestas() -> None:
+    """Todo lo que espera tu firma, de cualquier clase."""
+    _correr(PY, "scripts/propuestas.py", *sys.argv[2:])
+
+
 def traza() -> None:
     """Una consulta de punta a punta: carriles, fusion, respuesta, veredicto."""
     _correr(PY, "scripts/traza.py", *sys.argv[2:])
@@ -141,6 +176,7 @@ TAREAS = {
     f.__name__: f
     for f in (
         up, ingerir, epoca, serve, falso, eval, traza, calibrar, holdout, sesiones,
+        grafo, comunidades, analogias, topologia, gepa, propuestas, jobs,
         verificar, test, lint, extras, logs, down, limpiar,
     )
 }

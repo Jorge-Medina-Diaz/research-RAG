@@ -104,6 +104,50 @@ def identidad(p: Palancas, epoca: int | None, usar_juez: bool) -> dict[str, Any]
     }
 
 
+def _cuanto(valor: float, suelo: float, n: int) -> str:
+    """Compara la distancia al suelo con lo que mueve UNA sola probe.
+
+    Un suelo en TASA roto por menos de lo que mueve una probe no está roto: está
+    dentro del cuanto del instrumento. Este repositorio dedica dos páginas a
+    argumentar que una tasa no es exigible con esta n, y después puso `recall ≥
+    0,85` como su suelo primario y lo comprobó como una comparación exacta. La
+    primera vez que se rompió fue por 0,0167, con un cuanto de 0,0185 — o sea
+    por menos de lo que mueve una probe pasando de 1,0 a 0,5.
+
+    No se relaja el suelo: se dice al lado. Bajarlo sería mover la portería;
+    callarlo sería fingir precisión que el instrumento no tiene.
+    """
+    if not n:
+        return ""
+    # Media sobre n valores en [0,1]: el cambio más pequeño que puede ocurrir es
+    # una probe moviéndose medio punto, porque una probe con dos artefactos
+    # esperados solo puede valer 0, 0,5 o 1.
+    cuanto = 0.5 / n
+    falta = suelo - valor
+    if 0 < falta < cuanto:
+        return (
+            f"\n          roto por {falta:.4f}, y una sola probe mueve {cuanto:.4f}: "
+            "está DENTRO del cuanto\n"
+            "          del instrumento. Una tasa no es exigible a esta n — es el "
+            "argumento de\n"
+            "          la propia spec, cumpliéndose sobre su suelo primario."
+        )
+    return ""
+
+
+def _epoca_esta_abierta(numero: int | None) -> bool:
+    """¿Se está midiendo contra una época que todavía admite artefactos?"""
+    if numero is None:
+        return False
+    from cerebro.almacen import ESQUEMA, conexion
+
+    with conexion() as con:
+        fila = con.execute(
+            f"select cerrada_en from {ESQUEMA}.epoca where numero = %s", (numero,)
+        ).fetchone()
+    return bool(fila) and fila["cerrada_en"] is None
+
+
 def palancas_movidas(a: dict, b: dict) -> list[str]:
     """Qué palancas difieren entre dos corridas, por nombre.
 
@@ -349,6 +393,19 @@ def informe(
     print(f"  huella config {ident['huella_config']}  ·  época {ident['epoca']}  "
           f"·  juez {ident['huella_juez']}")
     print(f"  corpus {ident['n_artefactos']} artefactos · sha {ident['corpus_sha']}")
+
+    # El aviso que faltaba, y que costó verlo pasando. Mientras no se cierra
+    # ninguna época, `epoca_medicion()` devuelve la ABIERTA — y entonces cada
+    # artefacto que ingieres entra en la época que estás midiendo. La medición
+    # no está congelada, aunque el informe imprima un número de época y parezca
+    # que sí. Es exactamente el problema que las épocas existen para resolver,
+    # ocurriendo dentro del mecanismo que lo resuelve.
+    if _epoca_esta_abierta(ident["epoca"]):
+        print(
+            f"\n  ⚠  la época {ident['epoca']} está ABIERTA: la medición NO está\n"
+            "     congelada, y cada artefacto que ingieras se cuela en ella.\n"
+            "     `uv run rag epoca avanzar` la cierra y estabiliza el número."
+        )
     print(f"\n  pasan {pasan}/{n}"
           + (f"   recall@top_k {recall:.2f}" if recall is not None else "")
           + (f"   p95 {p95/1000:.1f}s" if es_nivel0 else ""))
@@ -388,7 +445,8 @@ def informe(
         ok_recall = recall >= SUELO_RECALL
         ok_p95 = p95 <= SUELO_P95_MS
         m = "ok  " if ok_recall else "ROTO"
-        print(f"    {m}  recall@top_k ≥ {SUELO_RECALL} ({recall:.2f})")
+        print(f"    {m}  recall@top_k ≥ {SUELO_RECALL} ({recall:.2f})"
+              + _cuanto(recall, SUELO_RECALL, len(medidas)))
         print(f"    {'ok  ' if ok_p95 else 'ROTO'}  latencia p95 ≤ 8s ({p95/1000:.1f}s)")
         print("    —     R2/R4/R5/R6 no se comprueban en nivel 0: necesitan respuesta")
     else:

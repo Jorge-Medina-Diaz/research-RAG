@@ -161,9 +161,49 @@ class Palancas:
     reranker: Literal["none", "local", "cohere"] = "none"
     reranker_top_n: int = 12
 
-    #: none | expansion. La reescritura de consulta SÍ tiene hook en agno 2.8.6
-    #: —Agent(knowledge_retriever=fn)—, en contra de lo que afirma atlas-rai.
-    reescritura: Literal["none", "expansion"] = "none"
+    #: none | expansion | hyde | hyde_lexico. Ver `cerebro/reescritura.py`.
+    #: `expansion` no gasta llamadas; los dos modos HyDE gastan una por consulta.
+    #: `hyde_lexico` es el reparto asimétrico: señuelo para el denso, literal
+    #: para el léxico, que es lo que cada carril hace bien.
+    reescritura: Literal["none", "expansion", "hyde", "hyde_lexico"] = "none"
+
+    #: none | reglas. Ajusta los pesos de fusión según la FORMA de la consulta,
+    #: por reglas auditables y sin llamadas. Ver `cerebro/enrutador.py`.
+    enrutado: Literal["none", "reglas"] = "none"
+
+    # ---- fase 3 · el grafo. Todo esto viene apagado y su disparador está
+    # ---- escrito: `multi_hop` por debajo de 0,60 tras agotar grada 1 y 2.
+
+    #: Enciende el tercer carril. Sin esto, `grafo_*` son palancas sobre nada —y
+    #: ese es exactamente el defecto que el repo persigue, así que el assert de
+    #: abajo comprueba que no queden vivas cuando el carril está apagado.
+    grafo_activo: bool = False
+
+    #: Probabilidad de teletransporte del PPR. Alto = casi las semillas;
+    #: bajo = el paseo se va al centro del grafo y devuelve siempre lo popular.
+    grafo_alfa: float = 0.15
+
+    #: Cuántos vecinos aporta el carril de grafo a la fusión.
+    grafo_top_k: int = 10
+
+    #: Cuántos resultados del carril denso siembran el PPR. El grafo no busca:
+    #: AMPLÍA lo que el denso encontró.
+    grafo_semillas: int = 5
+
+    #: Sirve el resumen de la comunidad en vez de sus miembros cuando la
+    #: consulta pide agregación. Necesita `rag comunidades --resumir`.
+    comunidades_en_respuesta: bool = False
+
+    #: La ventana de distancia coseno donde se buscan analogías. Por debajo del
+    #: mínimo es un duplicado; por encima del máximo, ruido de embedding.
+    analogia_min: float = 0.25
+    analogia_max: float = 0.55
+
+    #: Learning Machines de Agno: LearnedKnowledge (AGENTIC) + DecisionLog.
+    #: Lo aprendido NUNCA se cita en una respuesta —eso rompería R1— y
+    #: `run_rollouts` corta sus escrituras durante los evals, así que medirse
+    #: no contamina la medición. Ver `cerebro/aprendizaje.py`.
+    aprendizaje: bool = False
 
     #: Las instrucciones del cerebro. Es la palanca de casi todos los fallos de
     #: generación.
@@ -252,7 +292,15 @@ _GRADAS: dict[str, int] = {
         ),
         1,
     ),
-    **dict.fromkeys(("reranker", "reranker_top_n", "reescritura", "instrucciones"), 2),
+    **dict.fromkeys(
+        (
+            "reranker", "reranker_top_n", "reescritura", "instrucciones",
+            "enrutado", "grafo_activo", "grafo_alfa", "grafo_top_k",
+            "grafo_semillas", "comunidades_en_respuesta",
+            "analogia_min", "analogia_max", "aprendizaje",
+        ),
+        2,
+    ),
     **dict.fromkeys(
         (
             "troceado", "tam_fragmento", "solape", "contextualizar",

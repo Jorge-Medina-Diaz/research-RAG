@@ -4,7 +4,7 @@
 > que mide, después el sistema que se mide**.
 
 [![ci](https://github.com/Jorge-Medina-Diaz/research-RAG/actions/workflows/ci.yml/badge.svg)](https://github.com/Jorge-Medina-Diaz/research-RAG/actions/workflows/ci.yml)
-![tests](https://img.shields.io/badge/tests-84-brightgreen)
+![tests](https://img.shields.io/badge/tests-122-brightgreen)
 ![agno](https://img.shields.io/badge/agno-2.8.6-blue)
 ![python](https://img.shields.io/badge/python-3.12-blue)
 ![license](https://img.shields.io/badge/license-MIT-lightgrey)
@@ -523,7 +523,14 @@ uv run rag epoca       estado. `avanzar` cierra la abierta
 uv run rag calibrar    --preparar / --comparar
 uv run rag holdout     --instalar / --probar / --anadir / --correr
 uv run rag sesiones    vuelca el tráfico real
-uv run rag test        84 tests. Sin red, sin claves, sin base de datos.
+uv run rag grafo       construye el grafo de artefactos y lo describe
+uv run rag comunidades detecta comunidades. --resumir gasta LLM
+uv run rag analogias   la cola cross-dominio. --minar propone
+uv run rag topologia   puentes, agujeros y deriva. Cero llamadas
+uv run rag propuestas  todo lo que espera tu firma
+uv run rag gepa        evolución de instrucciones. Propone; no aplica
+uv run rag jobs        --nocturno (gratis) · --mensual (gasta)
+uv run rag test        122 tests. Sin red, sin claves, sin base de datos.
 ```
 
 </details>
@@ -539,6 +546,7 @@ uv run rag test        84 tests. Sin red, sin claves, sin base de datos.
 | [02 · Estado del arte](docs/02-estado-del-arte.md) | Qué existe, qué se tomó, qué se descartó y por qué. Con referencias | el 00 |
 | [03 · Arquitectura](docs/03-arquitectura.md) | El detalle técnico, componente a componente | el 00 |
 | [04 · La medición](docs/04-medicion.md) | Spec, reglas, juez, épocas y estadística | el 00 |
+| **[06 · Fases 2, 3 y 4](docs/06-fases-2-3-4.md)** | Grafo, comunidades, analogías, topología, GEPA. **Construidas y apagadas**, con la medición de cada una | el 00 |
 | **[05 · Una traza](docs/05-una-traza.md)** | Una consulta real de punta a punta, generada por `rag traza` | poco |
 | [99 · Glosario](docs/99-glosario.md) | Cada término, con su definición general y qué significa aquí | nada |
 | [CLAUDE.md](CLAUDE.md) | Mapa del repo para agentes de código | el 03 |
@@ -552,7 +560,10 @@ uv run rag test        84 tests. Sin red, sin claves, sin base de datos.
 | | |
 |---|---|
 | `rag up` en limpio, sin claves | Postgres 17 + pgvector, preflight en verde |
-| Ingesta → índice → recuperación | 13 artefactos, HNSW y GIN creados a mano porque Agno no los crea |
+| Ingesta → índice → recuperación | 14 artefactos, HNSW y GIN creados a mano porque Agno no los crea |
+| Carril de grafo, medido | Encendido sube el recall de 0,85 a 0,89 y **baja `multi_hop` de 3/7 a 2/7**. El diff: 4 peor, 5 mejor, 1 neto, suelo de detección 6. **No se puede saber**, y el carril se queda apagado |
+| Comunidades | 3 sobre 14 artefactos, modularidad 0,350. Pesar las aristas por rareza del tema (IDF) la subió desde 0,240 y la cruzó por encima del umbral de significación |
+| Épocas, el aviso que faltaba | Medir contra una época **abierta** no está congelado, y el arnés no lo decía. Ahora avisa: me pasó en mi propio repo y el recall se movió al ingerir |
 | Fusión de carriles | Los dos vivos. En la [traza](docs/05-una-traza.md) hay fragmentos que entran sin ser primeros en ningún carril, por acuerdo entre los dos. **Con 60 fragmentos y 30 por carril esto no demuestra que el híbrido funcione** —cada carril ve la mitad del corpus—; demuestra que la fusión hace la aritmética que dice hacer |
 | Nivel completo contra el guion | El arnés procesa las 41 sin romperse. **Pasan 18 de 41.** De las 23 que fallan, 10 son de `fuera_de_alcance` —el guion responde siempre, así que fallar ahí es lo esperado— y **13 son de recuperación o generación, o sea fallos de verdad**: 6 `single_hop`, 6 `lexical_exact` y 1 `temporal`. Una versión anterior de esta fila decía «acierta las de recuperar», y no era cierto |
 | Reproducción a k=3 | Las 10 violaciones de R2 y las 13 de R4 se confirman al re-correrlas; ninguna era espuria |
@@ -563,7 +574,7 @@ uv run rag test        84 tests. Sin red, sin claves, sin base de datos.
 | Mover **una** palanca → comparar | comparable, y el informe **nombra** la palanca: `top_k 12 → 20` |
 | Mover **dos** palancas → comparar | **NO COMPARABLE**: el delta no se puede atribuir a ninguna |
 | `SELECT` al holdout desde Python arbitrario | **permission denied** |
-| Tests / ruff / diagramas / enlaces | 84 pasan / limpio / 29 de 29 mermaid parsean / 45 de 45 enlaces internos resuelven. Los cuatro, comprobados en CI |
+| Tests / ruff / diagramas / enlaces | 122 pasan / limpio / 31 de 31 mermaid parsean / 48 de 48 enlaces internos resuelven. Los cuatro, comprobados en CI |
 
 **No hecho, y es lo que decide si esto sirve:**
 
@@ -574,7 +585,15 @@ uv run rag test        84 tests. Sin red, sin claves, sin base de datos.
 - **σ no está medido de verdad.** El mecanismo da `0,0000` contra el guion, que
   es determinista por construcción. Valida la tubería y no dice nada del ruido
   real, que es varianza del modelo y del juez.
-- **El golden set son 41 probes sobre 13 artefactos**, y los trece son del propio
+- **El suelo primario está ROTO**: recall 0,83 frente a 0,85. Y roto por 0,0167
+  cuando una sola probe mueve 0,0185, o sea **por menos de lo que puede
+  distinguir el instrumento**. Es el argumento de la propia spec —una tasa no
+  es exigible a esta n— cumpliéndose sobre su suelo más importante. El arnés
+  lo dice al lado del número en vez de bajar la portería.
+- **Siete de las nueve piezas de las fases 2, 3 y 4 están apagadas.** Están
+  construidas y probadas; encenderlas depende de una medición que todavía no
+  las justifica. El detalle de cada una en [06](docs/06-fases-2-3-4.md).
+- **El golden set son 41 probes sobre 14 artefactos**, y los catorce son del propio
   desarrollo, no material de investigación real.
 - **Cero tráfico real**, así que el golden set es 100 % sintético. Consecuencia
   ineludible: **el bucle solo puede mover palancas de recuperación**; las de

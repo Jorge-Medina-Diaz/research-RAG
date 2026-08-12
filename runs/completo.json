@@ -1,7 +1,7 @@
 {
- "fecha": "2026-08-12T14:38:58.172808+00:00",
+ "fecha": "2026-08-12T15:53:39.559767+00:00",
  "identidad": {
-  "huella_config": "e5a02a35322e",
+  "huella_config": "34580671ac3a",
   "palancas": {
    "top_k": 12,
    "carriles": [
@@ -26,6 +26,15 @@
    "reranker": "none",
    "reranker_top_n": 12,
    "reescritura": "none",
+   "enrutado": "none",
+   "grafo_activo": false,
+   "grafo_alfa": 0.15,
+   "grafo_top_k": 10,
+   "grafo_semillas": 5,
+   "comunidades_en_respuesta": false,
+   "analogia_min": 0.25,
+   "analogia_max": 0.55,
+   "aprendizaje": false,
    "instrucciones": [
     "Responde solo con lo que aparezca en el contexto recuperado.",
     "Cita el identificador del artefacto de cada afirmación, así: [[art:mi-id]].",
@@ -54,16 +63,16 @@
   "epoca": 0,
   "huella_juez": "07db7994eee5",
   "nivel": "completo",
-  "corpus_sha": "8730bae6dcb6",
-  "n_artefactos": 13,
+  "corpus_sha": "020fe0950eea",
+  "n_artefactos": 14,
   "indice": "fragmento_5645f428a2b1"
  },
  "nivel": "completo",
  "resumen": {
-  "pasan": 18,
+  "pasan": 17,
   "total": 41,
   "no_medibles": 0,
-  "recall": 0.8518518518518519,
+  "recall": 0.8333333333333334,
   "p95_ms": 0
  },
  "reproducciones": {
@@ -92,6 +101,7 @@
    "P-29": true,
    "P-30": true,
    "P-31": true,
+   "P-34": true,
    "P-41": true
   }
  },
@@ -442,7 +452,7 @@
     "R2": 1
    },
    "motivos": {
-    "R2": "debía abstenerse y respondió: 'Segun la memoria, el punto relevante esta recogido en [[art:2026-08-12-plainto-tsquery-hace-and-y-devuelve-cero]].'"
+    "R2": "debía abstenerse y respondió: 'Segun la memoria, el punto relevante esta recogido en [[art:2026-08-12-el-carril-de-grafo-construido-y-sin-encender]].'"
    },
    "recall": null
   },
@@ -505,7 +515,7 @@
     "R2": 1
    },
    "motivos": {
-    "R2": "debía abstenerse y respondió: 'Segun la memoria, el punto relevante esta recogido en [[art:2026-08-12-agno-env-fingerprint-ciego-al-corpus]].'"
+    "R2": "debía abstenerse y respondió: 'Segun la memoria, el punto relevante esta recogido en [[art:2026-08-12-el-carril-de-grafo-construido-y-sin-encender]].'"
    },
    "recall": null
   },
@@ -774,14 +784,18 @@
     "R4",
     "R5"
    ],
-   "pass_rate": 1.0,
+   "pass_rate": 0.0,
    "n_puntuados": 1,
    "n_sin_puntuar": 0,
    "en_zona_de_aprendizaje": false,
-   "diagnostico": "ninguno",
-   "incumple": {},
-   "motivos": {},
-   "recall": 1.0
+   "diagnostico": "prompt",
+   "incumple": {
+    "R4": 1
+   },
+   "motivos": {
+    "R4": "literales que no están en los fragmentos: ['08', '2026']"
+   },
+   "recall": 0.5
   },
   {
    "id": "P-35",

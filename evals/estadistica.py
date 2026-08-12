@@ -13,6 +13,7 @@ import random
 from collections import Counter
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
+from typing import Any
 
 #: La línea roja del criterio transversal de la Fase 0.
 LINEA_ROJA = 0.08
@@ -231,20 +232,142 @@ def bootstrap_ic(
 
 
 # --------------------------------------------------------------------------- #
-# Lo que NO está aquí, y por qué
+# Barridos: cuando una sesión prueba MUCHAS configuraciones, no una
 # --------------------------------------------------------------------------- #
-# - benjamini_hochberg: controla el FDR entre muchas comparaciones. El protocolo
-#   es UNA palanca por ronda. Entra el día que una sesión barra >=12
-#   configuraciones de golpe.
 #
-# - cuped: reduce varianza con una covariable. Con n≈30 y resultados binarios,
-#   np.cov produce un theta CONFIADAMENTE equivocado, que es peor que no
-#   ajustar; y la evaluación pareada ya captura casi toda la reducción. Entra a
-#   partir de ~150 probes y con una métrica continua.
-#
-# - successive_halving / hyperband / ASHA: asignan presupuesto entre MUCHOS
-#   candidatos. Con uno por ronda no hay problema de asignación que resolver.
-#
-# Escribir por qué no están evita que alguien —yo, en tres meses— los añada
-# porque aparecen en el artículo, sin comprobar si su condición de entrada se
-# cumple.
+# Las tres funciones de abajo estuvieron deliberadamente ausentes, con su motivo
+# escrito, mientras el protocolo era «una palanca por ronda». Ahora existen, y
+# la nota de por qué NO se usaban se conserva convertida en su CONDICIÓN DE
+# ENTRADA: cada una comprueba la suya y se niega a devolver un número cuando no
+# se cumple. Esa negativa es el punto — una corrección estadística aplicada
+# fuera de su régimen no es conservadora, es confiadamente equivocada.
+
+
+def benjamini_hochberg(
+    pvalores: Sequence[float], *, fdr: float = 0.05
+) -> tuple[list[bool], float]:
+    """Controla la tasa de falsos descubrimientos entre varias comparaciones.
+
+    Devuelve `(rechazos, umbral_efectivo)`.
+
+    **Cuándo hace falta.** Si pruebas doce configuraciones y te quedas con la
+    que da p < 0,05, la probabilidad de que al menos una parezca buena por azar
+    es `1 − 0,95¹² ≈ 46 %`. Bonferroni lo arregla y pasa de frenada: divide α
+    entre el número de pruebas y con doce ya no detecta nada real. BH controla
+    la *fracción esperada de falsos* entre los rechazados, que es la magnitud
+    que de verdad importa cuando vas a quedarte con varios.
+
+    **Cuándo NO.** Con una sola comparación devuelve exactamente lo mismo que no
+    corregir, y aplicarlo entonces solo añade una capa que hay que explicar.
+    """
+    ps = list(pvalores)
+    n = len(ps)
+    if n == 0:
+        return [], 0.0
+    if n == 1:
+        return [ps[0] <= fdr], fdr
+
+    orden = sorted(range(n), key=lambda i: ps[i])
+    umbral = 0.0
+    corte = -1
+    for rango, i in enumerate(orden, start=1):
+        if ps[i] <= (rango / n) * fdr:
+            corte = rango
+            umbral = (rango / n) * fdr
+    rechazos = [False] * n
+    for rango, i in enumerate(orden, start=1):
+        if rango <= corte:
+            rechazos[i] = True
+    return rechazos, umbral
+
+
+def cuped(
+    y: Sequence[float], x: Sequence[float], *, minimo_n: int = 150
+) -> tuple[list[float], float, str]:
+    """Reduce varianza usando una covariable previa al experimento.
+
+    Devuelve `(y_ajustada, theta, motivo)`. Si la condición de entrada no se
+    cumple, devuelve `y` sin tocar, `theta = 0` y el motivo en texto.
+
+    **La idea.** Si tienes una medida *anterior* al cambio que correlaciona con
+    la de después —el resultado de la misma probe en la ronda anterior— puedes
+    restar la parte predecible y quedarte con el efecto. `y' = y − θ(x − x̄)`,
+    con θ = cov(x,y)/var(x). En los A/B de Bing esto reduce la varianza ~50 %.
+
+    **Por qué la condición de entrada, y por qué es una negativa y no un aviso.**
+    θ es él mismo una estimación. Con n pequeño y resultados binarios, cov(x,y)
+    tiene tanto error que θ sale *confiadamente equivocado*, y ajustar con un θ
+    malo **aumenta** la varianza en vez de reducirla — mientras el número
+    resultante parece más limpio. Es peor que no ajustar, porque no se nota.
+    Con 41 probes binarias esto no entra, y por eso devuelve `y` intacta.
+    """
+    n = len(y)
+    if n != len(x):
+        raise ValueError("y y x tienen que tener el mismo tamaño")
+    if n < minimo_n:
+        return list(y), 0.0, (
+            f"n={n} < {minimo_n}: theta saldría confiadamente equivocado y "
+            "ajustar con él aumentaría la varianza. Sin ajuste."
+        )
+    binaria = all(v in (0, 1, 0.0, 1.0) for v in y)
+    if binaria:
+        return list(y), 0.0, (
+            "métrica binaria: la evaluación pareada (McNemar) ya captura casi "
+            "toda la reducción de varianza que CUPED daría. Sin ajuste."
+        )
+
+    mx = sum(x) / n
+    my = sum(y) / n
+    var_x = sum((xi - mx) ** 2 for xi in x) / (n - 1)
+    if var_x <= 0:
+        return list(y), 0.0, "la covariable no varía: theta indefinido. Sin ajuste."
+    cov = sum((xi - mx) * (yi - my) for xi, yi in zip(x, y, strict=True)) / (n - 1)
+    theta = cov / var_x
+    return [yi - theta * (xi - mx) for xi, yi in zip(x, y, strict=True)], theta, "aplicado"
+
+
+def successive_halving(
+    candidatos: Sequence[Any],
+    evaluar,
+    *,
+    presupuesto: int,
+    factor: int = 3,
+) -> list[tuple[Any, float]]:
+    """Reparte un presupuesto de evaluaciones entre muchos candidatos.
+
+    `evaluar(candidato, n)` recibe cuántas probes gastar y devuelve una nota.
+    Se empieza dando poco a todos y en cada ronda sobrevive `1/factor` de los
+    candidatos con el doble de presupuesto. Devuelve los supervivientes
+    ordenados.
+
+    **Cuándo hace falta.** Cuando quieres probar veinte configuraciones y no
+    tienes presupuesto para correr el golden set entero veinte veces. Gastar
+    todo en todos es el peor reparto posible: la mitad son malas y se ven malas
+    con tres probes.
+
+    **Su peligro, que es real y aquí muerde.** Descarta pronto usando
+    estimaciones ruidosas, así que puede tirar la buena por mala suerte. Con
+    poca n eso pasa mucho: por eso la primera ronda nunca baja de
+    `vuelcos_minimos_detectables()` probes por candidato, que es el suelo por
+    debajo del cual la comparación no distingue nada y descartar sería sortear.
+    """
+    vivos = list(candidatos)
+    if not vivos:
+        return []
+
+    suelo = vuelcos_minimos_detectables()
+    rondas = max(1, math.floor(math.log(len(vivos), factor)) + 1) if len(vivos) > 1 else 1
+    por_ronda = max(suelo, presupuesto // (rondas * max(1, len(vivos))))
+
+    historia: list[tuple[Any, float]] = []
+    n = por_ronda
+    while len(vivos) > 1:
+        notas = [(c, float(evaluar(c, n))) for c in vivos]
+        notas.sort(key=lambda t: -t[1])
+        historia = notas
+        quedan = max(1, len(vivos) // factor)
+        vivos = [c for c, _ in notas[:quedan]]
+        n *= factor
+    if len(vivos) == 1 and not historia:
+        historia = [(vivos[0], float(evaluar(vivos[0], n)))]
+    return historia

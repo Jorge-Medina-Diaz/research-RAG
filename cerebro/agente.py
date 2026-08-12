@@ -15,6 +15,8 @@ Verificado contra agno 2.8.6.
 
 from __future__ import annotations
 
+from typing import Any
+
 from agno.agent import Agent
 from agno.db.postgres import PostgresDb
 from agno.knowledge.knowledge import Knowledge
@@ -134,7 +136,15 @@ def construir_agente(p: Palancas = PALANCAS, *, epoca: int | None = None) -> Age
     `epoca` solo se pasa al MEDIR. Al servir es None y el agente ve todo el
     corpus: congelamos la vista para medir, no el corpus para servir.
     """
+    from cerebro.aprendizaje import construir_aprendizaje
     from cerebro.recuperador import construir_recuperador
+
+    extra: dict[str, Any] = {}
+    # El learning solo al SERVIR, nunca al medir. `run_rollouts` ya corta sus
+    # escrituras, pero pasarlo con `epoca` puesta sería pedirle a Agno que
+    # proteja una medición que nosotros mismos hemos contaminado antes.
+    if epoca is None and (lm := construir_aprendizaje(p)) is not None:
+        extra["learning"] = lm
 
     return Agent(
         name="Cerebro",
@@ -147,6 +157,7 @@ def construir_agente(p: Palancas = PALANCAS, *, epoca: int | None = None) -> Age
         instructions=list(p.instrucciones),
         markdown=False,  # empieza por el dato
         store_events=True,  # sin esto las trazas no quedan en la base
+        **extra,
     )
 
 
