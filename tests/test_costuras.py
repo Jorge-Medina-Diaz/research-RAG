@@ -20,6 +20,7 @@ que ocurrió de verdad, y lo dicen.
 
 from __future__ import annotations
 
+import os
 from dataclasses import replace
 
 import pytest
@@ -641,3 +642,45 @@ def test_no_hay_try_desnudo_sobre_trabajo_de_base_de_datos():
     ).read_text(encoding="utf-8")
     i = src.index("def _contar_fragmentos")
     assert "punto_de_guardado" in src[i : i + 1400]
+
+
+def test_verificar_acepta_todo_proveedor_de_embeddings_que_el_sistema_conoce():
+    """`rag verificar` no lleva su propia lista de proveedores: la pregunta.
+
+    La llevaba, y al añadir `local` —el modelo de frases que corre en la
+    máquina— el comprobador de coherencia se quedó diciendo «'local' no
+    reconocido» sobre la configuración con la que el resto del repositorio
+    llevaba días midiendo. La comprobación de arranque era la pieza sin
+    comprobar.
+
+    Se comprueba por CONDUCTA, no leyendo el fuente: se inventa un proveedor,
+    se mete en `MODELOS`, y se exige que el verificador no lo rechace. Un test
+    sobre el texto del fichero pasaría con una lista duplicada escrita de otra
+    forma.
+    """
+    import cerebro.embeddings as emb
+    import scripts.verificar as v
+
+    inventado = "un-proveedor-que-no-existia-al-escribir-verificar"
+    emb.MODELOS[inventado] = (None, 8)
+    fallos: list[str] = []
+    ok_linea, ok_env = v.linea, os.environ.get("EMBEDDINGS_PROVIDER")
+    try:
+        v.linea = lambda estado, txt, det=None: (
+            fallos.append(txt) if estado == v.FALLO else None
+        )
+        os.environ["EMBEDDINGS_PROVIDER"] = inventado
+        v.comprobar_proveedores()
+    finally:
+        v.linea = ok_linea
+        del emb.MODELOS[inventado]
+        if ok_env is None:
+            os.environ.pop("EMBEDDINGS_PROVIDER", None)
+        else:
+            os.environ["EMBEDDINGS_PROVIDER"] = ok_env
+
+    assert not fallos, (
+        f"verificar rechazó un proveedor que `cerebro.embeddings` sí conoce: "
+        f"{fallos}. La lista está duplicada otra vez, y el comprobador de "
+        "coherencia vuelve a ser la pieza incoherente."
+    )

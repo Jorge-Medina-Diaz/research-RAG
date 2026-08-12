@@ -87,7 +87,8 @@ runs/                 el archivo. Nunca se borra.
 
 ## Cinco cosas que hay que saber antes de tocar nada
 
-**1 · Agno 2.8.6 tiene cuatro defectos verificados que este repo esquiva.**
+**1 · Agno 2.8.6 tiene tres defectos verificados en `pgvector.py` que este repo
+esquiva.** (El cuarto, `env_fingerprint`, va aparte en el punto 2.)
 `PgVector.create()` no crea el HNSW ni el GIN —solo `optimize()`, al que nadie
 llama—; `_create_gin_index` interpola el idioma sin comillas y falla con
 `spanish`; y `hybrid_search` tiene el `@@` comentado, así que escanea la tabla
@@ -136,13 +137,21 @@ humano y está denegado al agente.
 
   | | líneas | presupuesto |
   |---|---|---|
-  | `evals/` — bucle y arnés | 1.517 | ≤ 1.000 · **excedido** |
-  | `cerebro/` | 4.006 | ≤ 2.000 · **excedido** |
-  | `ingesta/` | 740 | ≤ 800 |
-  | `scripts/` + `tareas.py` | 2.527 | ≤ 1.500 · **excedido** |
-  | **total sin tests** | **8.790** | |
+  | `evals/` — bucle y arnés | 2.347 | ≤ 1.000 · **excedido** |
+  | `cerebro/` | 4.494 | ≤ 2.000 · **excedido** |
+  | `ingesta/` | 873 | ≤ 800 · **excedido** |
+  | `scripts/` + `tareas.py` | 3.081 | ≤ 1.500 · **excedido** |
+  | **total sin tests** | **10.795** | |
+  | tests | 1.762 | |
 
-  Tres de cuatro excedidos, y el de `cerebro/` al doble. La causa es concreta y
+  Estas cifras se miden, no se recuerdan:
+
+  ```bash
+  uv run python -c "import pathlib;print(sum(len(p.read_text(encoding='utf-8').splitlines()) for d in ('evals','cerebro','ingesta','scripts') for p in pathlib.Path(d).rglob('*.py') if '__pycache__' not in str(p)))"
+  ```
+
+
+  **Los cuatro excedidos**, y el de `cerebro/` al doble. La causa es concreta y
   está fechada: las fases 2, 3 y 4 —grafo, comunidades, analogías, topología,
   reescritura, enrutado, aprendizaje— son 2.100 líneas que el plan original
   dejaba **diseñadas y sin construir**. Construirlas fue una decisión explícita.

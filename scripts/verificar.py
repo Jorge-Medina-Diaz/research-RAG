@@ -104,17 +104,28 @@ def comprobar_proveedores() -> None:
     """El sistema arranca entero sin claves. Esto informa de en qué modo va a correr,
     y avisa del único caso peligroso: pedir un proveedor real sin su clave, que en
     CVs-SaaS degradaba a determinista con un warning que nadie leía."""
-    for nombre, var_proveedor, var_clave, valor_real in (
-        ("embeddings", "EMBEDDINGS_PROVIDER", "OPENAI_API_KEY", "openai"),
-        ("llm", "LLM_PROVIDER", "ANTHROPIC_API_KEY", "anthropic"),
+    # Los proveedores de embeddings se PREGUNTAN a `cerebro.embeddings`, no se
+    # listan aquí. Estaban listados, y añadir `local` —el modelo de frases que
+    # corre en la máquina, sin clave— dejó a `rag verificar` diciendo «'local' no
+    # reconocido» sobre la configuración con la que el resto del repo llevaba
+    # días midiendo. El comprobador de coherencia era la pieza incoherente.
+    from cerebro.embeddings import MODELOS
+
+    # (nombre, variable, variable de clave, proveedores que la NECESITAN)
+    for nombre, var_proveedor, var_clave, validos, con_clave in (
+        ("embeddings", "EMBEDDINGS_PROVIDER", "OPENAI_API_KEY",
+         tuple(MODELOS), ("openai",)),
+        ("llm", "LLM_PROVIDER", "ANTHROPIC_API_KEY",
+         ("mock", "anthropic"), ("anthropic",)),
     ):
         proveedor = (os.environ.get(var_proveedor) or "mock").strip().lower()
         clave = (os.environ.get(var_clave) or "").strip()
-        if proveedor == "mock":
+        if proveedor not in validos:
+            linea(FALLO, f"{nombre}: {var_proveedor}={proveedor!r} no reconocido",
+                  f"valores válidos: {' | '.join(validos)}")
+        elif proveedor == "mock":
             linea(OK, f"{nombre}: mock", "determinista, sin coste, sin significado semántico")
-        elif proveedor == valor_real and clave:
-            linea(OK, f"{nombre}: {proveedor}")
-        elif proveedor == valor_real:
+        elif proveedor in con_clave and not clave:
             linea(
                 FALLO,
                 f"{nombre}: {proveedor} sin {var_clave}",
@@ -122,9 +133,11 @@ def comprobar_proveedores() -> None:
                 "el mismo índice, y mezclarlos hace que las distancias dejen de "
                 f"significar lo mismo. Pon la clave o pon {var_proveedor}=mock.",
             )
+        elif proveedor in con_clave:
+            linea(OK, f"{nombre}: {proveedor}")
         else:
-            linea(FALLO, f"{nombre}: {var_proveedor}={proveedor!r} no reconocido",
-                  f"valores válidos: mock | {valor_real}")
+            linea(OK, f"{nombre}: {proveedor}",
+                  "corre en esta máquina, sin clave y sin coste por consulta")
 
 
 def main() -> int:

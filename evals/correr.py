@@ -70,6 +70,11 @@ from evals.estadistica import (  # noqa: E402
     vuelcos_minimos_detectables,
 )
 
+#: El rango máximo del primer artefacto esperado para que una probe PASE en
+#: nivel 0. Ver el comentario largo en `nivel0`: es un número cableado que
+#: define qué significa «pasar», y está pendiente de firma.
+UMBRAL_RANGO = 3
+
 
 def hay_llm() -> bool:
     return (os.getenv("LLM_PROVIDER") or "mock").strip().lower() != "mock"
@@ -325,7 +330,22 @@ def nivel0(
             "recall": recall, "rango_primer_esperado": rango,
             "ms": round(ms), "recuperados": recuperados[:5], "esperados": quiero,
             "diagnostico": (
-                "ninguno" if recall == 1.0 and (rango or 99) <= 3
+                # OJO con el 3, y está documentado en `cerebro/SPEC-PENDIENTE.md`.
+                #
+                # Es el umbral de rango que separa «pasa» de `ordenacion`, está
+                # CABLEADO, no es una palanca, no aparece en la spec, y no se
+                # movió cuando `top_k` pasó de 12 a 20 ni cuando el corpus
+                # creció 3,7×. «En los 3 primeros de 12» y «en los 3 primeros de
+                # 20» son exigencias distintas, y hoy se aplica la segunda con
+                # un número elegido para la primera.
+                #
+                # Medido: con ≤3 pasan 67/94 (71 %); con ≤8, 76/94 (81 %). Y el
+                # 84 % tiene recall 1,0, o sea que el artefacto SÍ llegó. El
+                # umbral está descartando doce puntos de «llegó» como fallo.
+                #
+                # No se cambia aquí: cambiarlo cambia qué significa «pasar», y
+                # eso es una decisión de spec, no un ajuste. Va a firma.
+                "ninguno" if recall == 1.0 and (rango or 99) <= UMBRAL_RANGO
                 else "cobertura" if recall < 1.0
                 else "ordenacion"
             ),
@@ -476,6 +496,15 @@ def informe(
     print(f"\n  pasan {pasan}/{n}"
           + (f"   recall@top_k {recall:.2f}" if recall is not None else "")
           + (f"   p95 {p95/1000:.1f}s" if es_nivel0 else ""))
+
+    if es_nivel0 and medidas:
+        llegaron = sum(1 for f in medidas if (f.get("recall") or 0) == 1.0)
+        if llegaron > pasan:
+            print(f"  de esas, {llegaron} tienen recall 1,0 —el artefacto SÍ llegó— "
+                  f"y solo {pasan} pasan.")
+            print(f"  la diferencia son {llegaron - pasan} probes donde llegó por "
+                  f"debajo del puesto {UMBRAL_RANGO}. Ese umbral está cableado y "
+                  "pendiente de firma (cerebro/SPEC-PENDIENTE.md).")
 
     if no_medibles:
         cats = Counter(f["categoria"] for f in no_medibles)
