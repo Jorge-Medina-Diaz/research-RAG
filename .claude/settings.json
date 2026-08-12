@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(uv:*)",
+      "Bash(docker compose:*)",
+      "Bash(git status)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Read(//**)",
+      "Edit(cerebro/config.py)",
+      "Write(runs/**)"
+    ],
+    "deny": [
+      "Read(.env)",
+      "Read(.env.owner)",
+
+      "Edit(cerebro/spec.md)",
+      "Write(cerebro/spec.md)",
+      "Edit(cerebro/juez.py)",
+      "Write(cerebro/juez.py)",
+      "Edit(cerebro/scorer.py)",
+      "Write(cerebro/scorer.py)",
+      "Edit(cerebro/reglas.py)",
+      "Write(cerebro/reglas.py)",
+      "Edit(evals/estadistica.py)",
+      "Write(evals/estadistica.py)",
+
+      "Edit(artefactos/**)",
+      "Write(artefactos/**)",
+
+      "Edit(evals/probes.yaml)",
+      "Write(evals/probes.yaml)",
+
+      "Edit(scripts/epoca.py)",
+      "Write(scripts/epoca.py)",
+      "Edit(scripts/holdout.py)",
+      "Write(scripts/holdout.py)"
+    ]
+  }
+}

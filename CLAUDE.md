@@ -1,0 +1,105 @@
+# research-RAG — mapa del repo
+
+Memoria viva de I+D sobre Agno 2.8.6, con un bucle de auto-mejora que converge a
+`cerebro/spec.md`. Un usuario, una máquina, Postgres local.
+
+## El único comando
+
+```bash
+uv run rag up          # base de datos + comprobación. Funciona SIN NINGUNA CLAVE.
+uv run rag             # la lista de tareas
+```
+
+No hay Makefile: en Windows no hay `make`. `rag` es un entry point de packaging.
+
+## Dónde está cada cosa
+
+```
+cerebro/
+  spec.md         LA FUNCIÓN OBJETIVO. Denegada a la edición. Su sha entra en la
+                  huella del juez: tocarla invalida toda medición anterior.
+  config.py       PALANCAS + gradas + huellas. EL ÚNICO FICHERO QUE EL BUCLE EDITA.
+  agente.py       traduce palancas a objetos de Agno
+  recuperador.py  dos carriles + RRF + captura de traza. El seam de lectura.
+  reglas.py       R1, R2, R4, R7, R8 por código. Sin LLM. Denegado.
+  juez.py         R3, R5, R6 por LLM. Veredicto por regla + diagnóstico. Denegado.
+  scorer.py       el juez como Scorer de Agno, con digest(). Denegado.
+  almacen.py      esquema propio, épocas, y los índices que Agno no crea
+  embeddings.py   mock determinista + openai. El mock no es un juguete.
+  fusion.py       RRF k=60, extraído de CVs-SaaS
+
+ingesta/
+  contrato.py     el frontmatter, en pydantic. Cinco campos obligatorios.
+  pipeline.py     bandeja -> corpus. Síncrono. La carpeta ES la DLQ.
+  trocear.py      ConMetadatos (siempre) + ContextoSituacional (grada 3, apagado)
+
+evals/
+  probes.yaml     el golden set. Denegado a la edición.
+  entorno.py      Environment de Agno + ciclo de vida de las probes
+  correr.py       el arnés. Nivel 0 sin claves, completo con ellas.
+  estadistica.py  ruido, McNemar, Krippendorff, bootstrap. Denegado.
+
+artefactos/entrada/   la bandeja. Suelta .md aquí.
+artefactos/corpus/    lo ingerido. ES el corpus. Denegado.
+runs/                 el archivo. Nunca se borra.
+```
+
+## Cinco cosas que hay que saber antes de tocar nada
+
+**1 · Agno 2.8.6 tiene tres defectos verificados que este repo esquiva.**
+`PgVector.create()` no crea el HNSW ni el GIN —solo `optimize()`, al que nadie
+llama—; `_create_gin_index` interpola el idioma sin comillas y falla con
+`spanish`; y `hybrid_search` tiene el `@@` comentado, así que escanea la tabla
+entera y fusiona con una suma lineal de escalas incomparables. Por eso los
+índices se crean en `almacen.crear_indices()` y la fusión es RRF propio. Si
+subes de versión, comprueba los tres.
+
+**2 · El `env_fingerprint` de Agno es ciego al corpus y a la recuperación.**
+Hashea `instructions` pero no `knowledge` ni `top_k` ni los artefactos. Para un
+RAG se equivoca en las dos direcciones. Por eso NO se usa `diff()` de Agno: la
+identidad son las tres huellas de `correr.identidad()`.
+
+**3 · El nombre de la tabla deriva del hash de la configuración.** Tocar una
+palanca de grada 3 apunta a una tabla que aún no existe, así que servir contra
+un índice construido con otra configuración es imposible por construcción. Y la
+tabla anterior sigue viva: eso es el rollback.
+
+**4 · Nada se borra. Se invalida.** Un artefacto superado cierra su ventana y
+sus fragmentos pasan a `vigente: false`; siguen en la tabla porque una probe
+atada a una época anterior tiene que poder explicar por qué decía lo que decía.
+`escritura` no tiene `DELETE` salvo en `vaciar_indice()`, que solo llama
+`ingerir --recrear`.
+
+**5 · Las épocas.** Servir no filtra; medir filtra a la última época cerrada.
+Eso es lo que hace medible un corpus que crece. Avanzar la época es un acto
+humano y está denegado al agente.
+
+## Convenciones
+
+- Python 3.12, `uv`, ruff, pytest. Sin numpy salvo en extras.
+- Español en el dominio (palancas, columnas, mensajes), inglés en las APIs de
+  Agno que no elegimos.
+- **Cada test lleva por nombre la afirmación que fija.** La suite crece por un
+  motivo concreto, nunca persiguiendo cobertura.
+- Un `try/except` alrededor de trabajo de base de datos **no es** manejo de
+  errores: deja la transacción abortada y convierte el COMMIT en un ROLLBACK
+  silencioso. Usa `almacen.punto_de_guardado()`.
+- Presupuesto de tamaño: **por debajo de 1.500 LOC**. `atlas-rai` resuelve el
+  bucle entero en 966. Todo lo que pase de ahí es un defecto, no una
+  funcionalidad.
+
+## Lo que NO se automatiza, nunca
+
+Migraciones destructivas · borrado de conocimiento · el modelo de embeddings ·
+los suelos de la spec · la época de medición · el holdout · **el juez y el
+propio bucle**.
+
+Los tres primeros están en el deny-list. El juez está además impedido: su
+`digest()` entra en la huella, y cambiarlo hace ilegal comparar con lo medido
+antes. El holdout vive tras un rol de Postgres, porque un deny-list de ficheros
+lo derrota cualquier `uv run python -c`.
+
+Y una restricción de método, no de permisos: **las palancas de generación
+—`instrucciones`— el bucle las propone y las firmas tú**, hasta que haya ≥40
+probes minadas de tráfico real. Un golden set sintético no ordena arquitecturas
+de generación.

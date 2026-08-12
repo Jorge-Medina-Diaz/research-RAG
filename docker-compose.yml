@@ -1,0 +1,32 @@
+services:
+  db:
+    # pgvector a pelo, sin imagen propia. El mismo motor guarda los fragmentos
+    # del corpus, las sesiones de uso, las trazas de recuperación y el archivo
+    # del bucle. Un solo sitio que mirar, y un solo sumidero de métricas.
+    #
+    # Sin Apache AGE, a propósito: en CVs-SaaS costó una imagen compilada de
+    # 3 min, cuatro navajas documentadas y un SET-tras-MERGE descartado en
+    # silencio que dejó el modelo bi-temporal decorativo. El grafo, si llega,
+    # son dos tablas y igraph en proceso.
+    image: pgvector/pgvector:pg17
+    container_name: research-rag-db
+    environment:
+      POSTGRES_USER: ai
+      POSTGRES_PASSWORD: ai
+      POSTGRES_DB: ai
+    ports:
+      # 5533 y no 5432 ni 5532: no choca con un Postgres local ni con atlas-rai.
+      - '5533:5432'
+    volumes:
+      - research-rag-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      # `make up` no sigue hasta que esto responde: sin healthcheck la ingesta
+      # arranca contra una base que aún no acepta conexiones y falla en frío.
+      test: ['CMD-SHELL', 'pg_isready -U ai -d ai']
+      interval: 2s
+      timeout: 5s
+      retries: 30
+    restart: unless-stopped
+
+volumes:
+  research-rag-pgdata:
