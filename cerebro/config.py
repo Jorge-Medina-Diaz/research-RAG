@@ -98,7 +98,7 @@ class Palancas:
 
     #: Cuántos fragmentos ve el modelo. En Agno es Knowledge.max_results,
     #: NO un parámetro del Agent (error común y verificado).
-    top_k: int = 12
+    top_k: int = 20
 
     #: Carriles activos. En v1 hay dos; el registro admite más sin tocar nada.
     carriles: tuple[str, ...] = ("denso", "lexico")

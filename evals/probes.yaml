@@ -496,3 +496,920 @@ probes:
       Da la fecha del artefacto, no la de hoy, y no inventa un orden si varios
       comparten fecha: en ese caso lo dice.
     reglas: [R1, R3, R4, R6]
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # P-42 … P-121 · el lote sobre CORPUS AJENO.
+  #
+  # Por qué existe este lote, y es una predicción falsable, no una intuición.
+  #
+  # El estudio de mutación (`uv run rag mutar`) midió que el arnés no detecta
+  # NINGUNA degradación graduada: ni tirar el 70 % de los resultados, ni
+  # recortar tres cuartas partes. Y midió también que multiplicar el CORPUS por
+  # 3,7 no cambia eso en nada.
+  #
+  # La aritmética dice por qué y qué lo arreglaría. El suelo de McNemar son 6
+  # vuelcos netos SEA CUAL SEA la n; pero una degradación fraccional dada
+  # produce vuelcos proporcionales a la n. Con 27 probes medibles, tirar el 70 %
+  # daba 2-4 vuelcos. Con ~95 medibles deberían ser 7-14: cruza el suelo.
+  #
+  # LA PREDICCIÓN, escrita antes de correr nada: con este lote, el umbral de
+  # detección debe bajar de «nunca» a la franja del 30-50 %. Si NO baja, el
+  # problema no es el tamaño del conjunto y hay algo más roto — y eso sería un
+  # hallazgo mayor que el propio lote.
+  #
+  # Y una distinción que no hay que confundir, porque es el error que este
+  # repositorio persigue: esto arregla la RESOLUCIÓN, no la VALIDEZ. Las probes
+  # siguen siendo sintéticas, así que siguen sin poder ordenar arquitecturas de
+  # generación. Eso solo lo arregla el tráfico real.
+  #
+  # Lo que sí cambia respecto a las 41 primeras: **estas preguntan por material
+  # que el autor no escribió**. Las 41 originales preguntaban por artefactos
+  # suyos, así que su respuesta ya la sabía y medían su memoria tanto como la
+  # recuperación. Estas salen de los docstrings de Agno 2.8.6.
+  # ══════════════════════════════════════════════════════════════════════════
+
+  # ---- single_hop · un artefacto ajeno, un dato ----
+
+  - id: P-42
+    categoria: single_hop
+    clase: dependiente
+    consulta: ¿Por qué el motor de rollouts es privado y solo asíncrono?
+    espera: >-
+      Privado significa async-only y que la interfaz puede cambiar sin
+      deprecación; la puerta síncrona es `run_rollouts`.
+    reglas: [R1, R3]
+    requiere: [2026-08-12-agno-environments-engine]
+
+  - id: P-43
+    categoria: single_hop
+    clase: dependiente
+    consulta: ¿Por qué no hay una puerta de una sola ejecución en el motor de rollouts?
+    espera: >-
+      Porque `Agent.run` ya lo es, y puntuar una sola ejecución es
+      `scorer.score(agent.run(x), expected)`.
+    reglas: [R1, R3]
+    requiere: [2026-08-12-agno-environments-engine]
+
+  - id: P-44
+    categoria: single_hop
+    clase: dependiente
+    consulta: ¿Qué exige el servidor de autorización incorporado antes de dejar entrar a nadie?
+    espera: >-
+      El secreto de conexión del que despliega, en una página de login y
+      consentimiento, sobre HTTPS. El endpoint nunca queda abierto.
+    reglas: [R1, R3]
+    requiere: [2026-08-12-agno-os-mcp-auth-builtin]
+
+  - id: P-45
+    categoria: single_hop
+    clase: dependiente
+    consulta: ¿Para qué sirve el sistema de ficheros de agentes y qué hay debajo?
+    espera: >-
+      Para las notas durables del propio agente —decisiones con su razonamiento,
+      documentos vivos, estado de trabajo—, sobre un backend `BaseFS`
+      enchufable, base de datos por defecto.
+    reglas: [R1, R3]
+    requiere: [2026-08-12-agno-fs-fs]
+
+  - id: P-46
+    categoria: single_hop
+    clase: dependiente
+    consulta: ¿Qué dos tareas de mantenimiento de memoria hace el Curator?
+    espera: Poda de memorias viejas y deduplicación de duplicados exactos o casi exactos.
+    reglas: [R1, R3]
+    requiere: [2026-08-12-agno-learn-curate]
+
+  - id: P-47
+    categoria: single_hop
+    clase: dependiente
+    consulta: ¿Por qué el adaptador de ClickHouse es solo para trazas?
+    espera: >-
+      Porque es un almacén columnar OLAP sin actualizaciones por fila ni
+      garantías transaccionales, así que no sirve para sesiones, memorias ni
+      configuraciones. Hay que emparejarlo con un row-store.
+    reglas: [R1, R3]
+    requiere: [2026-08-12-agno-db-clickhouse-clickhouse]
+
+  - id: P-48
+    categoria: single_hop
+    clase: dependiente
+    consulta: ¿Qué hace el convertidor genérico de filtros y en qué se distingue del de PgVector?
+    espera: >-
+      Convierte `FilterExpr` serializados a predicados nativos sobre COLUMNAS
+      con nombre; el de PgVector opera sobre metadatos JSONB.
+    reglas: [R1, R3]
+    requiere: [2026-08-12-agno-db-filter-converter]
+
+  - id: P-49
+    categoria: single_hop
+    clase: dependiente
+    consulta: ¿Cómo se aísla por usuario en las rutas de AgentOS, y qué se dejó de hacer?
+    espera: >-
+      El framework ya NO envuelve la base de datos en un adaptador: cada
+      endpoint pasa `user_id` explícitamente. Menos piezas móviles a cambio de
+      una convención por endpoint.
+    reglas: [R1, R3]
+    requiere: [2026-08-12-agno-os-middleware-user-scope]
+
+  - id: P-50
+    categoria: single_hop
+    clase: dependiente
+    consulta: ¿Por qué el exportador de SFT no emite ni herramientas ni pesos de pérdida?
+    espera: >-
+      Para que el fichero sea portable POR OMISIÓN y no por traducción: son los
+      dos ejes en los que los consumidores divergen.
+    reglas: [R1, R3]
+    requiere: [2026-08-12-agno-environments-exporters-sft]
+
+  - id: P-51
+    categoria: single_hop
+    clase: dependiente
+    consulta: ¿Qué pasa si añado una clave extra al JSONL de exportación?
+    espera: >-
+      El consumidor más estricto rechaza el fichero ENTERO ante cualquier clave
+      desconocida —igualdad estricta de conjuntos, no descarta la clave—, así
+      que una clave de más rompe todos los consumidores a la vez.
+    reglas: [R1, R3]
+    requiere: [2026-08-12-agno-environments-exporters-sft]
+
+  - id: P-52
+    categoria: single_hop
+    clase: dependiente
+    consulta: ¿Por qué los resultados de las herramientas MCP van recortados por defecto?
+    espera: >-
+      Porque se inyectan directamente en la ventana de contexto del modelo
+      frontal, así que el modo por defecto lleva la respuesta y unos pocos
+      identificadores en vez de la transcripción completa.
+    reglas: [R1, R3]
+    requiere: [2026-08-12-agno-os-mcp-results]
+
+  - id: P-53
+    categoria: single_hop
+    clase: dependiente
+    consulta: ¿Por qué nunca se usa la serialización cruda de dataclass en los resultados MCP?
+    espera: >-
+      Porque vuelca el historial interno de mensajes —incluido el system
+      prompt— y revienta con medios binarios.
+    reglas: [R1, R3]
+    requiere: [2026-08-12-agno-os-mcp-results]
+
+  - id: P-54
+    categoria: single_hop
+    clase: dependiente
+    consulta: ¿Qué cambió en google-genai 2.9.0 que obligó a una capa de compatibilidad?
+    espera: >-
+      Los tipos de delta de streaming se movieron del submódulo `step_delta`
+      —llamados `Delta<X>`— al espacio de nombres `interactions`, renombrados a
+      `<X>Delta`.
+    reglas: [R1, R3]
+    requiere: [2026-08-12-agno-utils-models-genai-compat]
+
+  - id: P-55
+    categoria: single_hop
+    clase: dependiente
+    consulta: ¿Qué NO reporta la herramienta de operaciones de AgentOS, y por qué?
+    espera: >-
+      El coste: agno solo registra el que devuelve el proveedor, casi ninguno lo
+      devuelve, y no se agrega al resumen diario de métricas.
+    reglas: [R1, R3]
+    requiere: [2026-08-12-agno-tools-agentos]
+
+  - id: P-56
+    categoria: single_hop
+    clase: dependiente
+    consulta: ¿Qué dos métodos tiene que implementar toda subclase de proveedor de contexto?
+    espera: >-
+      `query`/`aquery`, que da acceso en lenguaje natural y devuelve un
+      `Answer`, y `status`/`astatus`, que dice si la fuente es alcanzable.
+    reglas: [R1, R3]
+    requiere: [2026-08-12-agno-context-provider]
+
+  - id: P-57
+    categoria: single_hop
+    clase: dependiente
+    consulta: ¿Qué registra el almacén de log de decisiones, y para qué sirve?
+    espera: >-
+      Decisiones con su razonamiento, contexto y resultado. Sirve para auditar,
+      depurar y aprender de decisiones pasadas.
+    reglas: [R1, R3]
+    requiere: [2026-08-12-agno-learn-stores-decision-log]
+
+  - id: P-58
+    categoria: single_hop
+    clase: dependiente
+    consulta: ¿Por qué el payload de identidad de modelo se construye en un solo sitio?
+    espera: >-
+      Porque el juez es parte de la regla de puntuación y la huella de política
+      identifica al modelo bajo prueba: las dos necesitan la misma respuesta a
+      «¿qué modelo es este?».
+    reglas: [R1, R3]
+    requiere: [2026-08-12-agno-scorer-model]
+
+  - id: P-59
+    categoria: single_hop
+    clase: dependiente
+    consulta: ¿Qué se excluye del payload de identidad de modelo y por qué?
+    espera: >-
+      Lo que demostrablemente no es política: cada una de la cincuentena de
+      clases de proveedor lleva sus propios campos de forma de petición.
+    reglas: [R1, R3]
+    requiere: [2026-08-12-agno-scorer-model]
+
+  - id: P-60
+    categoria: single_hop
+    clase: dependiente
+    consulta: ¿Qué API hay que activar además de la de Maps para usar sus herramientas?
+    espera: La Address Validation API del proyecto.
+    reglas: [R1, R3]
+    requiere: [2026-08-12-agno-tools-google-maps]
+
+  - id: P-61
+    categoria: single_hop
+    clase: dependiente
+    consulta: ¿Qué aporta el SDK en la autorización MCP y qué está implementado aparte?
+    espera: >-
+      El SDK da la capa de protocolo —endpoints, PKCE S256, coincidencia exacta
+      de redirect-URI, códigos de error—; el módulo implementa las callbacks
+      contra la base de datos y la página de login y consentimiento, que fastmcp
+      no trae.
+    reglas: [R1, R3]
+    requiere: [2026-08-12-agno-os-mcp-auth-builtin]
+
+  # ---- lexical_exact · símbolos que el embedding aplasta ----
+
+  - id: P-62
+    categoria: lexical_exact
+    clase: dependiente
+    consulta: ¿`AttemptResult` o `TaskResult`? ¿Cuál aparece en cada uno?
+    espera: >-
+      `AttemptResult` y `StopReason` son públicos y se reexportan desde
+      `agno.environments` porque aparecen en cada `TaskResult`. Distingue los
+      dos sin confundirlos.
+    reglas: [R1, R3, R4]
+    requiere: [2026-08-12-agno-environments-engine]
+
+  - id: P-63
+    categoria: lexical_exact
+    clase: dependiente
+    consulta: ¿Cómo se llama exactamente la variable de entorno de la API de Maps?
+    espera: GOOGLE_MAPS_API_KEY, literal.
+    reglas: [R1, R3, R4]
+    requiere: [2026-08-12-agno-tools-google-maps]
+
+  - id: P-64
+    categoria: lexical_exact
+    clase: dependiente
+    consulta: ¿`step_delta` o `interactions`? ¿Dónde estaban los deltas antes de 2.9.0?
+    espera: >-
+      En `step_delta`, con el nombre `Delta<X>`. Después pasaron a
+      `interactions` como `<X>Delta`.
+    reglas: [R1, R3, R4]
+    requiere: [2026-08-12-agno-utils-models-genai-compat]
+
+  - id: P-65
+    categoria: lexical_exact
+    clase: dependiente
+    consulta: ¿Qué tres helpers exporta el módulo de aislamiento por usuario?
+    espera: >-
+      `get_scoped_user_id`, `resolve_db_and_scope` y `enforce_owner_on_entity`.
+    reglas: [R1, R3, R4]
+    requiere: [2026-08-12-agno-os-middleware-user-scope]
+
+  - id: P-66
+    categoria: lexical_exact
+    clase: dependiente
+    consulta: ¿Qué bandera activa el aislamiento por usuario, y en qué clase vive?
+    espera: '`AuthorizationConfig(user_isolation=True)`, y es opt-in.'
+    reglas: [R1, R3, R4]
+    requiere: [2026-08-12-agno-os-middleware-user-scope]
+
+  - id: P-67
+    categoria: lexical_exact
+    clase: dependiente
+    consulta: ¿`AgentOSBuiltinAuth` o `AgentOSTools`? ¿Cuál es el servidor de autorización?
+    espera: >-
+      `AgentOSBuiltinAuth`. `AgentOSTools` es la vista de operaciones de solo
+      lectura. Distingue los dos.
+    reglas: [R1, R3, R4]
+    requiere:
+      - 2026-08-12-agno-os-mcp-auth-builtin
+      - 2026-08-12-agno-tools-agentos
+
+  - id: P-68
+    categoria: lexical_exact
+    clase: dependiente
+    consulta: ¿Qué constante de columnas usa el convertidor de filtros para trazas?
+    espera: '`TRACE_COLUMNS`, importada junto a `filter_expr_to_sqlalchemy`.'
+    reglas: [R1, R3, R4]
+    requiere: [2026-08-12-agno-db-filter-converter]
+
+  - id: P-69
+    categoria: lexical_exact
+    clase: dependiente
+    consulta: ¿Qué algoritmo firma los tokens del servidor de autorización incorporado?
+    espera: >-
+      HS256, vía el `JWTIssuer` de fastmcp. La verificación es sin estado, así
+      que cualquier réplica con la clave verifica sin tocar la base de datos.
+    reglas: [R1, R3, R4]
+    requiere: [2026-08-12-agno-os-mcp-auth-builtin]
+
+  - id: P-70
+    categoria: lexical_exact
+    clase: dependiente
+    consulta: ¿Qué clase base enchufable hay debajo del sistema de ficheros de agentes?
+    espera: '`BaseFS`, con base de datos por defecto.'
+    reglas: [R1, R3, R4]
+    requiere: [2026-08-12-agno-fs-fs]
+
+  - id: P-71
+    categoria: lexical_exact
+    clase: dependiente
+    consulta: ¿Qué dos parámetros toma la poda del Curator?
+    espera: '`max_age_days` y `max_count`, además del `user_id`.'
+    reglas: [R1, R3, R4]
+    requiere: [2026-08-12-agno-learn-curate]
+
+  - id: P-72
+    categoria: lexical_exact
+    clase: dependiente
+    consulta: ¿Cuáles son los seis operadores de comparación de los filtros?
+    espera: 'EQ, NEQ, GT, GTE, LT, LTE. Y aparte IN, de inclusión.'
+    reglas: [R1, R3, R4]
+    requiere: [2026-08-12-agno-filters]
+
+  # ---- multi_hop · cruzar dos artefactos, y varios cruzan ajeno con propio ----
+
+  - id: P-73
+    categoria: multi_hop
+    clase: dependiente
+    consulta: >-
+      Los filtros anuncian doce operadores. ¿Los implementan todos los backends
+      por igual?
+    espera: >-
+      No. `agno.filters` los declara y PgVector solo traduce siete sobre
+      metadatos JSONB. Cruza el módulo de filtros con el teardown propio, y los
+      presenta como dos fuentes, no como una.
+    reglas: [R1, R3, R5]
+    requiere:
+      - 2026-08-12-agno-filters
+      - 2026-08-12-agno-filtros-operadores-anunciados-no-implementados
+
+  - id: P-74
+    categoria: multi_hop
+    clase: dependiente
+    consulta: >-
+      ¿Hay más de un convertidor de filtros en Agno, y sobre qué opera cada uno?
+    espera: >-
+      Sí: el genérico opera sobre columnas con nombre y el de PgVector sobre
+      metadatos JSONB, y este último solo implementa siete de los doce
+      operadores. Cita los dos artefactos.
+    reglas: [R1, R3, R5]
+    requiere:
+      - 2026-08-12-agno-db-filter-converter
+      - 2026-08-12-agno-filtros-operadores-anunciados-no-implementados
+
+  - id: P-75
+    categoria: multi_hop
+    clase: dependiente
+    consulta: >-
+      ¿Qué relación hay entre la huella del entorno y la identidad del modelo?
+    espera: >-
+      El payload de identidad de modelo lo construye el scorer y lo importa
+      `agno.environments`; y el fingerprint del entorno no hashea ni el corpus
+      ni la recuperación. Cruza los dos y no los funde.
+    reglas: [R1, R3, R5]
+    requiere:
+      - 2026-08-12-agno-scorer-model
+      - 2026-08-12-agno-env-fingerprint-ciego-al-corpus
+
+  - id: P-76
+    categoria: multi_hop
+    clase: dependiente
+    consulta: >-
+      El motor de rollouts corre un sujeto K veces. ¿Con qué mecanismo se
+      compara después una corrida con otra, y qué le falta?
+    espera: >-
+      Con el `env_fingerprint`, que es ciego al corpus y a la recuperación.
+      Cruza el motor con el teardown del fingerprint.
+    reglas: [R1, R3, R5]
+    requiere:
+      - 2026-08-12-agno-environments-engine
+      - 2026-08-12-agno-env-fingerprint-ciego-al-corpus
+
+  - id: P-77
+    categoria: multi_hop
+    clase: dependiente
+    consulta: >-
+      ¿Qué tienen en común la exportación a SFT y la serialización de resultados
+      MCP en cómo tratan lo que NO emiten?
+    espera: >-
+      Las dos omiten a propósito: el exportador no emite herramientas ni pesos
+      para ser portable por omisión, y los resultados MCP recortan en vez de
+      volcar la transcripción. Nombra el patrón y cita los dos.
+    reglas: [R1, R3, R5]
+    requiere:
+      - 2026-08-12-agno-environments-exporters-sft
+      - 2026-08-12-agno-os-mcp-results
+
+  - id: P-78
+    categoria: multi_hop
+    clase: dependiente
+    consulta: >-
+      Si quiero guardar trazas en ClickHouse y sesiones en otro sitio, ¿qué dice
+      Agno y qué operadores de filtro tendré disponibles sobre las trazas?
+    espera: >-
+      ClickHouse es solo para trazas y hay que emparejarlo con un row-store; los
+      filtros sobre columnas de traza pasan por el convertidor genérico con
+      `TRACE_COLUMNS`. Cita los dos.
+    reglas: [R1, R3, R5]
+    requiere:
+      - 2026-08-12-agno-db-clickhouse-clickhouse
+      - 2026-08-12-agno-db-filter-converter
+
+  - id: P-79
+    categoria: multi_hop
+    clase: dependiente
+    consulta: >-
+      ¿Qué tienen en común el log de decisiones de Agno y lo que este proyecto
+      decidió guardar de su propio bucle?
+    espera: >-
+      Los dos registran el RAZONAMIENTO de una decisión, no solo su resultado.
+      Cruza el almacén de Agno con la nota propia sobre el tratamiento y el
+      instrumento, sin fundirlos.
+    reglas: [R1, R3, R5]
+    requiere:
+      - 2026-08-12-agno-learn-stores-decision-log
+      - 2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento
+
+  - id: P-80
+    categoria: multi_hop
+    clase: dependiente
+    consulta: >-
+      ¿Cómo se aísla un usuario de otro en AgentOS, y cómo se autentica antes de
+      llegar ahí?
+    espera: >-
+      La autenticación es el servidor OAuth incorporado con su secreto de
+      conexión; el aislamiento es por endpoint, pasando `user_id`. Son dos capas
+      distintas y hay que presentarlas como tales.
+    reglas: [R1, R3, R5]
+    requiere:
+      - 2026-08-12-agno-os-mcp-auth-builtin
+      - 2026-08-12-agno-os-middleware-user-scope
+
+  - id: P-81
+    categoria: multi_hop
+    clase: dependiente
+    consulta: >-
+      ¿Qué mecanismos de Agno he documentado yo que resultaron no hacer lo que
+      dice su documentación?
+    espera: >-
+      Los índices de PgVector que nunca se crean y el `hybrid_search` con el
+      predicado comentado, entre otros. Cruza los teardowns propios y cita cada
+      uno.
+    reglas: [R1, R3, R5]
+    requiere:
+      - 2026-08-12-agno-pgvector-indices-decorativos
+      - 2026-08-12-agno-hybrid-search-predicado-comentado
+
+  - id: P-82
+    categoria: multi_hop
+    clase: dependiente
+    consulta: >-
+      ¿Qué tienen en común el sistema de ficheros para agentes y los almacenes
+      de aprendizaje?
+    espera: >-
+      Los dos son memoria durable del agente, pero uno es de ficheros que él
+      gestiona y el otro de tipos de aprendizaje estructurados. Presenta la
+      diferencia, no una fusión.
+    reglas: [R1, R3, R5]
+    requiere:
+      - 2026-08-12-agno-fs-fs
+      - 2026-08-12-agno-learn-stores-init
+
+  - id: P-83
+    categoria: multi_hop
+    clase: dependiente
+    consulta: >-
+      La capa de compatibilidad de google-genai y el exportador de SFT resuelven
+      el mismo tipo de problema. ¿Cuál?
+    espera: >-
+      Los dos aíslan al consumidor de la divergencia entre proveedores: uno
+      renombrando tipos que se movieron, el otro omitiendo los ejes en los que
+      los formatos divergen. Cita los dos.
+    reglas: [R1, R3, R5]
+    requiere:
+      - 2026-08-12-agno-utils-models-genai-compat
+      - 2026-08-12-agno-environments-exporters-sft
+
+  # ---- aggregation · barrer varios artefactos ajenos ----
+
+  - id: P-84
+    categoria: aggregation
+    clase: dependiente
+    consulta: ¿Qué proveedores de contexto trae Agno?
+    espera: >-
+      Al menos calendario, base de datos, Drive, Gmail y MCP, sobre la interfaz
+      común de `ContextProvider`. Cita varios.
+    reglas: [R1, R3]
+    requiere:
+      - 2026-08-12-agno-context-provider
+      - 2026-08-12-agno-context-gmail-provider
+      - 2026-08-12-agno-context-mcp-provider
+
+  - id: P-85
+    categoria: aggregation
+    clase: dependiente
+    consulta: ¿Qué herramientas de Google integra Agno?
+    espera: >-
+      Drive, Gmail, Maps y Sheets, cada una con sus requisitos de credenciales.
+      Cita cada artefacto.
+    reglas: [R1, R3]
+    requiere:
+      - 2026-08-12-agno-tools-google-drive
+      - 2026-08-12-agno-tools-google-gmail
+      - 2026-08-12-agno-tools-google-maps
+      - 2026-08-12-agno-tools-google-sheets
+
+  - id: P-86
+    categoria: aggregation
+    clase: dependiente
+    consulta: ¿Qué piezas componen el subsistema de aprendizaje de Agno?
+    espera: >-
+      La configuración con sus enums, los esquemas por tipo, los almacenes
+      —incluidos el log de decisiones y la memoria de entidades— y el Curator de
+      mantenimiento. Cita varios.
+    reglas: [R1, R3]
+    requiere:
+      - 2026-08-12-agno-learn-config
+      - 2026-08-12-agno-learn-stores-init
+      - 2026-08-12-agno-learn-curate
+
+  - id: P-87
+    categoria: aggregation
+    clase: dependiente
+    consulta: ¿Qué partes tiene el subsistema de environments?
+    espera: >-
+      El motor privado de rollouts, la puerta pública, la rejilla de informe y
+      los exportadores. Cita varios y atribuye cada pieza a su artefacto.
+    reglas: [R1, R3, R5]
+    requiere:
+      - 2026-08-12-agno-environments-engine
+      - 2026-08-12-agno-environments-init
+      - 2026-08-12-agno-environments-render
+
+  - id: P-88
+    categoria: aggregation
+    clase: dependiente
+    consulta: ¿Qué decisiones de diseño de Agno he encontrado que priorizan la omisión?
+    espera: >-
+      El exportador que no emite herramientas ni pesos, los resultados MCP
+      recortados, y el payload de identidad que excluye lo que no es política.
+      Cita cada uno.
+    reglas: [R1, R3, R5]
+    requiere:
+      - 2026-08-12-agno-environments-exporters-sft
+      - 2026-08-12-agno-os-mcp-results
+      - 2026-08-12-agno-scorer-model
+
+  - id: P-89
+    categoria: aggregation
+    clase: dependiente
+    consulta: ¿Qué sé sobre la seguridad y el aislamiento en AgentOS?
+    espera: >-
+      El servidor OAuth incorporado con su secreto de conexión y PKCE, el
+      aislamiento por usuario opt-in en cada endpoint, y la serialización que no
+      vuelca el system prompt. Cita cada uno.
+    reglas: [R1, R3, R5]
+    requiere:
+      - 2026-08-12-agno-os-mcp-auth-builtin
+      - 2026-08-12-agno-os-middleware-user-scope
+      - 2026-08-12-agno-os-mcp-results
+
+  - id: P-90
+    categoria: aggregation
+    clase: dependiente
+    consulta: ¿Qué bases de datos soporta Agno y para qué sirve cada una?
+    espera: >-
+      ClickHouse solo para trazas, y row-stores como Postgres para sesiones,
+      memorias y configuraciones. Cita los artefactos.
+    reglas: [R1, R3]
+    requiere:
+      - 2026-08-12-agno-db-clickhouse-clickhouse
+      - 2026-08-12-agno-db-clickhouse-schemas
+
+  # ---- más single_hop, para llegar a la n que la predicción necesita ----
+
+  - id: P-91
+    categoria: single_hop
+    clase: dependiente
+    consulta: ¿Qué hace el módulo de renderizado de rollouts?
+    espera: La rejilla de rollouts y el informe por intento.
+    reglas: [R1, R3]
+    requiere: [2026-08-12-agno-environments-render]
+
+  - id: P-92
+    categoria: single_hop
+    clase: dependiente
+    consulta: ¿Qué declara uno para correr una suite de evaluación en Agno?
+    espera: '`Case`s, que se corren con `run_cases`.'
+    reglas: [R1, R3]
+    requiere: [2026-08-12-agno-eval-suite]
+
+  - id: P-93
+    categoria: single_hop
+    clase: dependiente
+    consulta: ¿Qué es la comprobación de aceptación de Tinker en el exportador?
+    espera: Una comprobación vendorizada y privada dentro de los exportadores.
+    reglas: [R1, R3]
+    requiere: [2026-08-12-agno-environments-exporters-validator]
+
+  - id: P-94
+    categoria: single_hop
+    clase: dependiente
+    consulta: ¿Para qué sirven los cargadores remotos de contenido?
+    espera: Para traer contenido remoto al `Knowledge`.
+    reglas: [R1, R3]
+    requiere: [2026-08-12-agno-knowledge-loaders-init]
+
+  - id: P-95
+    categoria: single_hop
+    clase: dependiente
+    consulta: ¿Qué guarda el almacén de memoria de entidades?
+    espera: El backend de almacenamiento del tipo de aprendizaje de entidades.
+    reglas: [R1, R3]
+    requiere: [2026-08-12-agno-learn-stores-entity-memory]
+
+  - id: P-96
+    categoria: single_hop
+    clase: dependiente
+    consulta: ¿Qué hay en el módulo de esquemas del aprendizaje?
+    espera: Un dataclass por cada tipo de aprendizaje.
+    reglas: [R1, R3]
+    requiere: [2026-08-12-agno-learn-schemas]
+
+  - id: P-97
+    categoria: single_hop
+    clase: dependiente
+    consulta: ¿Qué son los managers de AgentOS?
+    espera: Los gestores de AgentOS, tal como los describe su propio módulo.
+    reglas: [R1, R3]
+    requiere: [2026-08-12-agno-os-managers]
+
+  - id: P-98
+    categoria: single_hop
+    clase: dependiente
+    consulta: ¿Qué maneja el módulo de eventos de Slack?
+    espera: Los manejadores de eventos de streaming de Slack.
+    reglas: [R1, R3]
+    requiere: [2026-08-12-agno-os-interfaces-slack-events]
+
+  - id: P-99
+    categoria: single_hop
+    clase: dependiente
+    consulta: ¿Qué DDL usa el adaptador de trazas de ClickHouse?
+    espera: Las sentencias DDL de su módulo de esquemas.
+    reglas: [R1, R3]
+    requiere: [2026-08-12-agno-db-clickhouse-schemas]
+
+  - id: P-100
+    categoria: single_hop
+    clase: dependiente
+    consulta: ¿Dónde se guarda el estado de OAuth de MCP?
+    espera: >-
+      En una implementación compartida de SQLAlchemy, con sus esquemas propios
+      para el servidor de autorización incorporado.
+    reglas: [R1, R3]
+    requiere:
+      - 2026-08-12-agno-db-mcp-oauth-store
+      - 2026-08-12-agno-db-schemas-mcp-oauth
+
+  - id: P-101
+    categoria: single_hop
+    clase: dependiente
+    consulta: ¿Qué hace el proveedor de contexto de base de datos?
+    espera: Expone una base de datos como fuente de información para el agente.
+    reglas: [R1, R3]
+    requiere: [2026-08-12-agno-context-database-provider]
+
+  - id: P-102
+    categoria: single_hop
+    clase: dependiente
+    consulta: ¿Qué expone el proveedor de contexto de Google Drive?
+    espera: Drive como fuente consultable en lenguaje natural para el agente.
+    reglas: [R1, R3]
+    requiere: [2026-08-12-agno-context-gdrive-provider]
+
+  - id: P-103
+    categoria: single_hop
+    clase: dependiente
+    consulta: ¿Qué expone el proveedor de contexto de calendario?
+    espera: Google Calendar como fuente de información del agente.
+    reglas: [R1, R3]
+    requiere: [2026-08-12-agno-context-calendar-provider]
+
+  - id: P-104
+    categoria: single_hop
+    clase: dependiente
+    consulta: ¿Qué hace el toolkit del sistema de ficheros?
+    espera: Es la superficie de herramientas sobre el `FileSystem`.
+    reglas: [R1, R3]
+    requiere: [2026-08-12-agno-fs-toolkit]
+
+  - id: P-105
+    categoria: single_hop
+    clase: dependiente
+    consulta: ¿Para qué sirven las herramientas de Sheets?
+    espera: Para interactuar con la API de Google Sheets.
+    reglas: [R1, R3]
+    requiere: [2026-08-12-agno-tools-google-sheets]
+
+  - id: P-106
+    categoria: single_hop
+    clase: dependiente
+    consulta: ¿Qué permiten hacer las herramientas de Drive?
+    espera: Listar, buscar y leer en Google Drive.
+    reglas: [R1, R3]
+    requiere: [2026-08-12-agno-tools-google-drive]
+
+  - id: P-107
+    categoria: single_hop
+    clase: dependiente
+    consulta: ¿Qué es el toolkit de Gmail?
+    espera: El conjunto de herramientas para interactuar con la API de Gmail.
+    reglas: [R1, R3]
+    requiere: [2026-08-12-agno-tools-google-gmail]
+
+  - id: P-108
+    categoria: single_hop
+    clase: dependiente
+    consulta: ¿Qué tipos de enums lleva la configuración de LearningMachine?
+    espera: Los enums y las clases de configuración de cada tipo de aprendizaje.
+    reglas: [R1, R3]
+    requiere: [2026-08-12-agno-learn-config]
+
+  # ---- temporal ----
+
+  - id: P-109
+    categoria: temporal
+    clase: dependiente
+    consulta: >-
+      ¿Sigue vigente lo que dice mi corpus sobre cuántos operadores de filtro
+      funcionan?
+    espera: >-
+      Da la versión vigente —siete de doce en PgVector— y si algún artefacto
+      declara superar a otro, nombra el superado.
+    reglas: [R1, R3, R6]
+    requiere: [2026-08-12-agno-filtros-operadores-anunciados-no-implementados]
+
+  - id: P-110
+    categoria: temporal
+    clase: invariante
+    consulta: ¿Hay algo en el corpus que hable de una versión de biblioteca que ya cambió?
+    espera: >-
+      La capa de compatibilidad de google-genai documenta un cambio entre
+      versiones. No inventa superaciones que el corpus no declara.
+    reglas: [R1, R3, R6]
+
+  # ---- fuera_de_alcance · el freno tiene que crecer con el conjunto ----
+  #
+  # Con 121 probes el suelo de estrato es max(4, 20 %) = 24, y había 11. Sin
+  # estas trece el arnés se NEGARÍA a correr, que es exactamente lo que ese
+  # suelo existe para hacer: impedir que crecer el conjunto por el lado fácil
+  # abarate el óptimo degenerado de contestar «no lo sé» a todo.
+
+  - id: P-111
+    categoria: fuera_de_alcance
+    clase: invariante
+    consulta: ¿Cuánto cuesta por token el servidor de autorización incorporado de Agno?
+    espera: Responde exactamente «No lo tengo en la memoria.»
+    reglas: [R2, R3]
+    clave_negativa: coste por token del servidor de autorización
+
+  - id: P-112
+    categoria: fuera_de_alcance
+    clase: invariante
+    consulta: ¿Qué latencia media tiene el adaptador de ClickHouse en producción?
+    espera: >-
+      El corpus dice para qué sirve, no cuánto tarda. Responde exactamente «No
+      lo tengo en la memoria.»
+    reglas: [R2, R3]
+    clave_negativa: latencia media del adaptador de ClickHouse
+
+  - id: P-113
+    categoria: fuera_de_alcance
+    clase: invariante
+    consulta: ¿Qué versión de Agno introdujo el sistema de ficheros para agentes?
+    espera: >-
+      El corpus documenta la 2.8.6 y qué hay en ella, no cuándo se introdujo
+      cada pieza. Responde exactamente «No lo tengo en la memoria.»
+    reglas: [R2, R3]
+    clave_negativa: versión que introdujo el sistema de ficheros
+
+  - id: P-114
+    categoria: fuera_de_alcance
+    clase: invariante
+    consulta: ¿Cuántos usuarios activos tiene AgentOS?
+    espera: Responde exactamente «No lo tengo en la memoria.»
+    reglas: [R2, R3]
+    clave_negativa: usuarios activos de AgentOS
+
+  - id: P-115
+    categoria: fuera_de_alcance
+    clase: invariante
+    consulta: ¿Qué opinan los autores de Agno sobre LangGraph?
+    espera: Responde exactamente «No lo tengo en la memoria.»
+    reglas: [R2, R3]
+    clave_negativa: opinión de los autores de Agno sobre LangGraph
+
+  - id: P-116
+    categoria: fuera_de_alcance
+    clase: invariante
+    consulta: ¿Cuál es el plan de precios de la API de Google Maps?
+    espera: >-
+      El corpus dice qué API hay que activar, no lo que cuesta. Responde
+      exactamente «No lo tengo en la memoria.»
+    reglas: [R2, R3]
+    clave_negativa: plan de precios de la API de Google Maps
+
+  - id: P-117
+    categoria: fuera_de_alcance
+    clase: invariante
+    consulta: ¿Qué benchmark de recuperación gana el reordenador que uso?
+    espera: >-
+      Hay una medición de LATENCIA propia —145 ms frente a 5.257— y ninguna de
+      calidad ni de benchmark. Responde exactamente «No lo tengo en la memoria.»
+    reglas: [R2, R3]
+    clave_negativa: benchmark de recuperación del reordenador
+
+  - id: P-118
+    categoria: fuera_de_alcance
+    clase: invariante
+    consulta: >-
+      Según mis notas, ¿cuánto mejora el carril de grafo la categoría multi_hop?
+    espera: >-
+      Hay una medición y su resultado es «no se puede saber»: 4 peor, 5 mejor, 1
+      neto, suelo 6. Dar una mejora sería inventarla. Responde exactamente «No
+      lo tengo en la memoria.»
+    reglas: [R2, R3]
+    clave_negativa: cuánto mejora el carril de grafo multi_hop
+
+  - id: P-119
+    categoria: fuera_de_alcance
+    clase: invariante
+    consulta: ¿Qué valor de α de Krippendorff ha medido este sistema?
+    espera: >-
+      Ninguno: la puerta está cerrada y α sigue sin medir. Responde exactamente
+      «No lo tengo en la memoria.»
+    reglas: [R2, R3]
+    clave_negativa: valor de alfa de Krippendorff medido
+
+  - id: P-120
+    categoria: fuera_de_alcance
+    clase: invariante
+    consulta: ¿Cuántas rondas del bucle de auto-mejora se han completado?
+    espera: >-
+      El corpus documenta el protocolo, no una ejecución. Responde exactamente
+      «No lo tengo en la memoria.»
+    reglas: [R2, R3]
+    clave_negativa: rondas del bucle completadas
+
+  - id: P-121
+    categoria: fuera_de_alcance
+    clase: invariante
+    consulta: ¿Qué dice el corpus sobre el rendimiento de Weaviate frente a pgvector?
+    espera: Responde exactamente «No lo tengo en la memoria.»
+    reglas: [R2, R3]
+    clave_negativa: Weaviate
+
+  - id: P-122
+    categoria: fuera_de_alcance
+    clase: invariante
+    consulta: ¿Cuánto ocupa en disco el índice HNSW de mi corpus?
+    espera: >-
+      Se documenta cómo se crea el índice y con qué parámetros, no su tamaño.
+      Responde exactamente «No lo tengo en la memoria.»
+    reglas: [R2, R3]
+    clave_negativa: tamaño en disco del índice HNSW
+
+  - id: P-123
+    categoria: fuera_de_alcance
+    clase: invariante
+    consulta: ¿Qué acuerdo entre anotadores humanos he medido yo en mi golden set?
+    espera: >-
+      El 70,09 es de RAGChecker y sobre OTRO conjunto. Sobre el mío no hay
+      medición, y atribuirse la cifra ajena es el fallo que esta probe atrapa.
+      Responde exactamente «No lo tengo en la memoria.»
+    reglas: [R2, R3]
+    clave_negativa: acuerdo entre anotadores medido en mi golden set
+
+  - id: P-124
+    categoria: fuera_de_alcance
+    clase: invariante
+    consulta: ¿Qué coste tuvo en euros la última corrida completa del golden set?
+    espera: >-
+      Hay un suelo de coste declarado en la spec —4 € por ronda— pero ninguna
+      corrida contra un modelo real y por tanto ningún coste medido. Confundir
+      el suelo con la medida es el fallo que esta probe atrapa. Responde
+      exactamente «No lo tengo en la memoria.»
+    reglas: [R2, R3]
+    clave_negativa: coste en euros de la última corrida

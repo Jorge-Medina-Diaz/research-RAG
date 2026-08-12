@@ -298,19 +298,32 @@ def _umbral_de_deteccion(filas: list[dict]) -> dict[str, Any]:
     # detección — es la intensidad en la que la moneda salió cara, y tomarla por
     # una detección sería exactamente el error que el estudio existe para cazar
     # en otros.
+    # El criterio es «una vez cruza, se queda cruzada», no «crece siempre».
+    #
+    # La primera versión exigía que |Δ| creciera de forma monótona con la
+    # intensidad, y marcaba `barajar` como ruido. Estaba mal: una mezcla
+    # SATURA — a partir del 50 % ya es una permutación uniforme, así que barajar
+    # más no añade daño y el Δ se aplana o baja un poco por azar. Exigir
+    # crecimiento estricto a una mutación saturante es pedirle a la física algo
+    # que no hace.
+    #
+    # Lo que sí distingue una detección de un golpe de suerte es la
+    # PERSISTENCIA: si a intensidad 50 % se detecta y a 75 % y 100 % también,
+    # eso es una señal. Si se detecta solo en un punto y desaparece al subir el
+    # daño, es la intensidad en la que la moneda salió cara.
     monotonas: dict[str, bool] = {}
     for nombre in por_mut:
         serie = sorted(
-            ((f["intensidad"], f["delta"]) for f in filas
+            ((f["intensidad"], f["detectada"]) for f in filas
              if f["mutacion"] == nombre and f["intensidad"] is not None),
         )
-        if len(serie) < 3:
-            monotonas[nombre] = True
+        vistos = [d for _, d in serie]
+        if True not in vistos:
+            monotonas[nombre] = True   # no detecta nada: no hay nada que dudar
             continue
-        deltas = [abs(d) for _, d in serie]
-        monotonas[nombre] = all(
-            b >= a - 1e-9 for a, b in zip(deltas, deltas[1:], strict=False)
-        )
+        # Desde el primer «sí», todos los siguientes tienen que serlo.
+        primero = vistos.index(True)
+        monotonas[nombre] = all(vistos[primero:])
 
     # Una detección en una curva no monótona no cuenta.
     creibles = {

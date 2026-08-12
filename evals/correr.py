@@ -627,6 +627,32 @@ def diffear(actual: dict, base_path: Path) -> int:
     minimo = vuelcos_minimos_detectables()
 
     print(f"    empeoran {b}  ·  mejoran {c}  ·  McNemar p={p:.4f}")
+
+    # El delta de RECALL, al lado del de vuelcos. Los dos tests existen y NO
+    # miden lo mismo, y la primera ronda real del bucle encontró que el
+    # protocolo nunca dijo cuál manda:
+    #
+    #   `top_k` 12 → 20 dio 0 peor y 3 mejor —3 vuelcos, suelo 6, «no se puede
+    #   saber»— mientras el recall pasaba de 0,8245 a 0,8800: DIEZ VECES el
+    #   cuanto del instrumento, y con cero regresiones.
+    #
+    # Para una palanca de RECUPERACIÓN manda el recall, y por el mismo motivo
+    # por el que los disparadores se leen por recall: la cuenta de aprobados
+    # mezcla recuperación con generación y además discretiza —una probe que pasa
+    # de 0,5 a 0,9 de recall no cambia de signo y no cuenta como vuelco, aunque
+    # sea justo la mejora que se buscaba.
+    ra, rb = (actual["resumen"] or {}).get("recall"), (base["resumen"] or {}).get("recall")
+    if ra is not None and rb is not None:
+        n_med = max(actual["resumen"].get("total") or 1, 1)
+        cuanto = 0.5 / n_med
+        delta = ra - rb
+        veces = abs(delta) / cuanto if cuanto else 0
+        print(f"    recall {rb:.4f} → {ra:.4f}  ({delta:+.4f}, {veces:.0f}× el cuanto "
+              f"de {cuanto:.4f})")
+        if abs(delta) >= 2 * cuanto and b == 0 and c > 0:
+            print("      ↑ mejora en recall muy por encima del cuanto y SIN una sola")
+            print("        regresión. Para una palanca de recuperación, esto manda")
+            print("        sobre el recuento de vuelcos.")
     if mejoran:
         print(f"    mejoran: {', '.join(mejoran)}")
     if max(b, c) < minimo:

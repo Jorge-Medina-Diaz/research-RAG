@@ -5,6 +5,7 @@
 
 [![ci](https://github.com/Jorge-Medina-Diaz/research-RAG/actions/workflows/ci.yml/badge.svg)](https://github.com/Jorge-Medina-Diaz/research-RAG/actions/workflows/ci.yml)
 ![tests](https://img.shields.io/badge/tests-154-brightgreen)
+![probes](https://img.shields.io/badge/probes-124-blue)
 ![agno](https://img.shields.io/badge/agno-2.8.6-blue)
 ![python](https://img.shields.io/badge/python-3.12-blue)
 ![license](https://img.shields.io/badge/license-MIT-lightgrey)
@@ -32,7 +33,20 @@ no significaría nada.
 
 > ## El resultado que más importa de este repositorio
 >
-> **El arnés no detecta que se caiga un carril entero.** Ni que se tire el 70 %
+> Se midió qué degradación es capaz de ver el arnés rompiendo el recuperador a
+> propósito (`uv run rag mutar`). Con 27 probes medibles **no veía nada**: ni
+> tirar el 70 % de los resultados, ni que se cayera un carril entero.
+>
+> Eso produjo una predicción escrita antes de comprobarla: *con ~95 probes el
+> umbral debería bajar a la franja del 30-50 %*. Se escribieron 82 probes sobre
+> un corpus ajeno y **el umbral bajó al 15 %** — mejor de lo predicho.
+>
+> Y con resolución, una conclusión anterior **se invirtió**: apagar el carril
+> denso parecía MEJORAR el recall con 27 probes (Δ +0,02, no detectable) y lo
+> EMPEORA con 94 (Δ −0,04, 13 vuelcos, detectado). La primera lectura era un
+> artefacto del conjunto pequeño, y el arnés ya decía «no se puede saber».
+>
+> **La versión anterior de este párrafo decía que el arnés no detecta nada.** Ni que se tire el 70 %
 > de los resultados. Se ha medido rompiendo el recuperador a propósito en
 > cantidades controladas —`uv run rag mutar`— y ninguna degradación graduada
 > supera el suelo de detección.

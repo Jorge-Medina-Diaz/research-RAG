@@ -1,9 +1,9 @@
 {
- "fecha": "2026-08-12T19:03:49.139062+00:00",
+ "fecha": "2026-08-12T19:35:51.617970+00:00",
  "identidad": {
-  "huella_config": "620a40e2c8c6",
+  "huella_config": "d3e89f849206",
   "palancas": {
-   "top_k": 12,
+   "top_k": 20,
    "carriles": [
     "denso",
     "lexico"
@@ -59,20 +59,20 @@
    "hnsw_m": 16,
    "hnsw_ef_construction": 200
   },
-  "epoca": 3,
+  "epoca": 4,
   "huella_juez": "f9f0848cb649",
   "nivel": "nivel0",
-  "corpus_sha": "4f73786a506b",
-  "n_artefactos": 55,
+  "corpus_sha": "c0cb6e4c30f8",
+  "n_artefactos": 56,
   "indice": "fragmento_b3eeeef79661"
  },
  "nivel": "0",
  "resumen": {
-  "pasan": 17,
-  "total": 27,
-  "no_medibles": 14,
-  "recall": 0.8148148148148148,
-  "p95_ms": 167
+  "pasan": 67,
+  "total": 94,
+  "no_medibles": 29,
+  "recall": 0.8812056737588653,
+  "p95_ms": 170
  },
  "reproducciones": {},
  "probes": [
@@ -82,7 +82,7 @@
    "clase": "dependiente",
    "recall": 1.0,
    "rango_primer_esperado": 3,
-   "ms": 192,
+   "ms": 196,
    "recuperados": [
     "2026-08-12-agno-utils-models-genai-compat",
     "2026-08-12-agno-env-fingerprint-ciego-al-corpus",
@@ -101,7 +101,7 @@
    "clase": "dependiente",
    "recall": 0.0,
    "rango_primer_esperado": null,
-   "ms": 137,
+   "ms": 147,
    "recuperados": [
     "2026-08-12-rrf-k-60-de-donde-sale-el-sesenta",
     "2026-08-12-rrf-k-60-de-donde-sale-el-sesenta",
@@ -120,7 +120,7 @@
    "clase": "dependiente",
    "recall": 1.0,
    "rango_primer_esperado": 1,
-   "ms": 158,
+   "ms": 148,
    "recuperados": [
     "2026-08-12-agno-pgvector-indices-decorativos",
     "2026-08-12-agno-pgvector-indices-decorativos",
@@ -139,7 +139,7 @@
    "clase": "dependiente",
    "recall": 1.0,
    "rango_primer_esperado": 1,
-   "ms": 153,
+   "ms": 165,
    "recuperados": [
     "2026-08-12-agno-env-fingerprint-ciego-al-corpus",
     "2026-08-12-epocas-para-medir-un-corpus-que-crece",
@@ -159,13 +159,13 @@
    "clase": "dependiente",
    "recall": 1.0,
    "rango_primer_esperado": 1,
-   "ms": 145,
+   "ms": 163,
    "recuperados": [
     "2026-08-12-agno-pgvector-indices-decorativos",
     "2026-08-12-agno-pgvector-indices-decorativos",
     "2026-08-12-agno-pgvector-indices-decorativos",
     "2026-08-12-agno-pgvector-indices-decorativos",
-    "2026-08-12-agno-pgvector-indices-decorativos"
+    "2026-08-12-agno-hybrid-search-predicado-comentado"
    ],
    "esperados": [
     "2026-08-12-agno-pgvector-indices-decorativos",
@@ -179,7 +179,7 @@
    "clase": "dependiente",
    "recall": 1.0,
    "rango_primer_esperado": 1,
-   "ms": 141,
+   "ms": 150,
    "recuperados": [
     "2026-08-12-agno-pgvector-indices-decorativos",
     "2026-08-12-agno-pgvector-indices-decorativos",
@@ -199,13 +199,13 @@
    "clase": "dependiente",
    "recall": 0.0,
    "rango_primer_esperado": null,
-   "ms": 154,
+   "ms": 153,
    "recuperados": [
+    "2026-08-12-la-primera-ronda-del-bucle",
+    "2026-08-12-la-primera-ronda-del-bucle",
     "2026-08-12-plainto-tsquery-hace-and-y-devuelve-cero",
     "2026-08-12-agno-env-fingerprint-ciego-al-corpus",
-    "2026-08-12-agno-hybrid-search-predicado-comentado",
-    "2026-08-12-rrf-k-60-de-donde-sale-el-sesenta",
-    "2026-08-12-el-carril-de-grafo-construido-y-sin-encender"
+    "2026-08-12-la-primera-ronda-del-bucle"
    ],
    "esperados": [
     "2026-08-12-agno-pgvector-indices-decorativos"
@@ -218,7 +218,7 @@
    "clase": "dependiente",
    "recall": 1.0,
    "rango_primer_esperado": 6,
-   "ms": 145,
+   "ms": 159,
    "recuperados": [
     "2026-08-12-agno-hybrid-search-predicado-comentado",
     "2026-08-12-agno-hybrid-search-predicado-comentado",
@@ -380,7 +380,7 @@
    "clase": "dependiente",
    "recall": 1.0,
    "rango_primer_esperado": 1,
-   "ms": 138,
+   "ms": 147,
    "recuperados": [
     "2026-08-12-agno-hybrid-search-predicado-comentado",
     "2026-08-12-agno-hybrid-search-predicado-comentado",
@@ -399,13 +399,13 @@
    "clase": "dependiente",
    "recall": 1.0,
    "rango_primer_esperado": 1,
-   "ms": 154,
+   "ms": 142,
    "recuperados": [
     "2026-08-12-agno-filtros-operadores-anunciados-no-implementados",
     "2026-08-12-agno-filtros-operadores-anunciados-no-implementados",
     "2026-08-12-agno-filtros-operadores-anunciados-no-implementados",
     "2026-08-12-agno-filtros-operadores-anunciados-no-implementados",
-    "2026-08-12-agno-pgvector-indices-decorativos"
+    "2026-08-12-agno-hybrid-search-predicado-comentado"
    ],
    "esperados": [
     "2026-08-12-agno-filtros-operadores-anunciados-no-implementados"
@@ -418,7 +418,7 @@
    "clase": "dependiente",
    "recall": 1.0,
    "rango_primer_esperado": 1,
-   "ms": 138,
+   "ms": 141,
    "recuperados": [
     "2026-08-12-plainto-tsquery-hace-and-y-devuelve-cero",
     "2026-08-12-el-arnes-no-ve-caerse-un-carril-entero",
@@ -437,13 +437,13 @@
    "clase": "dependiente",
    "recall": 1.0,
    "rango_primer_esperado": 1,
-   "ms": 146,
+   "ms": 151,
    "recuperados": [
     "2026-08-12-rrf-k-60-de-donde-sale-el-sesenta",
     "2026-08-12-rrf-k-60-de-donde-sale-el-sesenta",
     "2026-08-12-rrf-k-60-de-donde-sale-el-sesenta",
-    "2026-08-12-rrf-k-60-de-donde-sale-el-sesenta",
-    "2026-08-12-el-arnes-no-ve-caerse-un-carril-entero"
+    "2026-08-12-el-arnes-no-ve-caerse-un-carril-entero",
+    "2026-08-12-rrf-k-60-de-donde-sale-el-sesenta"
    ],
    "esperados": [
     "2026-08-12-rrf-k-60-de-donde-sale-el-sesenta"
@@ -456,7 +456,7 @@
    "clase": "dependiente",
    "recall": 1.0,
    "rango_primer_esperado": 1,
-   "ms": 162,
+   "ms": 146,
    "recuperados": [
     "2026-08-12-ragchecker-la-aritmetica-no-la-dependencia",
     "2026-08-12-ragchecker-la-aritmetica-no-la-dependencia",
@@ -475,13 +475,13 @@
    "clase": "dependiente",
    "recall": 1.0,
    "rango_primer_esperado": 1,
-   "ms": 167,
+   "ms": 172,
    "recuperados": [
     "2026-08-12-getpass-no-falla-se-cuelga",
     "2026-08-12-getpass-no-falla-se-cuelga",
     "2026-08-12-getpass-no-falla-se-cuelga",
-    "2026-08-12-el-holdout-no-resiste-python-arbitrario",
-    "2026-08-12-getpass-no-falla-se-cuelga"
+    "2026-08-12-getpass-no-falla-se-cuelga",
+    "2026-08-12-el-holdout-no-resiste-python-arbitrario"
    ],
    "esperados": [
     "2026-08-12-getpass-no-falla-se-cuelga"
@@ -494,7 +494,7 @@
    "clase": "dependiente",
    "recall": 1.0,
    "rango_primer_esperado": 1,
-   "ms": 156,
+   "ms": 141,
    "recuperados": [
     "2026-08-12-plainto-tsquery-hace-and-y-devuelve-cero",
     "2026-08-12-plainto-tsquery-hace-and-y-devuelve-cero",
@@ -513,7 +513,7 @@
    "clase": "dependiente",
    "recall": 1.0,
    "rango_primer_esperado": 1,
-   "ms": 150,
+   "ms": 139,
    "recuperados": [
     "2026-08-12-ragchecker-la-aritmetica-no-la-dependencia",
     "2026-08-12-ragchecker-la-aritmetica-no-la-dependencia",
@@ -531,14 +531,14 @@
    "categoria": "lexical_exact",
    "clase": "dependiente",
    "recall": 1.0,
-   "rango_primer_esperado": 5,
-   "ms": 146,
+   "rango_primer_esperado": 7,
+   "ms": 138,
    "recuperados": [
     "2026-08-12-el-holdout-no-resiste-python-arbitrario",
     "2026-08-12-el-holdout-no-resiste-python-arbitrario",
     "2026-08-12-el-holdout-no-resiste-python-arbitrario",
     "2026-08-12-el-holdout-no-resiste-python-arbitrario",
-    "2026-08-12-getpass-no-falla-se-cuelga"
+    "2026-08-12-el-holdout-no-resiste-python-arbitrario"
    ],
    "esperados": [
     "2026-08-12-getpass-no-falla-se-cuelga"
@@ -551,7 +551,7 @@
    "clase": "dependiente",
    "recall": 1.0,
    "rango_primer_esperado": 1,
-   "ms": 145,
+   "ms": 164,
    "recuperados": [
     "2026-08-12-agno-filtros-operadores-anunciados-no-implementados",
     "2026-08-12-un-detector-que-siempre-dispara-esta-apagado",
@@ -570,13 +570,13 @@
    "clase": "dependiente",
    "recall": 1.0,
    "rango_primer_esperado": 1,
-   "ms": 158,
+   "ms": 153,
    "recuperados": [
     "2026-08-12-rrf-k-60-de-donde-sale-el-sesenta",
     "2026-08-12-rrf-k-60-de-donde-sale-el-sesenta",
     "2026-08-12-agno-hybrid-search-predicado-comentado",
     "2026-08-12-agno-pgvector-indices-decorativos",
-    "2026-08-12-agno-hybrid-search-predicado-comentado"
+    "2026-08-12-agno-pgvector-indices-decorativos"
    ],
    "esperados": [
     "2026-08-12-agno-hybrid-search-predicado-comentado",
@@ -589,14 +589,14 @@
    "categoria": "multi_hop",
    "clase": "dependiente",
    "recall": 0.5,
-   "rango_primer_esperado": 7,
-   "ms": 150,
+   "rango_primer_esperado": 8,
+   "ms": 160,
    "recuperados": [
+    "2026-08-12-la-primera-ronda-del-bucle",
+    "2026-08-12-la-primera-ronda-del-bucle",
     "2026-08-12-rrf-k-60-de-donde-sale-el-sesenta",
     "2026-08-12-rrf-k-60-de-donde-sale-el-sesenta",
-    "2026-08-12-el-arnes-no-ve-caerse-un-carril-entero",
-    "2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento",
-    "2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento"
+    "2026-08-12-la-primera-ronda-del-bucle"
    ],
    "esperados": [
     "2026-08-12-plainto-tsquery-hace-and-y-devuelve-cero",
@@ -610,13 +610,13 @@
    "clase": "dependiente",
    "recall": 0.5,
    "rango_primer_esperado": 1,
-   "ms": 178,
+   "ms": 150,
    "recuperados": [
     "2026-08-12-suelos-en-recuento-no-en-tasa",
     "2026-08-12-suelos-en-recuento-no-en-tasa",
-    "2026-08-12-suelos-en-recuento-no-en-tasa",
     "2026-08-12-el-arnes-no-ve-caerse-un-carril-entero",
-    "2026-08-12-suelos-en-recuento-no-en-tasa"
+    "2026-08-12-suelos-en-recuento-no-en-tasa",
+    "2026-08-12-epocas-para-medir-un-corpus-que-crece"
    ],
    "esperados": [
     "2026-08-12-suelos-en-recuento-no-en-tasa",
@@ -628,9 +628,9 @@
    "id": "P-35",
    "categoria": "multi_hop",
    "clase": "dependiente",
-   "recall": 0.5,
+   "recall": 1.0,
    "rango_primer_esperado": 1,
-   "ms": 135,
+   "ms": 173,
    "recuperados": [
     "2026-08-12-agno-env-fingerprint-ciego-al-corpus",
     "2026-08-12-agno-env-fingerprint-ciego-al-corpus",
@@ -642,27 +642,27 @@
     "2026-08-12-agno-env-fingerprint-ciego-al-corpus",
     "2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento"
    ],
-   "diagnostico": "cobertura"
+   "diagnostico": "ninguno"
   },
   {
    "id": "P-36",
    "categoria": "multi_hop",
    "clase": "dependiente",
-   "recall": 0.5,
+   "recall": 1.0,
    "rango_primer_esperado": 1,
-   "ms": 149,
+   "ms": 148,
    "recuperados": [
     "2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento",
     "2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento",
     "2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento",
     "2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento",
-    "2026-08-12-agno-env-fingerprint-ciego-al-corpus"
+    "2026-08-12-la-primera-ronda-del-bucle"
    ],
    "esperados": [
     "2026-08-12-epocas-para-medir-un-corpus-que-crece",
     "2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento"
    ],
-   "diagnostico": "cobertura"
+   "diagnostico": "ninguno"
   },
   {
    "id": "P-37",
@@ -670,13 +670,13 @@
    "clase": "dependiente",
    "recall": 1.0,
    "rango_primer_esperado": 2,
-   "ms": 149,
+   "ms": 174,
    "recuperados": [
     "2026-08-12-el-arnes-no-ve-caerse-un-carril-entero",
     "2026-08-12-un-detector-que-siempre-dispara-esta-apagado",
     "2026-08-12-un-detector-que-siempre-dispara-esta-apagado",
-    "2026-08-12-plainto-tsquery-hace-and-y-devuelve-cero",
-    "2026-08-12-el-arnes-no-ve-caerse-un-carril-entero"
+    "2026-08-12-el-arnes-no-ve-caerse-un-carril-entero",
+    "2026-08-12-plainto-tsquery-hace-and-y-devuelve-cero"
    ],
    "esperados": [
     "2026-08-12-plainto-tsquery-hace-and-y-devuelve-cero",
@@ -688,35 +688,35 @@
    "id": "P-38",
    "categoria": "aggregation",
    "clase": "dependiente",
-   "recall": 0.5,
+   "recall": 1.0,
    "rango_primer_esperado": 8,
-   "ms": 141,
+   "ms": 143,
    "recuperados": [
     "2026-08-12-el-holdout-no-resiste-python-arbitrario",
     "2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento",
     "2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento",
-    "2026-08-12-el-holdout-no-resiste-python-arbitrario",
-    "2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento"
+    "2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento",
+    "2026-08-12-el-holdout-no-resiste-python-arbitrario"
    ],
    "esperados": [
     "2026-08-12-agno-hybrid-search-predicado-comentado",
     "2026-08-12-agno-env-fingerprint-ciego-al-corpus"
    ],
-   "diagnostico": "cobertura"
+   "diagnostico": "ordenacion"
   },
   {
    "id": "P-39",
    "categoria": "aggregation",
    "clase": "dependiente",
    "recall": 0.5,
-   "rango_primer_esperado": 12,
-   "ms": 138,
+   "rango_primer_esperado": 14,
+   "ms": 142,
    "recuperados": [
     "2026-08-12-epocas-para-medir-un-corpus-que-crece",
     "2026-08-12-epocas-para-medir-un-corpus-que-crece",
     "2026-08-12-epocas-para-medir-un-corpus-que-crece",
     "2026-08-12-epocas-para-medir-un-corpus-que-crece",
-    "2026-08-12-el-carril-de-grafo-construido-y-sin-encender"
+    "2026-08-12-la-primera-ronda-del-bucle"
    ],
    "esperados": [
     "2026-08-12-suelos-en-recuento-no-en-tasa",
@@ -730,13 +730,13 @@
    "clase": "dependiente",
    "recall": 1.0,
    "rango_primer_esperado": 1,
-   "ms": 145,
+   "ms": 170,
    "recuperados": [
     "2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento",
     "2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento",
+    "2026-08-12-la-primera-ronda-del-bucle",
     "2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento",
-    "2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento",
-    "2026-08-12-epocas-para-medir-un-corpus-que-crece"
+    "2026-08-12-la-primera-ronda-del-bucle"
    ],
    "esperados": [
     "2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento"
@@ -753,7 +753,1477 @@
    "ms": 0,
    "recuperados": [],
    "esperados": []
+  },
+  {
+   "id": "P-42",
+   "categoria": "single_hop",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 1,
+   "ms": 150,
+   "recuperados": [
+    "2026-08-12-agno-environments-engine",
+    "2026-08-12-un-detector-que-siempre-dispara-esta-apagado",
+    "2026-08-12-la-primera-ronda-del-bucle",
+    "2026-08-12-agno-filtros-operadores-anunciados-no-implementados",
+    "2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento"
+   ],
+   "esperados": [
+    "2026-08-12-agno-environments-engine"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-43",
+   "categoria": "single_hop",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 3,
+   "ms": 160,
+   "recuperados": [
+    "2026-08-12-la-primera-ronda-del-bucle",
+    "2026-08-12-agno-filtros-operadores-anunciados-no-implementados",
+    "2026-08-12-agno-environments-engine",
+    "2026-08-12-un-detector-que-siempre-dispara-esta-apagado",
+    "2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento"
+   ],
+   "esperados": [
+    "2026-08-12-agno-environments-engine"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-44",
+   "categoria": "single_hop",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 7,
+   "ms": 143,
+   "recuperados": [
+    "2026-08-12-el-holdout-no-resiste-python-arbitrario",
+    "2026-08-12-el-holdout-no-resiste-python-arbitrario",
+    "2026-08-12-el-holdout-no-resiste-python-arbitrario",
+    "2026-08-12-getpass-no-falla-se-cuelga",
+    "2026-08-12-getpass-no-falla-se-cuelga"
+   ],
+   "esperados": [
+    "2026-08-12-agno-os-mcp-auth-builtin"
+   ],
+   "diagnostico": "ordenacion"
+  },
+  {
+   "id": "P-45",
+   "categoria": "single_hop",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 2,
+   "ms": 150,
+   "recuperados": [
+    "2026-08-12-agno-tools-agentos",
+    "2026-08-12-agno-fs-fs",
+    "2026-08-12-agno-tools-agentos",
+    "2026-08-12-agno-fs-toolkit",
+    "2026-08-12-agno-fs-toolkit"
+   ],
+   "esperados": [
+    "2026-08-12-agno-fs-fs"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-46",
+   "categoria": "single_hop",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 1,
+   "ms": 147,
+   "recuperados": [
+    "2026-08-12-agno-learn-curate",
+    "2026-08-12-la-primera-ronda-del-bucle",
+    "2026-08-12-la-primera-ronda-del-bucle",
+    "2026-08-12-epocas-para-medir-un-corpus-que-crece",
+    "2026-08-12-la-primera-ronda-del-bucle"
+   ],
+   "esperados": [
+    "2026-08-12-agno-learn-curate"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-47",
+   "categoria": "single_hop",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 1,
+   "ms": 146,
+   "recuperados": [
+    "2026-08-12-agno-db-clickhouse-clickhouse",
+    "2026-08-12-agno-db-clickhouse-schemas",
+    "2026-08-12-el-arnes-no-ve-caerse-un-carril-entero",
+    "2026-08-12-el-arnes-no-ve-caerse-un-carril-entero",
+    "2026-08-12-agno-filtros-operadores-anunciados-no-implementados"
+   ],
+   "esperados": [
+    "2026-08-12-agno-db-clickhouse-clickhouse"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-48",
+   "categoria": "single_hop",
+   "clase": "dependiente",
+   "recall": 0.0,
+   "rango_primer_esperado": null,
+   "ms": 158,
+   "recuperados": [
+    "2026-08-12-agno-filtros-operadores-anunciados-no-implementados",
+    "2026-08-12-agno-filtros-operadores-anunciados-no-implementados",
+    "2026-08-12-agno-filtros-operadores-anunciados-no-implementados",
+    "2026-08-12-agno-filtros-operadores-anunciados-no-implementados",
+    "2026-08-12-agno-hybrid-search-predicado-comentado"
+   ],
+   "esperados": [
+    "2026-08-12-agno-db-filter-converter"
+   ],
+   "diagnostico": "cobertura"
+  },
+  {
+   "id": "P-49",
+   "categoria": "single_hop",
+   "clase": "dependiente",
+   "recall": 0.0,
+   "rango_primer_esperado": null,
+   "ms": 150,
+   "recuperados": [
+    "2026-08-12-agno-tools-agentos",
+    "2026-08-12-agno-tools-agentos",
+    "2026-08-12-agno-tools-agentos",
+    "2026-08-12-agno-tools-agentos",
+    "2026-08-12-agno-os-mcp-auth-builtin"
+   ],
+   "esperados": [
+    "2026-08-12-agno-os-middleware-user-scope"
+   ],
+   "diagnostico": "cobertura"
+  },
+  {
+   "id": "P-50",
+   "categoria": "single_hop",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 1,
+   "ms": 148,
+   "recuperados": [
+    "2026-08-12-agno-environments-exporters-sft",
+    "2026-08-12-rrf-k-60-de-donde-sale-el-sesenta",
+    "2026-08-12-rrf-k-60-de-donde-sale-el-sesenta",
+    "2026-08-12-agno-tools-google-gmail",
+    "2026-08-12-rrf-k-60-de-donde-sale-el-sesenta"
+   ],
+   "esperados": [
+    "2026-08-12-agno-environments-exporters-sft"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-51",
+   "categoria": "single_hop",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 1,
+   "ms": 153,
+   "recuperados": [
+    "2026-08-12-agno-environments-exporters-sft",
+    "2026-08-12-agno-tools-google-gmail",
+    "2026-08-12-agno-tools-google-gmail",
+    "2026-08-12-la-primera-ronda-del-bucle",
+    "2026-08-12-agno-db-mcp-oauth-store"
+   ],
+   "esperados": [
+    "2026-08-12-agno-environments-exporters-sft"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-52",
+   "categoria": "single_hop",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 1,
+   "ms": 160,
+   "recuperados": [
+    "2026-08-12-agno-os-mcp-results",
+    "2026-08-12-agno-os-mcp-auth-builtin",
+    "2026-08-12-agno-os-mcp-auth-builtin",
+    "2026-08-12-agno-os-mcp-auth",
+    "2026-08-12-agno-os-mcp-auth-builtin"
+   ],
+   "esperados": [
+    "2026-08-12-agno-os-mcp-results"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-53",
+   "categoria": "single_hop",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 1,
+   "ms": 142,
+   "recuperados": [
+    "2026-08-12-agno-os-mcp-results",
+    "2026-08-12-agno-os-mcp-auth-builtin",
+    "2026-08-12-agno-os-mcp-auth-builtin",
+    "2026-08-12-agno-context-mcp-provider",
+    "2026-08-12-agno-os-mcp-auth-builtin"
+   ],
+   "esperados": [
+    "2026-08-12-agno-os-mcp-results"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-54",
+   "categoria": "single_hop",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 1,
+   "ms": 138,
+   "recuperados": [
+    "2026-08-12-agno-utils-models-genai-compat",
+    "2026-08-12-agno-utils-models-genai-compat",
+    "2026-08-12-agno-utils-models-genai-compat",
+    "2026-08-12-agno-utils-models-genai-compat",
+    "2026-08-12-agno-tools-google-sheets"
+   ],
+   "esperados": [
+    "2026-08-12-agno-utils-models-genai-compat"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-55",
+   "categoria": "single_hop",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 1,
+   "ms": 148,
+   "recuperados": [
+    "2026-08-12-agno-tools-agentos",
+    "2026-08-12-agno-tools-agentos",
+    "2026-08-12-agno-tools-agentos",
+    "2026-08-12-agno-os-managers",
+    "2026-08-12-agno-fs-fs"
+   ],
+   "esperados": [
+    "2026-08-12-agno-tools-agentos"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-56",
+   "categoria": "single_hop",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 1,
+   "ms": 157,
+   "recuperados": [
+    "2026-08-12-agno-context-provider",
+    "2026-08-12-agno-context-mcp-provider",
+    "2026-08-12-agno-context-database-provider",
+    "2026-08-12-agno-context-gmail-provider",
+    "2026-08-12-agno-context-provider"
+   ],
+   "esperados": [
+    "2026-08-12-agno-context-provider"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-57",
+   "categoria": "single_hop",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 1,
+   "ms": 135,
+   "recuperados": [
+    "2026-08-12-agno-learn-stores-decision-log",
+    "2026-08-12-ragchecker-la-aritmetica-no-la-dependencia",
+    "2026-08-12-el-carril-de-grafo-construido-y-sin-encender",
+    "2026-08-12-ragchecker-la-aritmetica-no-la-dependencia",
+    "2026-08-12-el-carril-de-grafo-construido-y-sin-encender"
+   ],
+   "esperados": [
+    "2026-08-12-agno-learn-stores-decision-log"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-58",
+   "categoria": "single_hop",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 1,
+   "ms": 148,
+   "recuperados": [
+    "2026-08-12-agno-scorer-model",
+    "2026-08-12-agno-env-fingerprint-ciego-al-corpus",
+    "2026-08-12-agno-env-fingerprint-ciego-al-corpus",
+    "2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento",
+    "2026-08-12-agno-context-provider"
+   ],
+   "esperados": [
+    "2026-08-12-agno-scorer-model"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-59",
+   "categoria": "single_hop",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 1,
+   "ms": 136,
+   "recuperados": [
+    "2026-08-12-agno-scorer-model",
+    "2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento",
+    "2026-08-12-agno-context-provider",
+    "2026-08-12-agno-os-mcp-auth-builtin",
+    "2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento"
+   ],
+   "esperados": [
+    "2026-08-12-agno-scorer-model"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-60",
+   "categoria": "single_hop",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 1,
+   "ms": 139,
+   "recuperados": [
+    "2026-08-12-agno-tools-google-maps",
+    "2026-08-12-agno-tools-google-sheets",
+    "2026-08-12-agno-tools-google-sheets",
+    "2026-08-12-agno-tools-google-gmail",
+    "2026-08-12-agno-tools-google-gmail"
+   ],
+   "esperados": [
+    "2026-08-12-agno-tools-google-maps"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-61",
+   "categoria": "single_hop",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 1,
+   "ms": 138,
+   "recuperados": [
+    "2026-08-12-agno-os-mcp-auth-builtin",
+    "2026-08-12-agno-os-mcp-auth-builtin",
+    "2026-08-12-agno-os-mcp-auth-builtin",
+    "2026-08-12-agno-os-mcp-auth-builtin",
+    "2026-08-12-agno-context-mcp-provider"
+   ],
+   "esperados": [
+    "2026-08-12-agno-os-mcp-auth-builtin"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-62",
+   "categoria": "lexical_exact",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 16,
+   "ms": 134,
+   "recuperados": [
+    "2026-08-12-plainto-tsquery-hace-and-y-devuelve-cero",
+    "2026-08-12-un-detector-que-siempre-dispara-esta-apagado",
+    "2026-08-12-rrf-k-60-de-donde-sale-el-sesenta",
+    "2026-08-12-un-detector-que-siempre-dispara-esta-apagado",
+    "2026-08-12-la-primera-ronda-del-bucle"
+   ],
+   "esperados": [
+    "2026-08-12-agno-environments-engine"
+   ],
+   "diagnostico": "ordenacion"
+  },
+  {
+   "id": "P-63",
+   "categoria": "lexical_exact",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 1,
+   "ms": 133,
+   "recuperados": [
+    "2026-08-12-agno-tools-google-maps",
+    "2026-08-12-agno-tools-google-sheets",
+    "2026-08-12-agno-tools-google-sheets",
+    "2026-08-12-agno-os-mcp-auth",
+    "2026-08-12-agno-context-provider"
+   ],
+   "esperados": [
+    "2026-08-12-agno-tools-google-maps"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-64",
+   "categoria": "lexical_exact",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 5,
+   "ms": 137,
+   "recuperados": [
+    "2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento",
+    "2026-08-12-rrf-k-60-de-donde-sale-el-sesenta",
+    "2026-08-12-agno-filtros-operadores-anunciados-no-implementados",
+    "2026-08-12-agno-pgvector-indices-decorativos",
+    "2026-08-12-agno-utils-models-genai-compat"
+   ],
+   "esperados": [
+    "2026-08-12-agno-utils-models-genai-compat"
+   ],
+   "diagnostico": "ordenacion"
+  },
+  {
+   "id": "P-65",
+   "categoria": "lexical_exact",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 1,
+   "ms": 148,
+   "recuperados": [
+    "2026-08-12-agno-os-middleware-user-scope",
+    "2026-08-12-agno-os-middleware-user-scope",
+    "2026-08-12-agno-os-middleware-user-scope",
+    "2026-08-12-agno-environments-exporters-sft",
+    "2026-08-12-agno-environments-engine"
+   ],
+   "esperados": [
+    "2026-08-12-agno-os-middleware-user-scope"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-66",
+   "categoria": "lexical_exact",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 7,
+   "ms": 130,
+   "recuperados": [
+    "2026-08-12-el-holdout-no-resiste-python-arbitrario",
+    "2026-08-12-el-holdout-no-resiste-python-arbitrario",
+    "2026-08-12-agno-os-mcp-auth-builtin",
+    "2026-08-12-ragchecker-la-aritmetica-no-la-dependencia",
+    "2026-08-12-el-holdout-no-resiste-python-arbitrario"
+   ],
+   "esperados": [
+    "2026-08-12-agno-os-middleware-user-scope"
+   ],
+   "diagnostico": "ordenacion"
+  },
+  {
+   "id": "P-67",
+   "categoria": "lexical_exact",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 1,
+   "ms": 135,
+   "recuperados": [
+    "2026-08-12-agno-tools-agentos",
+    "2026-08-12-agno-tools-agentos",
+    "2026-08-12-agno-tools-agentos",
+    "2026-08-12-agno-os-mcp-auth-builtin",
+    "2026-08-12-agno-tools-agentos"
+   ],
+   "esperados": [
+    "2026-08-12-agno-os-mcp-auth-builtin",
+    "2026-08-12-agno-tools-agentos"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-68",
+   "categoria": "lexical_exact",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 13,
+   "ms": 133,
+   "recuperados": [
+    "2026-08-12-el-arnes-no-ve-caerse-un-carril-entero",
+    "2026-08-12-epocas-para-medir-un-corpus-que-crece",
+    "2026-08-12-agno-hybrid-search-predicado-comentado",
+    "2026-08-12-agno-filtros-operadores-anunciados-no-implementados",
+    "2026-08-12-agno-filtros-operadores-anunciados-no-implementados"
+   ],
+   "esperados": [
+    "2026-08-12-agno-db-filter-converter"
+   ],
+   "diagnostico": "ordenacion"
+  },
+  {
+   "id": "P-69",
+   "categoria": "lexical_exact",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 3,
+   "ms": 132,
+   "recuperados": [
+    "2026-08-12-agno-db-schemas-mcp-oauth",
+    "2026-08-12-agno-db-schemas-mcp-oauth",
+    "2026-08-12-agno-os-mcp-auth-builtin",
+    "2026-08-12-agno-os-mcp-auth-builtin",
+    "2026-08-12-agno-os-mcp-auth-builtin"
+   ],
+   "esperados": [
+    "2026-08-12-agno-os-mcp-auth-builtin"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-70",
+   "categoria": "lexical_exact",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 2,
+   "ms": 147,
+   "recuperados": [
+    "2026-08-12-agno-tools-agentos",
+    "2026-08-12-agno-fs-fs",
+    "2026-08-12-agno-tools-agentos",
+    "2026-08-12-agno-tools-agentos",
+    "2026-08-12-agno-context-provider"
+   ],
+   "esperados": [
+    "2026-08-12-agno-fs-fs"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-71",
+   "categoria": "lexical_exact",
+   "clase": "dependiente",
+   "recall": 0.0,
+   "rango_primer_esperado": null,
+   "ms": 145,
+   "recuperados": [
+    "2026-08-12-la-primera-ronda-del-bucle",
+    "2026-08-12-la-primera-ronda-del-bucle",
+    "2026-08-12-la-primera-ronda-del-bucle",
+    "2026-08-12-rrf-k-60-de-donde-sale-el-sesenta",
+    "2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento"
+   ],
+   "esperados": [
+    "2026-08-12-agno-learn-curate"
+   ],
+   "diagnostico": "cobertura"
+  },
+  {
+   "id": "P-72",
+   "categoria": "lexical_exact",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 13,
+   "ms": 165,
+   "recuperados": [
+    "2026-08-12-agno-filtros-operadores-anunciados-no-implementados",
+    "2026-08-12-agno-filtros-operadores-anunciados-no-implementados",
+    "2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento",
+    "2026-08-12-agno-filtros-operadores-anunciados-no-implementados",
+    "2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento"
+   ],
+   "esperados": [
+    "2026-08-12-agno-filters"
+   ],
+   "diagnostico": "ordenacion"
+  },
+  {
+   "id": "P-73",
+   "categoria": "multi_hop",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 1,
+   "ms": 141,
+   "recuperados": [
+    "2026-08-12-agno-filtros-operadores-anunciados-no-implementados",
+    "2026-08-12-agno-filtros-operadores-anunciados-no-implementados",
+    "2026-08-12-agno-filtros-operadores-anunciados-no-implementados",
+    "2026-08-12-agno-filtros-operadores-anunciados-no-implementados",
+    "2026-08-12-un-detector-que-siempre-dispara-esta-apagado"
+   ],
+   "esperados": [
+    "2026-08-12-agno-filters",
+    "2026-08-12-agno-filtros-operadores-anunciados-no-implementados"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-74",
+   "categoria": "multi_hop",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 1,
+   "ms": 147,
+   "recuperados": [
+    "2026-08-12-agno-filtros-operadores-anunciados-no-implementados",
+    "2026-08-12-agno-filtros-operadores-anunciados-no-implementados",
+    "2026-08-12-agno-filtros-operadores-anunciados-no-implementados",
+    "2026-08-12-agno-os-mcp-auth",
+    "2026-08-12-agno-filtros-operadores-anunciados-no-implementados"
+   ],
+   "esperados": [
+    "2026-08-12-agno-db-filter-converter",
+    "2026-08-12-agno-filtros-operadores-anunciados-no-implementados"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-75",
+   "categoria": "multi_hop",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 1,
+   "ms": 143,
+   "recuperados": [
+    "2026-08-12-agno-scorer-model",
+    "2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento",
+    "2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento",
+    "2026-08-12-agno-env-fingerprint-ciego-al-corpus",
+    "2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento"
+   ],
+   "esperados": [
+    "2026-08-12-agno-scorer-model",
+    "2026-08-12-agno-env-fingerprint-ciego-al-corpus"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-76",
+   "categoria": "multi_hop",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 8,
+   "ms": 156,
+   "recuperados": [
+    "2026-08-12-la-primera-ronda-del-bucle",
+    "2026-08-12-la-primera-ronda-del-bucle",
+    "2026-08-12-la-primera-ronda-del-bucle",
+    "2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento",
+    "2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento"
+   ],
+   "esperados": [
+    "2026-08-12-agno-environments-engine",
+    "2026-08-12-agno-env-fingerprint-ciego-al-corpus"
+   ],
+   "diagnostico": "ordenacion"
+  },
+  {
+   "id": "P-77",
+   "categoria": "multi_hop",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 1,
+   "ms": 161,
+   "recuperados": [
+    "2026-08-12-agno-environments-exporters-sft",
+    "2026-08-12-agno-os-mcp-results",
+    "2026-08-12-agno-os-mcp-auth-builtin",
+    "2026-08-12-agno-os-mcp-auth-builtin",
+    "2026-08-12-agno-os-mcp-auth-builtin"
+   ],
+   "esperados": [
+    "2026-08-12-agno-environments-exporters-sft",
+    "2026-08-12-agno-os-mcp-results"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-78",
+   "categoria": "multi_hop",
+   "clase": "dependiente",
+   "recall": 0.5,
+   "rango_primer_esperado": 3,
+   "ms": 162,
+   "recuperados": [
+    "2026-08-12-agno-filtros-operadores-anunciados-no-implementados",
+    "2026-08-12-agno-filtros-operadores-anunciados-no-implementados",
+    "2026-08-12-agno-db-clickhouse-clickhouse",
+    "2026-08-12-agno-db-clickhouse-schemas",
+    "2026-08-12-agno-filtros-operadores-anunciados-no-implementados"
+   ],
+   "esperados": [
+    "2026-08-12-agno-db-clickhouse-clickhouse",
+    "2026-08-12-agno-db-filter-converter"
+   ],
+   "diagnostico": "cobertura"
+  },
+  {
+   "id": "P-79",
+   "categoria": "multi_hop",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 1,
+   "ms": 119,
+   "recuperados": [
+    "2026-08-12-agno-learn-stores-decision-log",
+    "2026-08-12-la-primera-ronda-del-bucle",
+    "2026-08-12-la-primera-ronda-del-bucle",
+    "2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento",
+    "2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento"
+   ],
+   "esperados": [
+    "2026-08-12-agno-learn-stores-decision-log",
+    "2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-80",
+   "categoria": "multi_hop",
+   "clase": "dependiente",
+   "recall": 0.5,
+   "rango_primer_esperado": 6,
+   "ms": 145,
+   "recuperados": [
+    "2026-08-12-agno-tools-agentos",
+    "2026-08-12-agno-tools-agentos",
+    "2026-08-12-agno-tools-agentos",
+    "2026-08-12-agno-tools-agentos",
+    "2026-08-12-agno-context-provider"
+   ],
+   "esperados": [
+    "2026-08-12-agno-os-mcp-auth-builtin",
+    "2026-08-12-agno-os-middleware-user-scope"
+   ],
+   "diagnostico": "cobertura"
+  },
+  {
+   "id": "P-81",
+   "categoria": "multi_hop",
+   "clase": "dependiente",
+   "recall": 0.5,
+   "rango_primer_esperado": 11,
+   "ms": 133,
+   "recuperados": [
+    "2026-08-12-agno-os-mcp-auth",
+    "2026-08-12-agno-env-fingerprint-ciego-al-corpus",
+    "2026-08-12-agno-environments-init",
+    "2026-08-12-agno-db-schemas-mcp-oauth",
+    "2026-08-12-el-arnes-no-ve-caerse-un-carril-entero"
+   ],
+   "esperados": [
+    "2026-08-12-agno-pgvector-indices-decorativos",
+    "2026-08-12-agno-hybrid-search-predicado-comentado"
+   ],
+   "diagnostico": "cobertura"
+  },
+  {
+   "id": "P-82",
+   "categoria": "multi_hop",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 2,
+   "ms": 138,
+   "recuperados": [
+    "2026-08-12-agno-fs-toolkit",
+    "2026-08-12-agno-fs-fs",
+    "2026-08-12-agno-tools-agentos",
+    "2026-08-12-agno-fs-toolkit",
+    "2026-08-12-agno-tools-agentos"
+   ],
+   "esperados": [
+    "2026-08-12-agno-fs-fs",
+    "2026-08-12-agno-learn-stores-init"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-83",
+   "categoria": "multi_hop",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 1,
+   "ms": 128,
+   "recuperados": [
+    "2026-08-12-agno-utils-models-genai-compat",
+    "2026-08-12-agno-environments-exporters-sft",
+    "2026-08-12-agno-utils-models-genai-compat",
+    "2026-08-12-agno-utils-models-genai-compat",
+    "2026-08-12-agno-utils-models-genai-compat"
+   ],
+   "esperados": [
+    "2026-08-12-agno-utils-models-genai-compat",
+    "2026-08-12-agno-environments-exporters-sft"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-84",
+   "categoria": "aggregation",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 1,
+   "ms": 160,
+   "recuperados": [
+    "2026-08-12-agno-context-mcp-provider",
+    "2026-08-12-agno-context-provider",
+    "2026-08-12-agno-context-database-provider",
+    "2026-08-12-agno-context-provider",
+    "2026-08-12-agno-context-provider"
+   ],
+   "esperados": [
+    "2026-08-12-agno-context-provider",
+    "2026-08-12-agno-context-gmail-provider",
+    "2026-08-12-agno-context-mcp-provider"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-85",
+   "categoria": "aggregation",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 1,
+   "ms": 162,
+   "recuperados": [
+    "2026-08-12-agno-tools-google-drive",
+    "2026-08-12-agno-tools-google-sheets",
+    "2026-08-12-agno-tools-google-maps",
+    "2026-08-12-agno-tools-google-gmail",
+    "2026-08-12-agno-utils-models-genai-compat"
+   ],
+   "esperados": [
+    "2026-08-12-agno-tools-google-drive",
+    "2026-08-12-agno-tools-google-gmail",
+    "2026-08-12-agno-tools-google-maps",
+    "2026-08-12-agno-tools-google-sheets"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-86",
+   "categoria": "aggregation",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 6,
+   "ms": 143,
+   "recuperados": [
+    "2026-08-12-agno-pgvector-indices-decorativos",
+    "2026-08-12-agno-os-mcp-auth",
+    "2026-08-12-agno-pgvector-indices-decorativos",
+    "2026-08-12-agno-environments-init",
+    "2026-08-12-agno-pgvector-indices-decorativos"
+   ],
+   "esperados": [
+    "2026-08-12-agno-learn-config",
+    "2026-08-12-agno-learn-stores-init",
+    "2026-08-12-agno-learn-curate"
+   ],
+   "diagnostico": "ordenacion"
+  },
+  {
+   "id": "P-87",
+   "categoria": "aggregation",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 1,
+   "ms": 134,
+   "recuperados": [
+    "2026-08-12-agno-environments-init",
+    "2026-08-12-agno-environments-render",
+    "2026-08-12-agno-env-fingerprint-ciego-al-corpus",
+    "2026-08-12-agno-env-fingerprint-ciego-al-corpus",
+    "2026-08-12-agno-scorer-model"
+   ],
+   "esperados": [
+    "2026-08-12-agno-environments-engine",
+    "2026-08-12-agno-environments-init",
+    "2026-08-12-agno-environments-render"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-88",
+   "categoria": "aggregation",
+   "clase": "dependiente",
+   "recall": 0.0,
+   "rango_primer_esperado": null,
+   "ms": 151,
+   "recuperados": [
+    "2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento",
+    "2026-08-12-agno-env-fingerprint-ciego-al-corpus",
+    "2026-08-12-agno-environments-init",
+    "2026-08-12-agno-learn-stores-decision-log",
+    "2026-08-12-agno-os-mcp-auth"
+   ],
+   "esperados": [
+    "2026-08-12-agno-environments-exporters-sft",
+    "2026-08-12-agno-os-mcp-results",
+    "2026-08-12-agno-scorer-model"
+   ],
+   "diagnostico": "cobertura"
+  },
+  {
+   "id": "P-89",
+   "categoria": "aggregation",
+   "clase": "dependiente",
+   "recall": 0.3333333333333333,
+   "rango_primer_esperado": 9,
+   "ms": 170,
+   "recuperados": [
+    "2026-08-12-agno-tools-agentos",
+    "2026-08-12-agno-tools-agentos",
+    "2026-08-12-agno-tools-agentos",
+    "2026-08-12-agno-tools-agentos",
+    "2026-08-12-agno-fs-fs"
+   ],
+   "esperados": [
+    "2026-08-12-agno-os-mcp-auth-builtin",
+    "2026-08-12-agno-os-middleware-user-scope",
+    "2026-08-12-agno-os-mcp-results"
+   ],
+   "diagnostico": "cobertura"
+  },
+  {
+   "id": "P-90",
+   "categoria": "aggregation",
+   "clase": "dependiente",
+   "recall": 0.5,
+   "rango_primer_esperado": 8,
+   "ms": 136,
+   "recuperados": [
+    "2026-08-12-agno-os-middleware-user-scope",
+    "2026-08-12-agno-pgvector-indices-decorativos",
+    "2026-08-12-agno-db-mcp-oauth-store",
+    "2026-08-12-agno-db-schemas-mcp-oauth",
+    "2026-08-12-agno-context-database-provider"
+   ],
+   "esperados": [
+    "2026-08-12-agno-db-clickhouse-clickhouse",
+    "2026-08-12-agno-db-clickhouse-schemas"
+   ],
+   "diagnostico": "cobertura"
+  },
+  {
+   "id": "P-91",
+   "categoria": "single_hop",
+   "clase": "dependiente",
+   "recall": 0.0,
+   "rango_primer_esperado": null,
+   "ms": 150,
+   "recuperados": [
+    "2026-08-12-agno-environments-engine",
+    "2026-08-12-agno-filtros-operadores-anunciados-no-implementados",
+    "2026-08-12-agno-learn-config",
+    "2026-08-12-agno-utils-models-genai-compat",
+    "2026-08-12-un-detector-que-siempre-dispara-esta-apagado"
+   ],
+   "esperados": [
+    "2026-08-12-agno-environments-render"
+   ],
+   "diagnostico": "cobertura"
+  },
+  {
+   "id": "P-92",
+   "categoria": "single_hop",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 1,
+   "ms": 150,
+   "recuperados": [
+    "2026-08-12-agno-eval-suite",
+    "2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento",
+    "2026-08-12-agno-tools-agentos",
+    "2026-08-12-agno-os-mcp-auth",
+    "2026-08-12-agno-db-schemas-mcp-oauth"
+   ],
+   "esperados": [
+    "2026-08-12-agno-eval-suite"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-94",
+   "categoria": "single_hop",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 1,
+   "ms": 140,
+   "recuperados": [
+    "2026-08-12-agno-knowledge-loaders-init",
+    "2026-08-12-el-carril-de-grafo-construido-y-sin-encender",
+    "2026-08-12-el-carril-de-grafo-construido-y-sin-encender",
+    "2026-08-12-agno-os-middleware-user-scope",
+    "2026-08-12-el-carril-de-grafo-construido-y-sin-encender"
+   ],
+   "esperados": [
+    "2026-08-12-agno-knowledge-loaders-init"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-95",
+   "categoria": "single_hop",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 4,
+   "ms": 139,
+   "recuperados": [
+    "2026-08-12-agno-learn-curate",
+    "2026-08-12-agno-learn-stores-init",
+    "2026-08-12-el-holdout-no-resiste-python-arbitrario",
+    "2026-08-12-agno-learn-stores-entity-memory",
+    "2026-08-12-agno-learn-stores-entity-memory"
+   ],
+   "esperados": [
+    "2026-08-12-agno-learn-stores-entity-memory"
+   ],
+   "diagnostico": "ordenacion"
+  },
+  {
+   "id": "P-96",
+   "categoria": "single_hop",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 3,
+   "ms": 147,
+   "recuperados": [
+    "2026-08-12-agno-learn-config",
+    "2026-08-12-agno-tools-google-maps",
+    "2026-08-12-agno-learn-schemas",
+    "2026-08-12-agno-learn-curate",
+    "2026-08-12-agno-environments-render"
+   ],
+   "esperados": [
+    "2026-08-12-agno-learn-schemas"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-97",
+   "categoria": "single_hop",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 1,
+   "ms": 159,
+   "recuperados": [
+    "2026-08-12-agno-os-managers",
+    "2026-08-12-agno-tools-agentos",
+    "2026-08-12-agno-tools-agentos",
+    "2026-08-12-agno-tools-agentos",
+    "2026-08-12-agno-fs-fs"
+   ],
+   "esperados": [
+    "2026-08-12-agno-os-managers"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-98",
+   "categoria": "single_hop",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 1,
+   "ms": 151,
+   "recuperados": [
+    "2026-08-12-agno-os-interfaces-slack-events",
+    "2026-08-12-agno-os-managers",
+    "2026-08-12-el-holdout-no-resiste-python-arbitrario",
+    "2026-08-12-agno-utils-models-genai-compat",
+    "2026-08-12-getpass-no-falla-se-cuelga"
+   ],
+   "esperados": [
+    "2026-08-12-agno-os-interfaces-slack-events"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-99",
+   "categoria": "single_hop",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 2,
+   "ms": 144,
+   "recuperados": [
+    "2026-08-12-agno-db-clickhouse-clickhouse",
+    "2026-08-12-agno-db-clickhouse-schemas",
+    "2026-08-12-agno-os-mcp-auth-builtin",
+    "2026-08-12-plainto-tsquery-hace-and-y-devuelve-cero",
+    "2026-08-12-agno-tools-google-gmail"
+   ],
+   "esperados": [
+    "2026-08-12-agno-db-clickhouse-schemas"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-100",
+   "categoria": "single_hop",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 3,
+   "ms": 143,
+   "recuperados": [
+    "2026-08-12-agno-os-mcp-auth-builtin",
+    "2026-08-12-agno-os-mcp-auth",
+    "2026-08-12-agno-db-schemas-mcp-oauth",
+    "2026-08-12-agno-os-mcp-auth",
+    "2026-08-12-agno-os-mcp-auth-builtin"
+   ],
+   "esperados": [
+    "2026-08-12-agno-db-mcp-oauth-store",
+    "2026-08-12-agno-db-schemas-mcp-oauth"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-101",
+   "categoria": "single_hop",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 1,
+   "ms": 151,
+   "recuperados": [
+    "2026-08-12-agno-context-database-provider",
+    "2026-08-12-agno-context-mcp-provider",
+    "2026-08-12-agno-context-provider",
+    "2026-08-12-agno-context-gdrive-provider",
+    "2026-08-12-agno-context-provider"
+   ],
+   "esperados": [
+    "2026-08-12-agno-context-database-provider"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-102",
+   "categoria": "single_hop",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 1,
+   "ms": 159,
+   "recuperados": [
+    "2026-08-12-agno-context-gdrive-provider",
+    "2026-08-12-agno-tools-google-drive",
+    "2026-08-12-agno-context-gdrive-provider",
+    "2026-08-12-agno-tools-google-drive",
+    "2026-08-12-agno-tools-google-sheets"
+   ],
+   "esperados": [
+    "2026-08-12-agno-context-gdrive-provider"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-103",
+   "categoria": "single_hop",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 1,
+   "ms": 136,
+   "recuperados": [
+    "2026-08-12-agno-context-calendar-provider",
+    "2026-08-12-agno-context-provider",
+    "2026-08-12-agno-context-mcp-provider",
+    "2026-08-12-agno-context-provider",
+    "2026-08-12-agno-context-database-provider"
+   ],
+   "esperados": [
+    "2026-08-12-agno-context-calendar-provider"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-104",
+   "categoria": "single_hop",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 1,
+   "ms": 157,
+   "recuperados": [
+    "2026-08-12-agno-fs-toolkit",
+    "2026-08-12-agno-fs-toolkit",
+    "2026-08-12-agno-fs-toolkit",
+    "2026-08-12-el-holdout-no-resiste-python-arbitrario",
+    "2026-08-12-agno-fs-toolkit"
+   ],
+   "esperados": [
+    "2026-08-12-agno-fs-toolkit"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-105",
+   "categoria": "single_hop",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 1,
+   "ms": 134,
+   "recuperados": [
+    "2026-08-12-agno-tools-google-sheets",
+    "2026-08-12-agno-tools-google-sheets",
+    "2026-08-12-agno-tools-google-sheets",
+    "2026-08-12-agno-tools-google-sheets",
+    "2026-08-12-el-carril-de-grafo-construido-y-sin-encender"
+   ],
+   "esperados": [
+    "2026-08-12-agno-tools-google-sheets"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-106",
+   "categoria": "single_hop",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 1,
+   "ms": 138,
+   "recuperados": [
+    "2026-08-12-agno-tools-google-drive",
+    "2026-08-12-agno-tools-google-drive",
+    "2026-08-12-agno-tools-google-drive",
+    "2026-08-12-agno-context-gdrive-provider",
+    "2026-08-12-agno-context-gdrive-provider"
+   ],
+   "esperados": [
+    "2026-08-12-agno-tools-google-drive"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-107",
+   "categoria": "single_hop",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 1,
+   "ms": 115,
+   "recuperados": [
+    "2026-08-12-agno-tools-google-gmail",
+    "2026-08-12-agno-tools-google-gmail",
+    "2026-08-12-agno-tools-google-gmail",
+    "2026-08-12-agno-context-gmail-provider",
+    "2026-08-12-agno-tools-google-gmail"
+   ],
+   "esperados": [
+    "2026-08-12-agno-tools-google-gmail"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-108",
+   "categoria": "single_hop",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 1,
+   "ms": 118,
+   "recuperados": [
+    "2026-08-12-agno-learn-config",
+    "2026-08-12-agno-learn-schemas",
+    "2026-08-12-agno-learn-curate",
+    "2026-08-12-agno-tools-agentos",
+    "2026-08-12-un-detector-que-siempre-dispara-esta-apagado"
+   ],
+   "esperados": [
+    "2026-08-12-agno-learn-config"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-109",
+   "categoria": "temporal",
+   "clase": "dependiente",
+   "recall": 1.0,
+   "rango_primer_esperado": 1,
+   "ms": 150,
+   "recuperados": [
+    "2026-08-12-agno-filtros-operadores-anunciados-no-implementados",
+    "2026-08-12-epocas-para-medir-un-corpus-que-crece",
+    "2026-08-12-agno-filtros-operadores-anunciados-no-implementados",
+    "2026-08-12-un-detector-que-siempre-dispara-esta-apagado",
+    "2026-08-12-un-detector-que-siempre-dispara-esta-apagado"
+   ],
+   "esperados": [
+    "2026-08-12-agno-filtros-operadores-anunciados-no-implementados"
+   ],
+   "diagnostico": "ninguno"
+  },
+  {
+   "id": "P-110",
+   "categoria": "temporal",
+   "clase": "invariante",
+   "diagnostico": "no-medible",
+   "recall": null,
+   "rango_primer_esperado": null,
+   "ms": 0,
+   "recuperados": [],
+   "esperados": []
+  },
+  {
+   "id": "P-111",
+   "categoria": "fuera_de_alcance",
+   "clase": "invariante",
+   "diagnostico": "no-medible",
+   "recall": null,
+   "rango_primer_esperado": null,
+   "ms": 0,
+   "recuperados": [],
+   "esperados": []
+  },
+  {
+   "id": "P-112",
+   "categoria": "fuera_de_alcance",
+   "clase": "invariante",
+   "diagnostico": "no-medible",
+   "recall": null,
+   "rango_primer_esperado": null,
+   "ms": 0,
+   "recuperados": [],
+   "esperados": []
+  },
+  {
+   "id": "P-113",
+   "categoria": "fuera_de_alcance",
+   "clase": "invariante",
+   "diagnostico": "no-medible",
+   "recall": null,
+   "rango_primer_esperado": null,
+   "ms": 0,
+   "recuperados": [],
+   "esperados": []
+  },
+  {
+   "id": "P-114",
+   "categoria": "fuera_de_alcance",
+   "clase": "invariante",
+   "diagnostico": "no-medible",
+   "recall": null,
+   "rango_primer_esperado": null,
+   "ms": 0,
+   "recuperados": [],
+   "esperados": []
+  },
+  {
+   "id": "P-115",
+   "categoria": "fuera_de_alcance",
+   "clase": "invariante",
+   "diagnostico": "no-medible",
+   "recall": null,
+   "rango_primer_esperado": null,
+   "ms": 0,
+   "recuperados": [],
+   "esperados": []
+  },
+  {
+   "id": "P-116",
+   "categoria": "fuera_de_alcance",
+   "clase": "invariante",
+   "diagnostico": "no-medible",
+   "recall": null,
+   "rango_primer_esperado": null,
+   "ms": 0,
+   "recuperados": [],
+   "esperados": []
+  },
+  {
+   "id": "P-117",
+   "categoria": "fuera_de_alcance",
+   "clase": "invariante",
+   "diagnostico": "no-medible",
+   "recall": null,
+   "rango_primer_esperado": null,
+   "ms": 0,
+   "recuperados": [],
+   "esperados": []
+  },
+  {
+   "id": "P-118",
+   "categoria": "fuera_de_alcance",
+   "clase": "invariante",
+   "diagnostico": "no-medible",
+   "recall": null,
+   "rango_primer_esperado": null,
+   "ms": 0,
+   "recuperados": [],
+   "esperados": []
+  },
+  {
+   "id": "P-119",
+   "categoria": "fuera_de_alcance",
+   "clase": "invariante",
+   "diagnostico": "no-medible",
+   "recall": null,
+   "rango_primer_esperado": null,
+   "ms": 0,
+   "recuperados": [],
+   "esperados": []
+  },
+  {
+   "id": "P-120",
+   "categoria": "fuera_de_alcance",
+   "clase": "invariante",
+   "diagnostico": "no-medible",
+   "recall": null,
+   "rango_primer_esperado": null,
+   "ms": 0,
+   "recuperados": [],
+   "esperados": []
+  },
+  {
+   "id": "P-121",
+   "categoria": "fuera_de_alcance",
+   "clase": "invariante",
+   "diagnostico": "no-medible",
+   "recall": null,
+   "rango_primer_esperado": null,
+   "ms": 0,
+   "recuperados": [],
+   "esperados": []
+  },
+  {
+   "id": "P-122",
+   "categoria": "fuera_de_alcance",
+   "clase": "invariante",
+   "diagnostico": "no-medible",
+   "recall": null,
+   "rango_primer_esperado": null,
+   "ms": 0,
+   "recuperados": [],
+   "esperados": []
+  },
+  {
+   "id": "P-123",
+   "categoria": "fuera_de_alcance",
+   "clase": "invariante",
+   "diagnostico": "no-medible",
+   "recall": null,
+   "rango_primer_esperado": null,
+   "ms": 0,
+   "recuperados": [],
+   "esperados": []
+  },
+  {
+   "id": "P-124",
+   "categoria": "fuera_de_alcance",
+   "clase": "invariante",
+   "diagnostico": "no-medible",
+   "recall": null,
+   "rango_primer_esperado": null,
+   "ms": 0,
+   "recuperados": [],
+   "esperados": []
   }
  ],
- "suspendidas": []
+ "suspendidas": [
+  {
+   "id": "P-93",
+   "motivo": "artefacto(s) no vigente(s) en esta época: ['2026-08-12-agno-environments-exporters-validator']"
+  }
+ ]
 }
