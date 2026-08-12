@@ -18,6 +18,8 @@ No hay Makefile: en Windows no hay `make`. `rag` es un entry point de packaging.
 cerebro/
   spec.md         LA FUNCIÓN OBJETIVO. Denegada a la edición. Su sha entra en la
                   huella del juez: tocarla invalida toda medición anterior.
+  SPEC-PENDIENTE  errores encontrados EN la spec, esperando firma humana. Si
+                  tiene contenido, la spec afirma algo que el código no hace.
   config.py       PALANCAS + gradas + huellas. EL ÚNICO FICHERO QUE EL BUCLE EDITA.
   agente.py       traduce palancas a objetos de Agno
   recuperador.py  dos carriles + RRF + captura de traza. El seam de lectura.
@@ -53,17 +55,17 @@ docs/
 
 .github/
   workflows/ci.yml            corre sin ninguna clave
-  scripts/comprobar-mermaid   los 28 diagramas parsean de verdad
+  scripts/comprobar-mermaid   los 29 diagramas parsean de verdad
   scripts/comprobar_enlaces   ningún enlace interno roto
 
 artefactos/entrada/   la bandeja. Suelta .md aquí.
-artefactos/corpus/    lo ingerido. ES el corpus. 12 artefactos. Denegado.
+artefactos/corpus/    lo ingerido. ES el corpus. 13 artefactos. Denegado.
 runs/                 el archivo. Nunca se borra.
 ```
 
 ## Cinco cosas que hay que saber antes de tocar nada
 
-**1 · Agno 2.8.6 tiene tres defectos verificados que este repo esquiva.**
+**1 · Agno 2.8.6 tiene cuatro defectos verificados que este repo esquiva.**
 `PgVector.create()` no crea el HNSW ni el GIN —solo `optimize()`, al que nadie
 llama—; `_create_gin_index` interpola el idioma sin comillas y falla con
 `spanish`; y `hybrid_search` tiene el `@@` comentado, así que escanea la tabla
@@ -107,11 +109,11 @@ humano y está denegado al agente.
 
   | | líneas | presupuesto |
   |---|---|---|
-  | `evals/` — bucle y arnés | 977 | ≤ 1.000, comparable a atlas-rai |
-  | `cerebro/` | 1.916 | ≤ 2.000 |
+  | `evals/` — bucle y arnés | 1.036 | ≤ 1.000 · **excedido** |
+  | `cerebro/` | 1.924 | ≤ 2.000 |
   | `ingesta/` | 740 | ≤ 800 |
-  | `scripts/` + `tareas.py` | 1.882 | ≤ 1.500 · **excedido** |
-  | **total sin tests** | **5.515** | |
+  | `scripts/` + `tareas.py` | 1.909 | ≤ 1.500 · **excedido** |
+  | **total sin tests** | **5.609** | |
 
   Una versión anterior de esta línea decía «por debajo de 1.500 LOC» a secas,
   con 5.249 en el repo. Era una convención que el propio repo incumplía en su

@@ -7,8 +7,18 @@
 #
 # `fuera_de_alcance` es la categoría que impide que el bucle aprenda a subir la
 # nota recuperando cada vez más contexto y respondiendo a todo. Si la quitas, el
-# bucle degenera. SUELO: por debajo de 12 probes activas en ese estrato, el
-# arnés se niega a correr.
+# bucle degenera.
+#
+# SUELO, y es PROPORCIONAL: `max(4, 20 % de las activas)`, en
+# `evals/entorno.py:suelo_de_estrato`. Por debajo de eso el arnés se niega a
+# correr — no avisa, se niega. Con las 41 de aquí el suelo es 8 y hay 11.
+#
+# Este comentario decía «por debajo de 12 probes activas», que era el suelo fijo
+# de la primera versión y que el propio código descartó después: sobre un
+# conjunto de 21 habría sido el 57 % y habría empujado a escribir probes de
+# relleno para pasar la puerta. Quedó aquí un mes de más, en el fichero que el
+# repo llama denegado a la edición, diciendo un número que ninguna línea de
+# código respeta. Lo encontró un lector externo comparando las dos fuentes.
 #
 # DOS CLASES, y es la diferencia que hace medible un corpus que crece:
 #

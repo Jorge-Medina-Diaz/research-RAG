@@ -146,6 +146,15 @@ class JuezDeSpec:
         La spec y los comprobadores deterministas entran junto al modelo y las
         instrucciones del juez. Si cualquiera cambia, el `env_fingerprint`
         cambia y `MismatchError` hace ilegal comparar con lo medido antes.
+
+        `usar_juez` NO entra, y esa ausencia costó un lector externo. Estaba en
+        el payload, así que comparar una corrida de nivel 0 con una de nivel
+        completo imprimía «el juez o la spec cambiaron» — y no había cambiado
+        ninguno de los dos: solo se había corrido con `--nivel0`. Un falso
+        positivo, y de un detector que este repo defiende explícitamente
+        diciendo que uno que se equivoca en las dos direcciones se deja de
+        mirar. El nivel no es una propiedad del juez; es del arnés, y viaja en
+        `identidad()` por su propia clave.
         """
         payload = {
             "modelo_juez": JUEZ,
@@ -154,7 +163,6 @@ class JuezDeSpec:
             "reglas_sha": _sha(REGLAS_PY),
             "deterministas": list(DETERMINISTAS),
             "del_juez": list(DEL_JUEZ),
-            "usar_juez": self.usar_juez,
         }
         canonico = json.dumps(payload, sort_keys=True, ensure_ascii=True, separators=(",", ":"))
         return hashlib.sha256(canonico.encode()).hexdigest()

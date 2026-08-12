@@ -40,7 +40,7 @@ mindmap
 La distinción que ordena el proyecto: **RSI** (*recursive self-improvement*) es
 divergente —el sistema se mejora a sí mismo, las mejoras apuntan a su capacidad
 de mejorar, las ganancias se componen, y no hay criterio de parada—. **RAI**
-(*recursive auto-improvement*) es convergente: una IA mejora a **otra**, sin
+(*recursive auto-improvement*, también citado como *automated*) es convergente: una IA mejora a **otra**, sin
 auto-referencia, hacia un punto fijo que es la spec del artefacto.
 
 > Para software de producción, convergente es exactamente lo que queremos.
@@ -169,7 +169,7 @@ El trigger es una categoría del golden set cayendo, no una corazonada.
 **ColBERT / multi-vector late interaction**, **re-ranking neuronal como
 defecto**, **routing aprendido entre subsistemas** (Adaptive-RAG, MoR,
 MBA-RAG). El routing existe para elegir entre subsistemas heterogéneos y aquí
-hay uno. Con ~20 consultas al día, un clasificador o un bandit tardarían meses
+hay uno solo. Y aunque hubiera varios: con del orden de 10 consultas a la SEMANA —el volumen real de un usuario, no las 20 diarias de un equipo— un clasificador o un bandit tardarían meses
 en converger; una regla escrita a mano da probablemente el 80 % del beneficio.
 
 ---
@@ -482,9 +482,18 @@ mano: si alguno no resuelve, el título y el año bastan para encontrarlo.
 
 ### El marco propio y su origen
 
-Las nociones de **RAI frente a RSI**, las **gradas**, las **fases** con puertas,
-la **escalera de escalones**, el **juez que devuelve diagnóstico**, los **suelos
-duros / ε-constraint** y **«no reviertas: invalida»** vienen de la serie de
-entradas publicadas por el autor del proyecto, y están resumidas en el
-[glosario](99-glosario.md#de-la-doctrina-de-auto-mejora). Este repositorio es su
-implementación y, en varios puntos, su corrección.
+Conviene separar tres capas, porque una versión anterior de este párrafo las
+mezclaba y contradecía al README:
+
+- **RAI frente a RSI** y los cinco requisitos de un sistema auto-mejorante son de
+  [Ashpreet Bedi](https://www.ashpreetbedi.com/recursive-auto-improvement).
+- **El vocabulario operativo** —gradas, fases con puertas, escalera de escalones,
+  juez con diagnóstico, suelos duros / ε-constraint, «una palanca por ronda»— es
+  de la serie de entradas del autor de este proyecto, escrita sobre lo anterior.
+  Está resumido en el [glosario](99-glosario.md#de-la-doctrina-de-auto-mejora).
+- **«No reviertas: invalida»** como principio bi-temporal aparece con nombre
+  propio en Zep/Graphiti (§4) y es también una regla de la doctrina del autor. Se
+  toma de los dos sitios, y no es original de este repositorio.
+
+Este repositorio es la implementación de todo lo anterior y, en varios puntos,
+su corrección.

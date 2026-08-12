@@ -344,7 +344,7 @@ de `references`, scorer y rollouts.
 > vez de dos**.
 
 El guion es **deliberadamente tonto** —responde siempre citando lo primero que le
-llega—, así que las once probes de `fuera_de_alcance` fallan R2. Ejercitar el
+llega—, así que **10 de las 11** probes de `fuera_de_alcance` fallan R2 (la restante se salva por accidente del guion, no por criterio). Ejercitar el
 camino de fallo es la mitad del valor de un doble de pruebas.
 
 ---

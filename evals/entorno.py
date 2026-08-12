@@ -180,6 +180,11 @@ def construir_entorno(
     tareas = tuple(
         Task(id=pr["id"], input=pr["consulta"], expected=pr, metadata={
             "categoria": pr["categoria"], "clase": pr.get("clase", "dependiente"),
+            # `requiere` y `reglas` viajan en los metadatos porque el arnés los
+            # necesita para calcular el recall y comprobar el suelo de R6, y
+            # `expected` no sobrevive intacto a todos los caminos de Agno.
+            "requiere": list(pr.get("requiere") or []),
+            "reglas": list(pr.get("reglas") or []),
         })
         for pr in probes
     )

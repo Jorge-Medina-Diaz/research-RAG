@@ -102,18 +102,19 @@ mindmap
       medir filtra a la última época cerrada
       avanzar es un acto humano y fechado
       coste, un WHERE
-    ["2 · Tres huellas propias"]
-      config, época, juez
-      el diff SE NIEGA si difiere alguna
-      las de Agno son ciegas al corpus
+    ["2 · Huellas propias"]
+      objeto, instrumento, tratamiento
+      la época y el juez SÍ impiden comparar
+      las palancas NO, son lo que se compara
+      y dos palancas a la vez, tampoco
     ["3 · Escalón 6 impedido"]
       el sha de la spec entra en el digest
       tocar el juez invalida lo medido
       no es una norma, es el tipo de dato
     ["4 · Holdout tras un rol"]
       un deny-list de ficheros no aísla
-      REVOKE SELECT sí
-      permission denied, verificado
+      REVOKE SELECT tampoco del todo
+      contra el despiste sí, contra la intención no
 ```
 
 ### 1 · Épocas — congelar la vista, no el corpus
@@ -126,15 +127,33 @@ que dispara en cada uso está, a efectos prácticos, apagado.
 ```mermaid
 timeline
     title Servir ve todo · medir ve hasta la última época CERRADA
-    época 0 — cerrada : art-01 : art-02 : art-03
-    época 1 — abierta : art-04 : art-05
+    época 0 — cerrada : 12 artefactos : es lo que ve la medición
+    época 1 — abierta : el artefacto 13 : el cerebro ya lo sirve
 ```
 
+La transcripción de abajo es **real**: es la sesión en la que se escribió el
+artefacto número 13 de este repositorio. Los dos `sha` son los de su corpus. Para
+reproducirla en un clon limpio, suelta cualquier `.md` nuevo en
+`artefactos/entrada/` entre el `avanzar` y el `ingerir` — el corpus que se
+distribuye ya lleva los 13 en la época 0, así que el punto de partida es ese.
+
 ```console
-$ uv run rag ingerir            # el artefacto nuevo entra en la época 1
+$ uv run rag eval                                  # línea base
+  época 0 · corpus 12 artefactos · sha ab7051da5370
+  pasan 15/27   recall@top_k 0.85   p95 0.1s
+
+$ uv run rag epoca avanzar                         # acto humano, fechado
+$ uv run rag ingerir                               # el nuevo entra en la época 1
+  corpus 13 artefacto(s) · sha 8730bae6dcb6
+  época abierta 1 · época de medición 0
+
 $ uv run rag eval
-  época 0  ·  corpus 4 artefactos · sha eb94ec7b       <- el corpus SÍ cambió
-  pasan 15/27  recall@top_k 0.85                       <- la medición NO se movió
+  época 0 · corpus 13 artefactos · sha 8730bae6dcb6  <- el corpus SÍ cambió
+  pasan 15/27   recall@top_k 0.85   p95 0.1s         <- la medición NO se movió
+
+$ uv run rag eval --epoca 1 --diff runs/base.json   # y si intentas mezclarlas
+  NO COMPARABLE:
+    · epoca: 1 != 0 — épocas distintas: el delta mezclaría sistema y corpus
 ```
 
 ### 2 · Tres huellas propias, no las de Agno
@@ -161,9 +180,14 @@ flowchart TD
 ```
 
 Un detector que se equivoca en una sola dirección se aprende. Uno que se
-equivoca en las dos se deja de mirar. Aquí la identidad de registro es
-`huella_config` + `epoca` + `huella_juez`, y `eval --diff` **se niega** si
-difiere cualquiera de las tres:
+equivoca en las dos se deja de mirar.
+
+Aquí la identidad de registro son tres huellas —`huella_config`, `epoca`,
+`huella_juez`— **pero no todas impiden comparar, y esa distinción costó
+encontrarla.** La configuración es el *tratamiento*: mover una palanca y
+comparar es lo único que hace el bucle, así que negarse ahí lo mataría. Lo que
+impide comparar es que cambie el *objeto* (la época, y con ella el corpus
+visible) o el *instrumento* (el juez, la spec):
 
 ```console
   NO COMPARABLE:
@@ -171,6 +195,31 @@ difiere cualquiera de las tres:
 
   Esto no es un aviso, es una negativa.
 ```
+
+Y una cuarta condición, que no es una huella sino un recuento: dos corridas que
+difieren en **dos** palancas son perfectamente comparables y aun así su delta no
+se puede atribuir a ninguna. También se niega. La regla «una palanca por ronda»
+deja de ser una convención escrita en un fichero y pasa a ser un código de
+salida:
+
+```console
+$ uv run rag eval --diff runs/base.json         # tras mover top_k
+    palanca: top_k  12 → 20
+    empeoran 0  ·  mejoran 0  ·  McNemar p=1.0000
+
+$ uv run rag eval --diff runs/base.json         # tras mover también k_rrf
+  NO COMPARABLE:
+    · 2 palancas movidas a la vez (k_rrf, top_k) — el delta no se puede
+      atribuir a ninguna: mueve una y vuelve
+```
+
+> Durante su primera versión esta sección decía «se niega si difiere cualquiera
+> de las tres», y era falso en el sentido más incómodo: `huella_config` solo
+> hasheaba las palancas que obligan a reindexar, así que `top_k` no la cambiaba
+> y el mecanismo no disparaba nunca. El código funcionaba **gracias** al fallo.
+> Es el mismo defecto que este repositorio le reprocha a Agno cuatro veces, y
+> está contado entero en
+> [el artefacto que lo documenta](artefactos/corpus/2026/la-configuracion-es-el-tratamiento-no-el-instrumento.md).
 
 ### 3 · El escalón 6, impedido por el tipo de dato
 
@@ -189,16 +238,46 @@ $ uv run rag eval --diff runs/base.json
     · huella_juez: 6355caf3e496 != 1d19fb0e54f3 — el juez o la spec cambiaron
 ```
 
-### 4 · El holdout tras un rol de Postgres
+### 4 · El holdout tras un rol de Postgres — y hasta dónde llega
 
 Una lista de permisos de ficheros no aísla: `Bash(uv:*)` ejecuta Python
 arbitrario y con eso se lee cualquier fichero del disco. El holdout vive en un
-esquema de Postgres cuyo `SELECT` está revocado para el rol de la aplicación.
+esquema de Postgres cuyo `SELECT` está revocado para el rol de la aplicación,
+que es el que lleva el `DATABASE_URL` del `.env`.
 
 ```console
 $ python -c "from cerebro.almacen import conexion; ..."
   BLOQUEADO: permission denied for table probes
 ```
+
+**Y ahora lo que esto NO compra**, porque una versión anterior de esta sección
+presentaba el rol como la respuesta al problema del Python arbitrario, y no lo
+es. La contraseña del superusuario de Postgres es `ai:ai`, está en
+`docker-compose.yml`, en `.env.example` y como valor por defecto en
+`cerebro/config.py` — que es precisamente el único fichero que el deny-list
+autoriza a editar. Así que:
+
+```python
+psycopg.connect("postgresql://ai:ai@localhost:5533/ai")   # una línea, y dentro
+```
+
+No hay arreglo local para esto: la base de datos corre en tu máquina y sus
+credenciales tienen que estar en algún sitio que tu máquina pueda leer. Un
+agente que ejecuta código con tu mismo usuario llega a todo lo que tú llegas.
+
+Lo que la barrera sí compra, y es concreto y limitado:
+
+- El holdout **no está en ningún fichero** que el agente vaya a abrir mientras
+  trabaja. Un deny-list sobre `evals/holdout.yaml` se salta sin querer; un
+  `REVOKE` hay que rodearlo a propósito.
+- El rodeo **deja huella**: escribir una conexión con otra credencial es un acto
+  deliberado y visible en el historial, no un `Read` más entre cincuenta.
+- Y la credencial del dueño no toca el disco en ningún momento: se pide por
+  teclado, con plazo, y no se guarda.
+
+Es una barrera contra el despiste, no contra la intención. El docstring de
+`scripts/holdout.py` lo dice desde el primer día; esta sección tardó en decirlo
+y por eso está escrito aquí ahora.
 
 ---
 
@@ -243,6 +322,57 @@ dentro del artefacto.
 
 ## El bucle
 
+### Antes del diagrama: quién ejecuta esto
+
+Esta sección daba por sabido algo que no está escrito en ninguna parte del
+repositorio, y un lector externo pasó cuatro secciones sin averiguarlo. Así que:
+
+**«El bucle» no es un proceso. Es un agente de código —Claude Code— leyendo
+[`CLAUDE.md`](CLAUDE.md) y el comando
+[`/mejorar-rag`](.claude/commands/mejorar-rag.md), y editando ficheros.**
+
+El reparto es este, y cada pieza está donde está por un motivo:
+
+| quién | qué hace | por qué ahí |
+|---|---|---|
+| **`uv run rag eval`** | mide y produce el informe | determinista, sin criterio, reproducible |
+| **el agente** | lee el informe, elige **una** palanca, edita `cerebro/config.py`, vuelve a medir | elegir qué palanca abre un diagnóstico es exactamente el trabajo que un `if` no hace bien |
+| **tú** | firmas las palancas de grada 3 y todo lo de generación | son las que no se pueden revertir en un minuto, o las que un golden set sintético no sabe ordenar |
+
+Esto explica el resto del README de golpe. Cuando más abajo se habla del
+**escalón 6**, del **deny-list**, o de que «una lista de permisos no aísla
+porque `Bash(uv:*)` ejecuta Python arbitrario», no es paranoia abstracta: el
+optimizador es un LLM con acceso de escritura al repositorio y un objetivo
+numérico que subir. Y la vía más barata para subir un número no es mejorar el
+sistema, es **relajar al que puntúa**.
+
+Nada de esto supone mala fe. Supone lo de siempre en optimización: un sistema
+que puede modificar su propia función objetivo la modificará, porque es el
+camino más corto.
+
+```mermaid
+flowchart LR
+    subgraph det["determinista · sin criterio"]
+        E["uv run rag eval"] --> INF["runs/ronda-N.json<br/>diagnóstico por probe"]
+    end
+    subgraph ag["agente LLM · con criterio"]
+        INF --> D["lee el diagnóstico<br/>más frecuente"]
+        D --> P["elige UNA palanca<br/>de las que ese diagnóstico abre"]
+        P --> ED["edita cerebro/config.py"]
+    end
+    subgraph hum["tú"]
+        P -.->|"grada 3 o generación"| F["firma"]
+        F -.-> ED
+    end
+    ED --> E
+
+    style det fill:#eef4ff,stroke:#4477cc
+    style ag fill:#fff8ee,stroke:#cc8844
+    style hum fill:#eeffee,stroke:#44aa66
+```
+
+### El protocolo de ronda
+
 ```mermaid
 flowchart TD
     START(["uv run rag eval --ruido"]) --> G0{"2σ ≤ 0,08?"}
@@ -284,6 +414,11 @@ Una nota agregada dice que algo va mal; un diagnóstico dice qué tocar.
 
 ## Arranque
 
+**Qué necesitas antes:** [Docker](https://docs.docker.com/get-docker/) corriendo
+—`rag up` levanta un Postgres 17 con pgvector en el puerto 5533— y
+[uv](https://docs.astral.sh/uv/getting-started/installation/), que gestiona
+Python 3.12 y las dependencias. Nada más: **ninguna clave de API**.
+
 ```bash
 git clone https://github.com/Jorge-Medina-Diaz/research-RAG
 cd research-RAG
@@ -291,6 +426,60 @@ uv run rag up          # Postgres + comprobación. SIN NINGUNA CLAVE.
 uv run rag ingerir     # artefactos/entrada/*.md -> corpus
 uv run rag eval        # el golden set
 ```
+
+`rag up` es idempotente: si el contenedor ya está levantado, comprueba y sale.
+Si algo falla, lo dice con el motivo — es lo que hace `scripts/verificar.py`, y
+también comprueba que la versión de Agno siga siendo 2.8.6.
+
+<details>
+<summary><b>Y un artefacto de ejemplo, para escribir el primero</b></summary>
+
+Suéltalo en `artefactos/entrada/` y corre `rag ingerir`. Cinco campos
+obligatorios; el resto se deriva o es opcional. Si falta uno, el fichero se
+mueve a `rechazado/` con un `.motivo.txt` al lado — la carpeta **es** la cola de
+errores, y se ve con `ls` sin abrir psql.
+
+```yaml
+---
+tipo: teardown-repo         # nota-investigacion · teardown-repo · lectura-paper
+                            # patron · problema-solucion · decision · benchmark
+titulo: Lo que descubrí mirando X por dentro
+fecha: 2026-08-12
+temas: [rag, postgres]      # vocabulario ABIERTO, sirve para filtrar
+dominio: recuperacion       # vocabulario CERRADO: recuperacion · evaluacion
+                            # agentes · datos · infraestructura · estadistica
+                            # producto · otro
+
+# --- opcionales, pero es donde está casi todo el valor ---
+madurez: maduro             # maduro | semi   (borrador se RECHAZA)
+confianza: alta             # alta | media | baja
+fuentes:                    # obligatorio si tipo es teardown-repo o lectura-paper
+  - tipo: repo              # repo · paper · web · sesion · libro
+    ref: usuario/repo
+    commit: v1.2.3          # obligatorio en un repo: sin commit no es verificable
+    acceso: 2026-08-12
+afirmaciones:               # lo que el artefacto SOSTIENE, con su estatus
+  - texto: La función create() no crea el índice.
+    estado: probado         # probado · reportado · extrapolacion · conjetura
+  - texto: Con 20k fragmentos esto dejará de ser irrelevante.
+    estado: extrapolacion
+    verificable_por: >-     # OBLIGATORIO si es extrapolacion: sin forma de
+      Medir la latencia p95 a 5k, 20k y 50k fragmentos.
+                            # comprobarla sería una conjetura, y ese es otro estado
+supera: [2026-05-02-nota-vieja]   # cierra la ventana de validez de la otra
+relacionado_con: [2026-08-12-otra-nota]
+---
+
+El cuerpo, en Markdown. Se trocea y se indexa junto con las afirmaciones, que
+van por delante para que un símbolo que solo aparece en el frontmatter siga
+siendo buscable.
+```
+
+Los doce artefactos de [`artefactos/corpus/2026/`](artefactos/corpus/2026/) son
+ejemplos reales y ya ingeridos: todos documentan hallazgos de la construcción de
+este mismo repositorio.
+
+</details>
 
 El sistema arranca **entero sin claves de API**. Los embeddings en modo `mock`
 son pseudo-vectores derivados de SHA-256: deterministas, sin significado
@@ -324,7 +513,7 @@ uv run rag epoca       estado. `avanzar` cierra la abierta
 uv run rag calibrar    --preparar / --comparar
 uv run rag holdout     --instalar / --probar / --anadir / --correr
 uv run rag sesiones    vuelca el tráfico real
-uv run rag test        83 tests. Sin red, sin claves, sin base de datos.
+uv run rag test        84 tests. Sin red, sin claves, sin base de datos.
 ```
 
 </details>
@@ -353,16 +542,18 @@ uv run rag test        83 tests. Sin red, sin claves, sin base de datos.
 | | |
 |---|---|
 | `rag up` en limpio, sin claves | Postgres 17 + pgvector, preflight en verde |
-| Ingesta → índice → recuperación | 12 artefactos, 60 fragmentos, HNSW y GIN creados a mano porque Agno no los crea |
-| Fusión de carriles | Los dos carriles vivos y contribuyendo. En la [traza](docs/05-una-traza.md), el artefacto que acaba **segundo** no fue primero en ninguno: salió 7.º en denso y 8.º en léxico y ganó por acuerdo |
-| Nivel completo contra el guion | El arnés procesa las 41 sin romperse. **Pasan 22 de 41**, y el perfil es el correcto: el guion responde siempre, así que acierta las de recuperar y falla 8 de las 11 de `fuera_de_alcance` |
-| Reproducción a k=3 | Las 8 violaciones de R2 y las 11 de R4 se confirman al re-correrlas; ninguna era espuria |
+| Ingesta → índice → recuperación | 13 artefactos, HNSW y GIN creados a mano porque Agno no los crea |
+| Fusión de carriles | Los dos vivos. En la [traza](docs/05-una-traza.md) hay fragmentos que entran sin ser primeros en ningún carril, por acuerdo entre los dos. **Con 60 fragmentos y 30 por carril esto no demuestra que el híbrido funcione** —cada carril ve la mitad del corpus—; demuestra que la fusión hace la aritmética que dice hacer |
+| Nivel completo contra el guion | El arnés procesa las 41 sin romperse. **Pasan 18 de 41.** De las 23 que fallan, 10 son de `fuera_de_alcance` —el guion responde siempre, así que fallar ahí es lo esperado— y **13 son de recuperación o generación, o sea fallos de verdad**: 6 `single_hop`, 6 `lexical_exact` y 1 `temporal`. Una versión anterior de esta fila decía «acierta las de recuperar», y no era cierto |
+| Reproducción a k=3 | Las 10 violaciones de R2 y las 13 de R4 se confirman al re-correrlas; ninguna era espuria |
+| Determinismo del arnés | Tres corridas completas seguidas devuelven **el mismo conjunto exacto** de 18 probes aprobadas. Lo que se mide contra el guion es la fontanería, y la fontanería no tiembla |
 | Tocar la spec → comparar | **NO COMPARABLE** |
-| Cruzar épocas → comparar | **NO COMPARABLE** |
+| Cruzar épocas → comparar | **NO COMPARABLE** — y verificado de punta a punta: avanzar la época, ingerir un artefacto 13.º y volver a medir da **el mismo 15/27 con el mismo recall 0,85** mientras el sha del corpus cambia |
+| Suelos en nivel completo | Los cinco se comprueban: recall 0,85 sobre 27 probes · R6 1,00 sobre 3 · R2 y R4 **ROTOS** con 10 y 13 violaciones confirmadas a k=3 · R5 en 0 |
 | Mover **una** palanca → comparar | comparable, y el informe **nombra** la palanca: `top_k 12 → 20` |
 | Mover **dos** palancas → comparar | **NO COMPARABLE**: el delta no se puede atribuir a ninguna |
 | `SELECT` al holdout desde Python arbitrario | **permission denied** |
-| Tests / ruff / diagramas | 84 pasan / limpio / 28 de 28 mermaid parsean, comprobado en CI |
+| Tests / ruff / diagramas / enlaces | 84 pasan / limpio / 29 de 29 mermaid parsean / 45 de 45 enlaces internos resuelven. Los cuatro, comprobados en CI |
 
 **No hecho, y es lo que decide si esto sirve:**
 
@@ -373,19 +564,29 @@ uv run rag test        83 tests. Sin red, sin claves, sin base de datos.
 - **σ no está medido de verdad.** El mecanismo da `0,0000` contra el guion, que
   es determinista por construcción. Valida la tubería y no dice nada del ruido
   real, que es varianza del modelo y del juez.
-- **El golden set son 41 probes sobre 12 artefactos**, y los doce son del propio
+- **El golden set son 41 probes sobre 13 artefactos**, y los trece son del propio
   desarrollo, no material de investigación real.
 - **Cero tráfico real**, así que el golden set es 100 % sintético. Consecuencia
   ineludible: **el bucle solo puede mover palancas de recuperación**; las de
   generación las propone y las firma una persona.
 - **El sesgo del post-filtrado por época sobre el ANN no está medido**, solo
   acotado por diseño.
+- **La barrera del holdout no resiste Python arbitrario.** El rol de Postgres
+  es real y la negativa está verificada, pero la contraseña del superusuario
+  viaja en el repositorio. Qué compra exactamente y qué no está
+  [en su sección](#4--el-holdout-tras-un-rol-de-postgres--y-hasta-dónde-llega).
+- **`cerebro/spec.md` tiene dos afirmaciones falsas** —dice 30 probes cuando hay
+  41, y promete una comprobación por código para R6 que `reglas.py` no
+  implementa— y está congelada por hash. Corregirla invalida toda medición
+  anterior, así que es una firma humana pendiente, no un `sed`. Es también un
+  defecto del método: congelar un documento en prosa **garantiza** que se pudra.
 - No hay grafo, ni comunidades, ni analogías cross-dominio. Están diseñadas como
   costuras con su trigger explícito, y el trigger es una categoría del golden
   set cayendo, no una corazonada.
 
-**Deuda conocida:** `evals/correr.py` (~480 líneas) hace demasiado; el
-reordenador está escrito y nunca se ha ejecutado.
+**Deuda conocida:** `evals/correr.py` (587 líneas) hace demasiado; el
+reordenador está escrito y nunca se ha ejecutado; y `scripts/` + `tareas.py`
+van 400 líneas por encima de su presupuesto, anotado en `CLAUDE.md`.
 
 ---
 
@@ -425,13 +626,23 @@ literal: son fallos medidos, no hipótesis.
 
 ## Créditos
 
-El marco conceptual —RAI frente a RSI, gradas, fases, puertas, la escalera de
-escalones, el juez que devuelve diagnóstico— viene del trabajo de
-[Ashpreet Bedi](https://www.ashpreetbedi.com/recursive-auto-improvement) sobre
-auto-mejora recursiva de agentes. La extensión al caso del **corpus vivo** —las
-épocas, la tercera huella, la caducidad de probes, la separación entre lo que el
-bucle puede tocar solo y lo que firma una persona— es propia y **no está
-validada en ningún benchmark publicado**.
+Tres capas, y conviene no confundirlas:
+
+1. **La distinción RAI / RSI y los cinco requisitos de un sistema auto-mejorante**
+   vienen de [Ashpreet Bedi](https://www.ashpreetbedi.com/recursive-auto-improvement).
+2. **El vocabulario operativo** —gradas, fases con puertas, la escalera de
+   escalones, el juez que devuelve diagnóstico en vez de nota, «una palanca por
+   ronda», los suelos duros, «no reviertas: invalida»— es de la serie de entradas
+   del autor de este repositorio, escrita sobre lo anterior. Cuando este README
+   dice «la doctrina», se refiere a eso.
+3. **La extensión al caso del corpus vivo** —las épocas, la separación entre
+   objeto, instrumento y tratamiento, la caducidad ruidosa de probes, la
+   separación entre lo que el bucle mueve solo y lo que firma una persona— es
+   propia de este proyecto y **no está validada en ningún benchmark publicado**.
+
+Una versión anterior de esta sección atribuía la capa 2 a la 1, y la sección
+final de [02 · Estado del arte](docs/02-estado-del-arte.md) la atribuía al autor:
+las dos no podían ser ciertas, y lo señaló un lector externo.
 
 Construido sobre [Agno](https://github.com/agno-agi/agno).
 

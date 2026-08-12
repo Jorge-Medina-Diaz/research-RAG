@@ -1,5 +1,5 @@
 {
- "fecha": "2026-08-12T12:50:31.350397+00:00",
+ "fecha": "2026-08-12T13:43:53.882780+00:00",
  "identidad": {
   "huella_config": "e5a02a35322e",
   "palancas": {
@@ -52,22 +52,25 @@
    "hnsw_ef_construction": 200
   },
   "epoca": 0,
-  "huella_juez": "daacaeb903d7",
-  "corpus_sha": "cad80bf08218",
-  "n_artefactos": 12,
+  "huella_juez": "07db7994eee5",
+  "nivel": "completo",
+  "corpus_sha": "8730bae6dcb6",
+  "n_artefactos": 13,
   "indice": "fragmento_5645f428a2b1"
  },
  "nivel": "completo",
  "resumen": {
-  "pasan": 22,
+  "pasan": 18,
   "total": 41,
   "no_medibles": 0,
-  "recall": null,
+  "recall": 0.8518518518518519,
   "p95_ms": 0
  },
  "reproducciones": {
   "R2": {
+   "P-11": true,
    "P-12": true,
+   "P-13": true,
    "P-14": true,
    "P-15": true,
    "P-16": true,
@@ -79,14 +82,16 @@
   "R4": {
    "P-01": true,
    "P-02": true,
+   "P-03": true,
    "P-07": true,
+   "P-08": true,
    "P-09": true,
    "P-22": true,
+   "P-23": true,
    "P-25": true,
    "P-29": true,
    "P-30": true,
    "P-31": true,
-   "P-34": true,
    "P-41": true
   }
  },
@@ -95,6 +100,11 @@
    "id": "P-01",
    "categoria": "single_hop",
    "clase": "dependiente",
+   "reglas": [
+    "R1",
+    "R3",
+    "R4"
+   ],
    "pass_rate": 0.0,
    "n_puntuados": 1,
    "n_sin_puntuar": 0,
@@ -105,12 +115,18 @@
    },
    "motivos": {
     "R4": "literales que no están en los fragmentos: ['08', '2026']"
-   }
+   },
+   "recall": 1.0
   },
   {
    "id": "P-02",
    "categoria": "single_hop",
    "clase": "dependiente",
+   "reglas": [
+    "R1",
+    "R3",
+    "R4"
+   ],
    "pass_rate": 0.0,
    "n_puntuados": 1,
    "n_sin_puntuar": 0,
@@ -121,60 +137,93 @@
    },
    "motivos": {
     "R4": "literales que no están en los fragmentos: ['08', '2026']"
-   }
+   },
+   "recall": 0.0
   },
   {
    "id": "P-03",
    "categoria": "single_hop",
    "clase": "dependiente",
-   "pass_rate": 1.0,
+   "reglas": [
+    "R1",
+    "R3",
+    "R4"
+   ],
+   "pass_rate": 0.0,
    "n_puntuados": 1,
    "n_sin_puntuar": 0,
    "en_zona_de_aprendizaje": false,
-   "diagnostico": "ninguno",
-   "incumple": {},
-   "motivos": {}
+   "diagnostico": "prompt",
+   "incumple": {
+    "R4": 1
+   },
+   "motivos": {
+    "R4": "literales que no están en los fragmentos: ['08', '2026']"
+   },
+   "recall": 1.0
   },
   {
    "id": "P-04",
    "categoria": "multi_hop",
    "clase": "dependiente",
+   "reglas": [
+    "R1",
+    "R3",
+    "R5"
+   ],
    "pass_rate": 1.0,
    "n_puntuados": 1,
    "n_sin_puntuar": 0,
    "en_zona_de_aprendizaje": false,
    "diagnostico": "ninguno",
    "incumple": {},
-   "motivos": {}
+   "motivos": {},
+   "recall": 1.0
   },
   {
    "id": "P-05",
    "categoria": "multi_hop",
    "clase": "dependiente",
+   "reglas": [
+    "R1",
+    "R3",
+    "R5"
+   ],
    "pass_rate": 1.0,
    "n_puntuados": 1,
    "n_sin_puntuar": 0,
    "en_zona_de_aprendizaje": false,
    "diagnostico": "ninguno",
    "incumple": {},
-   "motivos": {}
+   "motivos": {},
+   "recall": 1.0
   },
   {
    "id": "P-06",
    "categoria": "aggregation",
    "clase": "dependiente",
+   "reglas": [
+    "R1",
+    "R3"
+   ],
    "pass_rate": 1.0,
    "n_puntuados": 1,
    "n_sin_puntuar": 0,
    "en_zona_de_aprendizaje": false,
    "diagnostico": "ninguno",
    "incumple": {},
-   "motivos": {}
+   "motivos": {},
+   "recall": 1.0
   },
   {
    "id": "P-07",
    "categoria": "lexical_exact",
    "clase": "dependiente",
+   "reglas": [
+    "R1",
+    "R3",
+    "R4"
+   ],
    "pass_rate": 0.0,
    "n_puntuados": 1,
    "n_sin_puntuar": 0,
@@ -185,24 +234,18 @@
    },
    "motivos": {
     "R4": "literales que no están en los fragmentos: ['08', '2026']"
-   }
+   },
+   "recall": 1.0
   },
   {
    "id": "P-08",
    "categoria": "lexical_exact",
    "clase": "dependiente",
-   "pass_rate": 1.0,
-   "n_puntuados": 1,
-   "n_sin_puntuar": 0,
-   "en_zona_de_aprendizaje": false,
-   "diagnostico": "ninguno",
-   "incumple": {},
-   "motivos": {}
-  },
-  {
-   "id": "P-09",
-   "categoria": "lexical_exact",
-   "clase": "invariante",
+   "reglas": [
+    "R1",
+    "R3",
+    "R4"
+   ],
    "pass_rate": 0.0,
    "n_puntuados": 1,
    "n_sin_puntuar": 0,
@@ -213,36 +256,78 @@
    },
    "motivos": {
     "R4": "literales que no están en los fragmentos: ['08', '2026']"
-   }
+   },
+   "recall": 1.0
+  },
+  {
+   "id": "P-09",
+   "categoria": "lexical_exact",
+   "clase": "invariante",
+   "reglas": [
+    "R1",
+    "R3",
+    "R4"
+   ],
+   "pass_rate": 0.0,
+   "n_puntuados": 1,
+   "n_sin_puntuar": 0,
+   "en_zona_de_aprendizaje": false,
+   "diagnostico": "prompt",
+   "incumple": {
+    "R4": 1
+   },
+   "motivos": {
+    "R4": "literales que no están en los fragmentos: ['08', '2026']"
+   },
+   "recall": null
   },
   {
    "id": "P-10",
    "categoria": "temporal",
    "clase": "invariante",
+   "reglas": [
+    "R1",
+    "R3",
+    "R6"
+   ],
    "pass_rate": 1.0,
    "n_puntuados": 1,
    "n_sin_puntuar": 0,
    "en_zona_de_aprendizaje": false,
    "diagnostico": "ninguno",
    "incumple": {},
-   "motivos": {}
+   "motivos": {},
+   "recall": null
   },
   {
    "id": "P-11",
    "categoria": "fuera_de_alcance",
    "clase": "dependiente",
-   "pass_rate": 1.0,
+   "reglas": [
+    "R2",
+    "R3"
+   ],
+   "pass_rate": 0.0,
    "n_puntuados": 1,
    "n_sin_puntuar": 0,
    "en_zona_de_aprendizaje": false,
-   "diagnostico": "ninguno",
-   "incumple": {},
-   "motivos": {}
+   "diagnostico": "prompt",
+   "incumple": {
+    "R2": 1
+   },
+   "motivos": {
+    "R2": "debía abstenerse y respondió: 'Segun la memoria, el punto relevante esta recogido en [[art:2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrume'"
+   },
+   "recall": null
   },
   {
    "id": "P-12",
    "categoria": "fuera_de_alcance",
    "clase": "dependiente",
+   "reglas": [
+    "R2",
+    "R3"
+   ],
    "pass_rate": 0.0,
    "n_puntuados": 1,
    "n_sin_puntuar": 0,
@@ -253,24 +338,38 @@
    },
    "motivos": {
     "R2": "debía abstenerse y respondió: 'Segun la memoria, el punto relevante esta recogido en [[art:2026-08-12-epocas-para-medir-un-corpus-que-crece]].'"
-   }
+   },
+   "recall": null
   },
   {
    "id": "P-13",
    "categoria": "fuera_de_alcance",
    "clase": "invariante",
-   "pass_rate": 1.0,
+   "reglas": [
+    "R2",
+    "R3"
+   ],
+   "pass_rate": 0.0,
    "n_puntuados": 1,
    "n_sin_puntuar": 0,
    "en_zona_de_aprendizaje": false,
-   "diagnostico": "ninguno",
-   "incumple": {},
-   "motivos": {}
+   "diagnostico": "prompt",
+   "incumple": {
+    "R2": 1
+   },
+   "motivos": {
+    "R2": "debía abstenerse y respondió: 'Segun la memoria, el punto relevante esta recogido en [[art:2026-08-12-ragchecker-la-aritmetica-no-la-dependencia]].'"
+   },
+   "recall": null
   },
   {
    "id": "P-14",
    "categoria": "fuera_de_alcance",
    "clase": "invariante",
+   "reglas": [
+    "R2",
+    "R3"
+   ],
    "pass_rate": 0.0,
    "n_puntuados": 1,
    "n_sin_puntuar": 0,
@@ -281,12 +380,17 @@
    },
    "motivos": {
     "R2": "debía abstenerse y respondió: 'Segun la memoria, el punto relevante esta recogido en [[art:2026-08-12-agno-hybrid-search-predicado-comentado]].'"
-   }
+   },
+   "recall": null
   },
   {
    "id": "P-15",
    "categoria": "fuera_de_alcance",
    "clase": "invariante",
+   "reglas": [
+    "R2",
+    "R3"
+   ],
    "pass_rate": 0.0,
    "n_puntuados": 1,
    "n_sin_puntuar": 0,
@@ -297,12 +401,17 @@
    },
    "motivos": {
     "R2": "debía abstenerse y respondió: 'Segun la memoria, el punto relevante esta recogido en [[art:2026-08-12-agno-pgvector-indices-decorativos]].'"
-   }
+   },
+   "recall": null
   },
   {
    "id": "P-16",
    "categoria": "fuera_de_alcance",
    "clase": "invariante",
+   "reglas": [
+    "R2",
+    "R3"
+   ],
    "pass_rate": 0.0,
    "n_puntuados": 1,
    "n_sin_puntuar": 0,
@@ -313,12 +422,17 @@
    },
    "motivos": {
     "R2": "debía abstenerse y respondió: 'Segun la memoria, el punto relevante esta recogido en [[art:2026-08-12-agno-env-fingerprint-ciego-al-corpus]].'"
-   }
+   },
+   "recall": null
   },
   {
    "id": "P-17",
    "categoria": "fuera_de_alcance",
    "clase": "invariante",
+   "reglas": [
+    "R2",
+    "R3"
+   ],
    "pass_rate": 0.0,
    "n_puntuados": 1,
    "n_sin_puntuar": 0,
@@ -329,12 +443,17 @@
    },
    "motivos": {
     "R2": "debía abstenerse y respondió: 'Segun la memoria, el punto relevante esta recogido en [[art:2026-08-12-plainto-tsquery-hace-and-y-devuelve-cero]].'"
-   }
+   },
+   "recall": null
   },
   {
    "id": "P-18",
    "categoria": "fuera_de_alcance",
    "clase": "invariante",
+   "reglas": [
+    "R2",
+    "R3"
+   ],
    "pass_rate": 0.0,
    "n_puntuados": 1,
    "n_sin_puntuar": 0,
@@ -345,12 +464,17 @@
    },
    "motivos": {
     "R2": "debía abstenerse y respondió: 'Segun la memoria, el punto relevante esta recogido en [[art:2026-08-12-ragchecker-la-aritmetica-no-la-dependencia]].'"
-   }
+   },
+   "recall": null
   },
   {
    "id": "P-19",
    "categoria": "fuera_de_alcance",
    "clase": "invariante",
+   "reglas": [
+    "R2",
+    "R3"
+   ],
    "pass_rate": 0.0,
    "n_puntuados": 1,
    "n_sin_puntuar": 0,
@@ -361,12 +485,17 @@
    },
    "motivos": {
     "R2": "debía abstenerse y respondió: 'Segun la memoria, el punto relevante esta recogido en [[art:2026-08-12-ragchecker-la-aritmetica-no-la-dependencia]].'"
-   }
+   },
+   "recall": null
   },
   {
    "id": "P-20",
    "categoria": "fuera_de_alcance",
    "clase": "invariante",
+   "reglas": [
+    "R2",
+    "R3"
+   ],
    "pass_rate": 0.0,
    "n_puntuados": 1,
    "n_sin_puntuar": 0,
@@ -377,24 +506,35 @@
    },
    "motivos": {
     "R2": "debía abstenerse y respondió: 'Segun la memoria, el punto relevante esta recogido en [[art:2026-08-12-agno-env-fingerprint-ciego-al-corpus]].'"
-   }
+   },
+   "recall": null
   },
   {
    "id": "P-21",
    "categoria": "fuera_de_alcance",
    "clase": "invariante",
+   "reglas": [
+    "R2",
+    "R3"
+   ],
    "pass_rate": 1.0,
    "n_puntuados": 1,
    "n_sin_puntuar": 0,
    "en_zona_de_aprendizaje": false,
    "diagnostico": "ninguno",
    "incumple": {},
-   "motivos": {}
+   "motivos": {},
+   "recall": null
   },
   {
    "id": "P-22",
    "categoria": "single_hop",
    "clase": "dependiente",
+   "reglas": [
+    "R1",
+    "R3",
+    "R4"
+   ],
    "pass_rate": 0.0,
    "n_puntuados": 1,
    "n_sin_puntuar": 0,
@@ -405,36 +545,57 @@
    },
    "motivos": {
     "R4": "literales que no están en los fragmentos: ['08', '2026']"
-   }
+   },
+   "recall": 1.0
   },
   {
    "id": "P-23",
    "categoria": "single_hop",
    "clase": "dependiente",
-   "pass_rate": 1.0,
+   "reglas": [
+    "R1",
+    "R3",
+    "R4"
+   ],
+   "pass_rate": 0.0,
    "n_puntuados": 1,
    "n_sin_puntuar": 0,
    "en_zona_de_aprendizaje": false,
-   "diagnostico": "ninguno",
-   "incumple": {},
-   "motivos": {}
+   "diagnostico": "prompt",
+   "incumple": {
+    "R4": 1
+   },
+   "motivos": {
+    "R4": "literales que no están en los fragmentos: ['08', '2026']"
+   },
+   "recall": 1.0
   },
   {
    "id": "P-24",
    "categoria": "single_hop",
    "clase": "dependiente",
+   "reglas": [
+    "R1",
+    "R3"
+   ],
    "pass_rate": 1.0,
    "n_puntuados": 1,
    "n_sin_puntuar": 0,
    "en_zona_de_aprendizaje": false,
    "diagnostico": "ninguno",
    "incumple": {},
-   "motivos": {}
+   "motivos": {},
+   "recall": 1.0
   },
   {
    "id": "P-25",
    "categoria": "single_hop",
    "clase": "dependiente",
+   "reglas": [
+    "R1",
+    "R3",
+    "R4"
+   ],
    "pass_rate": 0.0,
    "n_puntuados": 1,
    "n_sin_puntuar": 0,
@@ -445,48 +606,71 @@
    },
    "motivos": {
     "R4": "literales que no están en los fragmentos: ['08', '2026']"
-   }
+   },
+   "recall": 1.0
   },
   {
    "id": "P-26",
    "categoria": "single_hop",
    "clase": "dependiente",
+   "reglas": [
+    "R1",
+    "R3",
+    "R4"
+   ],
    "pass_rate": 1.0,
    "n_puntuados": 1,
    "n_sin_puntuar": 0,
    "en_zona_de_aprendizaje": false,
    "diagnostico": "ninguno",
    "incumple": {},
-   "motivos": {}
+   "motivos": {},
+   "recall": 1.0
   },
   {
    "id": "P-27",
    "categoria": "single_hop",
    "clase": "dependiente",
+   "reglas": [
+    "R1",
+    "R3"
+   ],
    "pass_rate": 1.0,
    "n_puntuados": 1,
    "n_sin_puntuar": 0,
    "en_zona_de_aprendizaje": false,
    "diagnostico": "ninguno",
    "incumple": {},
-   "motivos": {}
+   "motivos": {},
+   "recall": 1.0
   },
   {
    "id": "P-28",
    "categoria": "lexical_exact",
    "clase": "dependiente",
+   "reglas": [
+    "R1",
+    "R3",
+    "R4"
+   ],
    "pass_rate": 1.0,
    "n_puntuados": 1,
    "n_sin_puntuar": 0,
    "en_zona_de_aprendizaje": false,
    "diagnostico": "ninguno",
    "incumple": {},
-   "motivos": {}
+   "motivos": {},
+   "recall": 1.0
   },
   {
    "id": "P-29",
    "categoria": "lexical_exact",
    "clase": "dependiente",
+   "reglas": [
+    "R1",
+    "R3",
+    "R4"
+   ],
    "pass_rate": 0.0,
    "n_puntuados": 1,
    "n_sin_puntuar": 0,
@@ -497,12 +681,18 @@
    },
    "motivos": {
     "R4": "literales que no están en los fragmentos: ['08', '2026']"
-   }
+   },
+   "recall": 1.0
   },
   {
    "id": "P-30",
    "categoria": "lexical_exact",
    "clase": "dependiente",
+   "reglas": [
+    "R1",
+    "R3",
+    "R4"
+   ],
    "pass_rate": 0.0,
    "n_puntuados": 1,
    "n_sin_puntuar": 0,
@@ -513,12 +703,18 @@
    },
    "motivos": {
     "R4": "literales que no están en los fragmentos: ['08', '2026']"
-   }
+   },
+   "recall": 1.0
   },
   {
    "id": "P-31",
    "categoria": "lexical_exact",
    "clase": "dependiente",
+   "reglas": [
+    "R1",
+    "R3",
+    "R4"
+   ],
    "pass_rate": 0.0,
    "n_puntuados": 1,
    "n_sin_puntuar": 0,
@@ -529,124 +725,180 @@
    },
    "motivos": {
     "R4": "literales que no están en los fragmentos: ['08', '12', '2026']"
-   }
+   },
+   "recall": 1.0
   },
   {
    "id": "P-32",
    "categoria": "multi_hop",
    "clase": "dependiente",
+   "reglas": [
+    "R1",
+    "R3",
+    "R5"
+   ],
    "pass_rate": 1.0,
    "n_puntuados": 1,
    "n_sin_puntuar": 0,
    "en_zona_de_aprendizaje": false,
    "diagnostico": "ninguno",
    "incumple": {},
-   "motivos": {}
+   "motivos": {},
+   "recall": 1.0
   },
   {
    "id": "P-33",
    "categoria": "multi_hop",
    "clase": "dependiente",
+   "reglas": [
+    "R1",
+    "R3",
+    "R5"
+   ],
    "pass_rate": 1.0,
    "n_puntuados": 1,
    "n_sin_puntuar": 0,
    "en_zona_de_aprendizaje": false,
    "diagnostico": "ninguno",
    "incumple": {},
-   "motivos": {}
+   "motivos": {},
+   "recall": 1.0
   },
   {
    "id": "P-34",
    "categoria": "multi_hop",
    "clase": "dependiente",
-   "pass_rate": 0.0,
+   "reglas": [
+    "R1",
+    "R3",
+    "R4",
+    "R5"
+   ],
+   "pass_rate": 1.0,
    "n_puntuados": 1,
    "n_sin_puntuar": 0,
    "en_zona_de_aprendizaje": false,
-   "diagnostico": "prompt",
-   "incumple": {
-    "R4": 1
-   },
-   "motivos": {
-    "R4": "literales que no están en los fragmentos: ['08', '2026']"
-   }
+   "diagnostico": "ninguno",
+   "incumple": {},
+   "motivos": {},
+   "recall": 1.0
   },
   {
    "id": "P-35",
    "categoria": "multi_hop",
    "clase": "dependiente",
+   "reglas": [
+    "R1",
+    "R3",
+    "R5"
+   ],
    "pass_rate": 1.0,
    "n_puntuados": 1,
    "n_sin_puntuar": 0,
    "en_zona_de_aprendizaje": false,
    "diagnostico": "ninguno",
    "incumple": {},
-   "motivos": {}
+   "motivos": {},
+   "recall": 0.5
   },
   {
    "id": "P-36",
    "categoria": "multi_hop",
    "clase": "dependiente",
+   "reglas": [
+    "R1",
+    "R3",
+    "R5"
+   ],
    "pass_rate": 1.0,
    "n_puntuados": 1,
    "n_sin_puntuar": 0,
    "en_zona_de_aprendizaje": false,
    "diagnostico": "ninguno",
    "incumple": {},
-   "motivos": {}
+   "motivos": {},
+   "recall": 0.5
   },
   {
    "id": "P-37",
    "categoria": "aggregation",
    "clase": "dependiente",
+   "reglas": [
+    "R1",
+    "R3"
+   ],
    "pass_rate": 1.0,
    "n_puntuados": 1,
    "n_sin_puntuar": 0,
    "en_zona_de_aprendizaje": false,
    "diagnostico": "ninguno",
    "incumple": {},
-   "motivos": {}
+   "motivos": {},
+   "recall": 0.5
   },
   {
    "id": "P-38",
    "categoria": "aggregation",
    "clase": "dependiente",
+   "reglas": [
+    "R1",
+    "R3"
+   ],
    "pass_rate": 1.0,
    "n_puntuados": 1,
    "n_sin_puntuar": 0,
    "en_zona_de_aprendizaje": false,
    "diagnostico": "ninguno",
    "incumple": {},
-   "motivos": {}
+   "motivos": {},
+   "recall": 0.5
   },
   {
    "id": "P-39",
    "categoria": "aggregation",
    "clase": "dependiente",
+   "reglas": [
+    "R1",
+    "R3",
+    "R5"
+   ],
    "pass_rate": 1.0,
    "n_puntuados": 1,
    "n_sin_puntuar": 0,
    "en_zona_de_aprendizaje": false,
    "diagnostico": "ninguno",
    "incumple": {},
-   "motivos": {}
+   "motivos": {},
+   "recall": 0.0
   },
   {
    "id": "P-40",
    "categoria": "temporal",
    "clase": "dependiente",
+   "reglas": [
+    "R1",
+    "R3",
+    "R6"
+   ],
    "pass_rate": 1.0,
    "n_puntuados": 1,
    "n_sin_puntuar": 0,
    "en_zona_de_aprendizaje": false,
    "diagnostico": "ninguno",
    "incumple": {},
-   "motivos": {}
+   "motivos": {},
+   "recall": 1.0
   },
   {
    "id": "P-41",
    "categoria": "temporal",
    "clase": "invariante",
+   "reglas": [
+    "R1",
+    "R3",
+    "R4",
+    "R6"
+   ],
    "pass_rate": 0.0,
    "n_puntuados": 1,
    "n_sin_puntuar": 0,
@@ -657,7 +909,8 @@
    },
    "motivos": {
     "R4": "literales que no están en los fragmentos: ['08', '2026']"
-   }
+   },
+   "recall": null
   }
  ],
  "suspendidas": []

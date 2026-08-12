@@ -30,11 +30,23 @@ y que llega al prompt.
 que es lo que lo hace inmune a mezclar escalas incomparables. Aquí `k = 60`,
 del paper de Cormack et al. (SIGIR 2009).
 
-**`top_k`** · Cuántos fragmentos llegan al prompt. Aquí 12.
+**`top_k`** · Cuántos fragmentos llegan al prompt. Aquí **12**.
 
-**`pool_fusion`** · Cuántos candidatos pide cada carril **antes** de fusionar.
-Aquí 40. Es mayor que `top_k` a propósito: sin margen, un reranker solo puede
-reordenar, nunca descartar.
+**`top_k_por_carril`** · Cuántos candidatos pide **cada carril** antes de
+fusionar. Aquí **30**. Con un corpus de 60 fragmentos eso es la mitad de todo, y
+conviene tenerlo presente al leer cualquier resultado de recuperación de este
+repositorio: a esta escala los dos carriles se solapan casi por completo.
+
+**`pool_fusion`** · Cuántos candidatos sobreviven a la fusión y llegan al
+**reordenador**. Aquí **40**, mayor que `top_k` a propósito: sin margen, un
+reordenador solo puede reordenar, nunca descartar.
+
+> Estas dos entradas estaban mal. `pool_fusion` se definía con la descripción de
+> `top_k_por_carril` y con su propio valor, y `top_k_por_carril` no aparecía —
+> siendo una de las palancas que el diagnóstico `cobertura` abre. Lo encontró un
+> lector externo comparando el glosario con `cerebro/config.py`. Que el error
+> estuviera precisamente en el documento al que el README manda a quien tropieza
+> con una palabra es lo que lo hacía caro.
 
 **HNSW** · *Hierarchical Navigable Small World*. La estructura de índice que
 hace rápida la búsqueda densa. Sin ella, cada consulta compara contra todos los
@@ -82,11 +94,32 @@ proyecto a «¿mejoró el sistema o mejoró el corpus?».
 **Huella** (*fingerprint*) · Un hash que identifica una corrida. Aquí hay tres:
 `huella_config` (todos los parámetros ajustables), `epoca` y `huella_juez` (el
 modelo del juez + sus instrucciones + el sha de la especificación y de los
-comprobadores).
+comprobadores). Una cuarta clave, `nivel`, distingue nivel 0 de nivel completo;
+va aparte y no dentro del digest del juez, porque tenerla dentro hacía que
+comparar los dos niveles acusara al juez de haber cambiado cuando no lo había
+hecho.
 
 **Comparable** · Dos corridas lo son si midieron el mismo objeto (misma época)
-con el mismo instrumento (mismo juez) y difieren en **como mucho un** parámetro.
-Si no, la herramienta se niega, y la negativa dice qué cambió.
+con el mismo instrumento (mismo juez) en el mismo nivel, y difieren en **como
+mucho un** parámetro. Si no, la herramienta se niega, y la negativa dice qué
+cambió.
+
+**ANN** · *Approximate Nearest Neighbour*, búsqueda aproximada del vecino más
+cercano. Es lo que hace HNSW: en vez de comparar contra todos los vectores,
+navega un grafo y devuelve *casi siempre* los mejores. El «casi» es el precio
+de la velocidad, y aquí importa porque filtrar por época **después** de esa
+navegación puede descartar nodos que el grafo ya visitó — un sesgo acotado por
+diseño y no medido.
+
+**Costura** (*seam*) · Vocabulario de la casa: una funcionalidad **diseñada y
+deliberadamente no construida**, con el punto de enganche ya previsto en el
+código y un **disparador escrito** que dice cuándo construirla. No es lo mismo
+que «pendiente»: una costura sin disparador sería una promesa, y con él es una
+decisión con condición de revisión.
+
+**Trinquete** · También de la casa: cada fallo resuelto se convierte en probe
+permanente, así que el sistema no solo mejora sino que **acumula inmunidad**. Un
+trinquete gira en un sentido y no vuelve.
 
 **Objeto / instrumento / tratamiento** · La distinción prestada del diseño de
 experimentos que ordena lo anterior. El objeto es el corpus visible; el
@@ -173,8 +206,8 @@ otra por una **puerta** con umbral duro, no por sensación.
 la función objetivo). La regla es **arreglar en el escalón más bajo que pueda
 expresar el fallo**, y el 6 no se automatiza nunca.
 
-**RAI vs RSI** · *Recursive Automated Improvement* frente a *Recursive
-Self-Improvement*. La primera converge hacia una especificación que no se toca;
+**RAI vs RSI** · *Recursive Auto-Improvement* —también escrito *Automated*—
+frente a *Recursive Self-Improvement*. La primera converge hacia una especificación que no se toca;
 la segunda puede reescribir sus propios objetivos y diverge. Este proyecto es
 RAI, y el mecanismo que lo garantiza no es la buena voluntad: tocar la
 especificación cambia la huella del juez y **convierte en ilegal** toda
@@ -192,6 +225,13 @@ que impide arrancar si alguna no la tiene.
 que lo corrija. El bucle lo mediría ronda tras ronda sin poder hacer nada,
 agotaría las cinco rondas y concluiría «problema estructural». Hay un `assert`
 contra esto.
+
+> **Aviso de colisión.** En estadística, «censura» son datos parcialmente
+> observados —sabes que el valor está por encima de un umbral, no cuál es—. Aquí
+> no significa eso: significa *silenciamiento*, en el sentido de que el fallo no
+> puede ni expresarse ni corregirse. Un ingeniero de datos lee «censura» y
+> piensa en lo otro; el nombre es peor de lo que parecía al elegirlo y se queda
+> por compatibilidad con el código, no porque sea bueno.
 
 ---
 

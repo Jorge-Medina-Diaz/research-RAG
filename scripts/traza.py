@@ -71,13 +71,20 @@ def traza(consulta: str, *, probe: dict | None = None) -> list[str]:
         for carril, info in (d.get("meta_data", {}).get("por_carril") or {}).items():
             por_carril.setdefault(carril, []).append((info["rango"], d["name"]))
     for carril in sorted(por_carril):
-        w(f"**{carril}** — {len(por_carril[carril])} de los {len(docs)} finales "
-          "venían de aquí\n")
-        w("| puesto en su carril | artefacto |")
+        # «de los N finales» y no «N de N venían de aquí»: un fragmento puede
+        # venir de LOS DOS carriles, así que las dos cifras pueden sumar más
+        # que el total sin que haya contradicción. La redacción anterior daba a
+        # entender exclusividad y sumaba 24 sobre 12.
+        w(f"**{carril}** — respaldó {len(por_carril[carril])} de los "
+          f"{len(docs)} fragmentos que acabaron entrando\n")
+        w("| puesto que tenía aquí | artefacto |")
         w("|---:|---|")
-        for rango, nombre in sorted(por_carril[carril])[:8]:
+        for rango, nombre in sorted(por_carril[carril]):
             w(f"| {rango:.0f} | `{nombre}` |")
         w("")
+        w("_Los puestos que faltan son candidatos que este carril colocaba por "
+          "delante y que el otro no respaldó, así que no sobrevivieron a la "
+          "fusión._\n")
     if not por_carril:
         w("_Ningún carril reportó rangos: la traza está rota o los dos vinieron vacíos._\n")
 
@@ -118,9 +125,12 @@ def traza(consulta: str, *, probe: dict | None = None) -> list[str]:
     if respuesta and probe:
         from cerebro.reglas import comprobar_deterministas
 
+        decl = probe.get("reglas") or []
         w("## 5 · El veredicto, regla por regla\n")
-        w("Cinco de las ocho reglas las decide código, no el juez. Una regla que")
-        w("necesita criterio para saber si se cumple no es una regla.\n")
+        w("La spec tiene ocho reglas; cinco las decide código y tres el juez. "
+          "Una probe no las declara todas: solo las que su caso pone a prueba. "
+          f"Esta declara **{len(decl)}** —{', '.join(decl)}— y de esas, las que "
+          "van por código son las de la tabla.\n")
         vs = comprobar_deterministas(
             respuesta,
             docs,
@@ -155,11 +165,28 @@ def traza(consulta: str, *, probe: dict | None = None) -> list[str]:
              f"Faltó `{falta[0]}`, así que el diagnóstico es `cobertura` y "
              "ningún ajuste de prompt lo arregla — el fragmento no llegó."))
         w("")
+    # El ejemplo se CALCULA. Una versión anterior lo tenía escrito a mano
+    # —«salió séptimo en denso y octavo en léxico»— dentro de un documento
+    # generado, y los puestos reales eran otros. Un número inventado en medio
+    # de una transcripción real es peor que no poner ninguno: contamina los que
+    # sí son ciertos.
     w("Y lo que solo se ve aquí: **un artefacto puede ganar sin ser el primero "
-      "de ningún carril.** RRF suma `1/(k+puesto)` de cada carril, así que "
-      "salir séptimo en denso y octavo en léxico vence a salir tercero en uno "
-      "solo. El acuerdo entre dos formas distintas de buscar es una señal más "
-      "fuerte que la convicción de una.\n")
+      "de ningún carril.** RRF suma `1/(k+puesto)` de cada carril, así que el "
+      "acuerdo entre dos formas distintas de buscar pesa más que la convicción "
+      "de una sola.\n")
+    ejemplo = next(
+        (d for d in docs[1:]
+         if len(d.get("meta_data", {}).get("por_carril") or {}) > 1
+         and all(v["rango"] > 1 for v in d["meta_data"]["por_carril"].values())),
+        None,
+    )
+    if ejemplo:
+        i = docs.index(ejemplo) + 1
+        pc = ejemplo["meta_data"]["por_carril"]
+        detalle = " y ".join(f"{v['rango']:.0f}.º en {c}" for c, v in sorted(pc.items()))
+        w(f"En esta corrida lo hace el número **{i}**: salió {detalle}, sin ser "
+          f"primero en ninguno, y aun así entra por delante de candidatos mejor "
+          f"situados en un solo carril.\n")
     w("Después de fusionar, esta información ya no existe. Por eso se captura "
       "**en el instante de la búsqueda** y se guarda en la tabla `consulta`: "
       "sin ella, mover `peso_carril`, cambiar de embedder y tocar el "

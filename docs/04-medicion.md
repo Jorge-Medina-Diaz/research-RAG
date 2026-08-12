@@ -96,9 +96,11 @@ lo usará para maximizar el número sacrificando lo que querías proteger.
 
 ### Dos refinamientos que no son cosméticos
 
-**1 · Los suelos que importan van en recuento, no en tasa.** Con n≈30 el
-semiancho del intervalo de confianza al 95 % ronda ±16 puntos: un suelo de
-«0,85» no es exigible porque el instrumento no lo distingue de 0,72. Cero
+**1 · Los suelos que importan van en recuento, no en tasa.** Con las 41 probes
+actuales el semiancho del intervalo de confianza al 95 % ronda ±11 puntos: un
+suelo de «0,85» no es exigible porque el instrumento no lo distingue de 0,74.
+(Esta línea decía «con n≈30, ±16 puntos», y las dos cifras juntas no cuadran:
+para p=0,85 y n=30 el semiancho es ±12,8, y el ±16 corresponde a n≈20.) Cero
 violaciones sí es exigible a cualquier n.
 
 **2 · Una violación tiene que reproducirse.**
@@ -124,9 +126,12 @@ probabilidad de al menos un veredicto espurio por corrida es
 > Nótese que el número **empeora al crecer el conjunto**, y eso es correcto:
 > más preguntas son más oportunidades de que el juez se equivoque en alguna.
 > Es la razón por la que un suelo sin margen no escala sin reproducción.
-Con un suelo de «cero violaciones», eso significa que **dos de cada tres
-corridas bloquearían la promoción por un fantasma**, y el bucle gastaría
-rondas persiguiéndolo. Coste de la defensa: tres llamadas por probe
+Con un suelo de «cero violaciones», eso significa que **casi nueve de cada
+diez corridas bloquearían la promoción por un fantasma**, y el bucle gastaría
+rondas persiguiéndolo. Esta frase decía «dos de cada tres», que era la
+conclusión correcta del cálculo anterior con 21 probes; la premisa se actualizó
+a 41 y la conclusión se quedó cuatro líneas más abajo diciendo lo de antes. Es
+la avería típica de actualizar un número y no su consecuencia. Coste de la defensa: tres llamadas por probe
 sospechosa, no una corrida entera.
 
 > El número exacto importa menos que su orden de magnitud: con cualquier juez

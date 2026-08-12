@@ -396,11 +396,13 @@ Este devuelve una etiqueta de cinco valores:
 
 Esa etiqueta **es** la que dice qué hacer. La nota global no.
 
-En la corrida actual con el modelo guionizado el reparto es 19 × `prompt`, lo
-cual es correcto y esperable: el modelo guionizado responde siempre lo mismo, la
-recuperación funciona, y el fallo está en la generación. En el nivel sin modelo,
-el reparto es 6 × `cobertura` y 6 × `ordenacion` — dos juegos de palancas
-completamente distintos.
+En la corrida actual con el modelo guionizado, de las 41 probes fallan 23 y el
+reparto de diagnósticos es 23 × `prompt`. Es correcto y esperable: el guion
+responde siempre lo mismo, la recuperación llega —el recall es 0,85— y el fallo
+está entero en la generación. En el nivel sin modelo, sobre las 27 probes que se
+pueden medir sin respuesta, el reparto es 6 × `cobertura` y 6 × `ordenacion`:
+dos juegos de palancas completamente distintos, que es justo para lo que existe
+el diagnóstico.
 
 ---
 
@@ -423,7 +425,7 @@ muestras:
 
 Con 41 preguntas, el semiancho del intervalo de confianza al 95 % para una
 proporción cercana a 0,85 ronda los 11 puntos porcentuales. Un suelo de «0,85»
-no distingue 0,85 de 0,75: el instrumento no tiene esa resolución. Lo que has
+no distingue 0,85 de 0,74: el instrumento no tiene esa resolución. Lo que has
 construido no es una puerta, es una moneda.
 
 Un recuento no estima nada. «¿Hubo alguna respuesta que citara mal una cifra?»
@@ -432,8 +434,13 @@ tiene respuesta exacta. Un solo caso la rompe, y ese caso es real.
 **El coste de un suelo sin margen.** Es sensible al ruido del juez. Con un juez
 al 95 % de auto-consistencia —un supuesto ilustrativo, no una medición de este
 sistema— y 41 preguntas, la probabilidad de al menos un veredicto espurio por
-corrida es `1 − 0,95⁴¹ ≈ 88 %`. Casi todas las corridas bloquearían por un
-fantasma.
+corrida es `1 − 0,95⁴¹ ≈ 88 %`. Casi nueve de cada diez corridas bloquearían
+por un fantasma.
+
+> Fíjate en que el número **empeora al crecer el conjunto de pruebas**, que es
+> lo contrario de lo que dice la intuición: más preguntas son más oportunidades
+> de que el juez se equivoque en alguna. Un suelo sin margen no escala sin
+> reproducción.
 
 Por eso toda violación de suelo se **reproduce**: se re-corre solo esa pregunta
 tres veces y se exige que se repita al menos dos. Cuesta tres llamadas, no una
@@ -458,7 +465,7 @@ semanas**. Antes de eso, un descubridor de analogías sería una máquina de
 generar trabajo sin manera de saber si el trabajo vale.
 
 Lo mismo con el carril de grafo, las comunidades y la reescritura de consultas.
-[Las cuatro costuras y sus disparadores están en la arquitectura](03-arquitectura.md#lo-que-no-está-y-su-trigger).
+[Las cinco costuras y sus disparadores están en la arquitectura](03-arquitectura.md#lo-que-no-está-y-su-trigger).
 
 Y una limitación que no tiene solución elegante: **el conjunto de pruebas es
 mayoritariamente sintético.** Lo escribió el autor mirando su propio corpus, no

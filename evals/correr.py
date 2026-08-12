@@ -92,6 +92,12 @@ def identidad(p: Palancas, epoca: int | None, usar_juez: bool) -> dict[str, Any]
         "palancas": p.dict(),
         "epoca": epoca,
         "huella_juez": JuezDeSpec(p, usar_juez=usar_juez).digest()[:12],
+        # El nivel viaja por su propia clave y no dentro del digest del juez.
+        # Estaba dentro, y comparar nivel 0 con completo acusaba al juez de
+        # haber cambiado cuando lo único distinto era el arnés: el detector
+        # daba la razón correcta con el motivo equivocado, que es la avería
+        # que este repo persigue.
+        "nivel": "nivel0" if not usar_juez else "completo",
         "corpus_sha": sha,
         "n_artefactos": n,
         "indice": tabla_fragmentos(p),
@@ -136,6 +142,7 @@ def comparables(a: dict, b: dict) -> tuple[bool, list[str]]:
     for clave, explica in (
         ("epoca", "épocas distintas: el delta mezclaría sistema y corpus"),
         ("huella_juez", "el juez o la spec cambiaron: no es agregación, es cambiar la regla"),
+        ("nivel", "niveles distintos: el nivel 0 no mide lo mismo que el completo"),
     ):
         if a.get(clave) != b.get(clave):
             motivos.append(f"{clave}: {a.get(clave)} != {b.get(clave)} — {explica}")
@@ -238,14 +245,34 @@ def completo(probes: list[dict], *, epoca: int | None, p: Palancas, k: int) -> l
             "id": tr.task.id,
             "categoria": (tr.task.metadata or {}).get("categoria", "?"),
             "clase": (tr.task.metadata or {}).get("clase", "dependiente"),
+            "reglas": (tr.task.metadata or {}).get("reglas", []),
             "pass_rate": tr.pass_rate,
             "n_puntuados": tr.n_scored, "n_sin_puntuar": tr.n_unscored,
             "en_zona_de_aprendizaje": tr.in_learning_zone,
             "diagnostico": diag.most_common(1)[0][0] if diag else "ninguno",
             "incumple": dict(incumple),
             "motivos": {r: m for d in detalles for r, m in (d.get("motivos") or {}).items()},
+            # El recall TAMBIÉN aquí, y no solo en el nivel 0. Es la métrica
+            # primaria de la spec, y durante un tiempo el nivel completo la
+            # ponía a None: el suelo más importante no se comprobaba justo en
+            # el modo que corre el juez. Un lector externo lo señaló.
+            "recall": _recall_del_intento(tr, detalles),
         })
     return filas
+
+
+def _recall_del_intento(tr, detalles: list[dict]) -> float | None:
+    """De los artefactos que la probe declaraba necesitar, cuántos llegaron.
+
+    `None` —no `0.0`— cuando la probe no declara `requiere`: su recall sería
+    trivialmente 1,0 y ensuciaría la media hacia arriba. Es la misma semántica
+    que el nivel 0 aplica a las no medibles.
+    """
+    esperados = set((tr.task.metadata or {}).get("requiere") or [])
+    if not esperados:
+        return None
+    llegados = {a for d in detalles for a in (d.get("artefactos") or []) if a}
+    return len(esperados & llegados) / len(esperados)
 
 
 # --------------------------------------------------------------------------- #
@@ -310,9 +337,11 @@ def informe(
         )
     else:
         pasan = sum(1 for f in medidas if (f.get("pass_rate") or 0) >= 1.0)
-        # None y no float("nan"): NaN no es JSON válido y revienta al
-        # persistir el informe. «No se calculó» es ausencia, no un número raro.
-        recall = None
+        # Sobre las que declaran `requiere`. Las demás no tienen recall que
+        # medir, y `None` —no `0.0`, y desde luego no `NaN`, que ni siquiera es
+        # JSON válido— es la forma de decir «esta medición no ocurrió».
+        con_recall = [f["recall"] for f in medidas if f.get("recall") is not None]
+        recall = statistics.mean(con_recall) if con_recall else None
         p95 = 0
 
     print(f"\n{'─' * 68}")
@@ -320,8 +349,9 @@ def informe(
     print(f"  huella config {ident['huella_config']}  ·  época {ident['epoca']}  "
           f"·  juez {ident['huella_juez']}")
     print(f"  corpus {ident['n_artefactos']} artefactos · sha {ident['corpus_sha']}")
-    print(f"\n  pasan {pasan}/{n}" + (f"   recall@top_k {recall:.2f}   p95 {p95/1000:.1f}s"
-                                      if es_nivel0 else ""))
+    print(f"\n  pasan {pasan}/{n}"
+          + (f"   recall@top_k {recall:.2f}" if recall is not None else "")
+          + (f"   p95 {p95/1000:.1f}s" if es_nivel0 else ""))
 
     if no_medibles:
         cats = Counter(f["categoria"] for f in no_medibles)
@@ -362,6 +392,30 @@ def informe(
         print(f"    {'ok  ' if ok_p95 else 'ROTO'}  latencia p95 ≤ 8s ({p95/1000:.1f}s)")
         print("    —     R2/R4/R5/R6 no se comprueban en nivel 0: necesitan respuesta")
     else:
+        # El recall TAMBIÉN aquí. Es la métrica primaria de la spec y durante
+        # un tiempo solo se comprobaba en el nivel 0, o sea en el modo que no
+        # corre el juez: el suelo más importante no se evaluaba en el modo que
+        # importa. Se comprueba sobre las probes que declaran `requiere`.
+        if recall is not None:
+            print(f"    {'ok  ' if recall >= SUELO_RECALL else 'ROTO'}  "
+                  f"recall@top_k ≥ {SUELO_RECALL} "
+                  f"({recall:.2f}, sobre {len(con_recall)} probes)")
+
+        # R6 en tasa, y con su n a la vista. Estaba declarado en la spec, tenía
+        # su constante en este fichero, y no lo comprobaba nadie: era una
+        # afirmación muerta dentro del arnés que existe para cazarlas.
+        con_r6 = [f for f in medidas if "R6" in (f.get("reglas") or [])]
+        if con_r6:
+            ok6 = sum(1 for f in con_r6 if f["incumple"].get("R6", 0) == 0)
+            tasa6 = ok6 / len(con_r6)
+            aviso = (
+                "  ← con esta n, «≥ 0,95» es «cero fallos» disfrazado"
+                if len(con_r6) < 20 else ""
+            )
+            print(f"    {'ok  ' if tasa6 >= SUELO_R6 else 'ROTO'}  "
+                  f"R6 · lo superado se marca ≥ {SUELO_R6} "
+                  f"({tasa6:.2f} sobre {len(con_r6)}){aviso}")
+
         for regla, tope in SUELOS_RECUENTO.items():
             culpables = [f["id"] for f in medidas if f["incumple"].get(regla, 0) > 0]
             repro = (reproducciones or {}).get(regla)

@@ -105,13 +105,33 @@ flowchart LR
 Usar `run_rollouts` como **motor de repeticiones** y no su `diff()`. La
 identidad de registro son tres huellas propias:
 
-| Huella | Cubre |
-|---|---|
-| `huella_config` | Troceado, tamaño, solape, contextualización, embedder, dimensión, distancia y **proveedor de embeddings** |
-| `epoca` | El corte del corpus |
-| `huella_juez` | Modelo del juez, sus instrucciones, y el sha de `spec.md` y `reglas.py` |
+| Huella | Cubre | ¿impide comparar? |
+|---|---|---|
+| `huella_config` | **Todas** las palancas, más el proveedor de embeddings | **no** — nombra el brazo del experimento |
+| `epoca` | El corte del corpus | sí: cambia el objeto medido |
+| `huella_juez` | Modelo del juez, sus instrucciones, y el sha de `spec.md` y `reglas.py` | sí: cambia el instrumento |
+| `nivel` | Nivel 0 o completo | sí: no miden lo mismo |
 
-`eval --diff` se niega si difiere cualquiera, con el motivo escrito.
+Y una cuarta condición que no es una huella sino un recuento: **más de una
+palanca movida** entre las dos corridas también se niega, porque el delta no se
+puede atribuir a ninguna.
+
+> **Dos correcciones sobre la primera versión de esta decisión**, las dos
+> encontradas por lectores externos y las dos de la misma clase que este
+> documento critica.
+>
+> La primera: `huella_config` hasheaba solo las palancas que obligan a
+> reindexar, así que `top_k`, `k_rrf` y los pesos de fusión quedaban fuera —
+> exactamente el defecto que la decisión existe para esquivar. Al arreglarlo
+> apareció lo de verdad interesante: hashear todas y negarse **mata el bucle**,
+> porque mover una palanca y comparar es lo único que el bucle hace. La
+> configuración es el *tratamiento*, no el instrumento, y esa distinción es
+> ahora lo que ordena la tabla de arriba.
+>
+> La segunda: `usar_juez` estaba dentro del digest del juez, así que comparar
+> una corrida de nivel 0 con una de nivel completo imprimía «el juez o la spec
+> cambiaron» sin que hubiera cambiado ninguno. El nivel salió del digest y tiene
+> su propia clave.
 
 ### Alternativas descartadas
 
@@ -156,12 +176,30 @@ flowchart TD
 
     A --> A1["contra un agente<br/>que se despista"]
     B --> B1["la manipulación no es<br/>silenciosa: es ruidosa<br/>y automática"]
-    C --> C1["contra un agente<br/>que busca la salida"]
+    C --> C1["contra el DESPISTE, no<br/>contra la intención:<br/>ver el aviso de abajo"]
 
     style A1 fill:#fff4e6,stroke:#e69500
     style B1 fill:#e6f2ff,stroke:#0080ff
-    style C1 fill:#e6ffe6,stroke:#00994d
+    style C1 fill:#fff4e6,stroke:#e69500
 ```
+
+> **La capa 3 no aísla tanto como decía esta sección.** La contraseña del
+> superusuario de Postgres viaja en `docker-compose.yml`, en `.env.example` y
+> como valor por defecto en `cerebro/config.py`, que es el único fichero que el
+> deny-list autoriza a editar. Con `Bash(uv:*)` permitido, saltarse el `REVOKE`
+> es una línea. No hay arreglo local: la base de datos corre en la misma máquina
+> y sus credenciales tienen que estar donde la máquina las lea.
+>
+> Lo que sí compra es concreto: el holdout **no está en ningún fichero** que el
+> agente abra mientras trabaja, rodearlo exige un acto deliberado y visible, y la
+> credencial del dueño no toca el disco. Es una barrera contra el despiste, y el
+> despiste es el caso frecuente. El detalle entero está en
+> [su artefacto](../artefactos/corpus/2026/el-holdout-no-resiste-python-arbitrario.md).
+>
+> **La capa 2 es la que de verdad aguanta**, y no por ser más fuerte sino por
+> ser de otra naturaleza: no impide la manipulación, la hace *inútil*. Un agente
+> puede relajar la spec; lo que no puede es hacer que la medición resultante
+> cuente como comparable con la anterior.
 
 La capa 2 es la clave conceptual: **el agente puede escribir lo que quiera; lo
 que no puede es hacer que su escritura cuente.** Editar el juez cambia el
@@ -323,7 +361,7 @@ Python, con el rango de cada carril guardado **antes** de fusionar.
 
 Un golden set sintético —generado a partir del corpus— **ordena bien
 configuraciones de recuperación y no ordena bien arquitecturas de generación**.
-Con ~10 consultas reales a la semana, el golden set de este sistema será
+Con el volumen realista de un usuario —del orden de 10 consultas a la semana, no de 20 al día— el golden set de este sistema será
 mayoritariamente sintético durante meses.
 
 ### Decisión
