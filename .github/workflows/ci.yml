@@ -106,3 +106,6 @@ jobs:
         run: |
           npm install --silent --no-save mermaid@11 jsdom
           node .github/scripts/comprobar-mermaid.mjs .
+
+      - name: 'ningún enlace interno de la documentación está roto'
+        run: uv run python .github/scripts/comprobar_enlaces.py

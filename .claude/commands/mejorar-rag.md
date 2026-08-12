@@ -44,6 +44,13 @@ reporte ya te da el reparto. Coge el más frecuente.
 Una sola. Si cambias dos, la ronda no te enseña nada: la atribución causal
 exige cambios atómicos.
 
+> **Y esto ya no depende de tu disciplina.** `rag eval --diff` compara las
+> palancas de las dos corridas y **se niega** si se movió más de una, nombrando
+> cuáles. Si se movió exactamente una, la nombra en la cabecera del diff —
+> `palanca: top_k  12 → 20`— para que dentro de tres semanas el número siga
+> siendo atribuible. Y si no se movió ninguna, avisa de que lo que estás
+> midiendo es **ruido**, no una mejora.
+
 **Dos frenos antes de tocar:**
 
 - Si la palanca es de **grada 3** (`PALANCAS.grada_de(...) == 3`), PARA y

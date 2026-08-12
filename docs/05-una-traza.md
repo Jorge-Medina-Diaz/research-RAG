@@ -27,25 +27,25 @@ embedder y el analizador léxico son tres movimientos indistinguibles.
 |---:|---|
 | 1 | `2026-08-12-rrf-k-60-de-donde-sale-el-sesenta` |
 | 3 | `2026-08-12-epocas-para-medir-un-corpus-que-crece` |
-| 5 | `2026-08-12-epocas-para-medir-un-corpus-que-crece` |
 | 7 | `2026-08-12-agno-hybrid-search-predicado-comentado` |
 | 9 | `2026-08-12-agno-pgvector-indices-decorativos` |
+| 11 | `2026-08-12-un-detector-que-siempre-dispara-esta-apagado` |
 | 12 | `2026-08-12-getpass-no-falla-se-cuelga` |
 | 13 | `2026-08-12-epocas-para-medir-un-corpus-que-crece` |
-| 15 | `2026-08-12-agno-filtros-operadores-anunciados-no-implementados` |
+| 14 | `2026-08-12-agno-pgvector-indices-decorativos` |
 
 **lexico** — 12 de los 12 finales venían de aquí
 
 | puesto en su carril | artefacto |
 |---:|---|
 | 1 | `2026-08-12-rrf-k-60-de-donde-sale-el-sesenta` |
-| 4 | `2026-08-12-agno-hybrid-search-predicado-comentado` |
+| 3 | `2026-08-12-agno-hybrid-search-predicado-comentado` |
 | 5 | `2026-08-12-agno-pgvector-indices-decorativos` |
-| 6 | `2026-08-12-plainto-tsquery-hace-and-y-devuelve-cero` |
-| 8 | `2026-08-12-agno-hybrid-search-predicado-comentado` |
-| 9 | `2026-08-12-getpass-no-falla-se-cuelga` |
-| 10 | `2026-08-12-ragchecker-la-aritmetica-no-la-dependencia` |
-| 11 | `2026-08-12-agno-pgvector-indices-decorativos` |
+| 7 | `2026-08-12-agno-hybrid-search-predicado-comentado` |
+| 9 | `2026-08-12-agno-pgvector-indices-decorativos` |
+| 10 | `2026-08-12-agno-filtros-operadores-anunciados-no-implementados` |
+| 11 | `2026-08-12-ragchecker-la-aritmetica-no-la-dependencia` |
+| 12 | `2026-08-12-getpass-no-falla-se-cuelga` |
 
 ## 3 · La fusión (RRF, k=60)
 
@@ -57,17 +57,17 @@ puesto solitario.
 | # | artefacto · fragmento | RRF | puesto en cada carril |
 |---:|---|---:|---|
 | 1 | `2026-08-12-rrf-k-60-de-donde-sale-el-sesenta` · `…d25fd6` | 0.03279 | denso #1, lexico #1 |
-| 2 | `2026-08-12-agno-hybrid-search-predicado-comentado` · `…d35f0b` | 0.02963 | denso #7, lexico #8 |
-| 3 | `2026-08-12-epocas-para-medir-un-corpus-que-crece` · `…9da64b` | 0.02939 | denso #3, lexico #14 |
-| 4 | `2026-08-12-agno-pgvector-indices-decorativos` · `…87f52f` | 0.02858 | denso #9, lexico #11 |
-| 5 | `2026-08-12-getpass-no-falla-se-cuelga` · `…ccb283` | 0.02838 | denso #12, lexico #9 |
-| 6 | `2026-08-12-agno-hybrid-search-predicado-comentado` · `…6b5f41` | 0.02797 | denso #21, lexico #4 |
-| 7 | `2026-08-12-agno-filtros-operadores-anunciados-no-implementados` · `…3e1340` | 0.02722 | denso #15, lexico #12 |
-| 8 | `2026-08-12-epocas-para-medir-un-corpus-que-crece` · `…94eb7b` | 0.02688 | denso #5, lexico #27 |
-| 9 | `2026-08-12-epocas-para-medir-un-corpus-que-crece` · `…a671b9` | 0.02686 | denso #13, lexico #16 |
-| 10 | `2026-08-12-ragchecker-la-aritmetica-no-la-dependencia` · `…5c4edf` | 0.02679 | denso #20, lexico #10 |
-| 11 | `2026-08-12-agno-pgvector-indices-decorativos` · `…0780fa` | 0.02675 | denso #28, lexico #5 |
-| 12 | `2026-08-12-plainto-tsquery-hace-and-y-devuelve-cero` · `…8bf237` | 0.02626 | denso #30, lexico #6 |
+| 2 | `2026-08-12-agno-hybrid-search-predicado-comentado` · `…d35f0b` | 0.02985 | denso #7, lexico #7 |
+| 3 | `2026-08-12-agno-pgvector-indices-decorativos` · `…87f52f` | 0.02899 | denso #9, lexico #9 |
+| 4 | `2026-08-12-agno-hybrid-search-predicado-comentado` · `…6b5f41` | 0.02822 | denso #21, lexico #3 |
+| 5 | `2026-08-12-getpass-no-falla-se-cuelga` · `…ccb283` | 0.02778 | denso #12, lexico #12 |
+| 6 | `2026-08-12-epocas-para-medir-un-corpus-que-crece` · `…9da64b` | 0.02764 | denso #3, lexico #25 |
+| 7 | `2026-08-12-agno-filtros-operadores-anunciados-no-implementados` · `…3e1340` | 0.02762 | denso #15, lexico #10 |
+| 8 | `2026-08-12-agno-pgvector-indices-decorativos` · `…0780fa` | 0.02662 | denso #29, lexico #5 |
+| 9 | `2026-08-12-ragchecker-la-aritmetica-no-la-dependencia` · `…5c4edf` | 0.02659 | denso #20, lexico #11 |
+| 10 | `2026-08-12-epocas-para-medir-un-corpus-que-crece` · `…a671b9` | 0.02589 | denso #13, lexico #22 |
+| 11 | `2026-08-12-un-detector-que-siempre-dispara-esta-apagado` · `…65b653` | 0.02571 | denso #11, lexico #26 |
+| 12 | `2026-08-12-agno-pgvector-indices-decorativos` · `…a89e8b` | 0.02463 | denso #14, lexico #30 |
 
 De un pool de 40 candidatos por carril salen los **12** que llegan al prompt.
 

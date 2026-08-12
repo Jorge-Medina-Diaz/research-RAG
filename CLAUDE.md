@@ -34,13 +34,30 @@ ingesta/
   trocear.py      ConMetadatos (siempre) + ContextoSituacional (grada 3, apagado)
 
 evals/
-  probes.yaml     el golden set. Denegado a la edición.
+  probes.yaml     el golden set: 41 probes, 6 categorías. Denegado a la edición.
   entorno.py      Environment de Agno + ciclo de vida de las probes
   correr.py       el arnés. Nivel 0 sin claves, completo con ellas.
   estadistica.py  ruido, McNemar, Krippendorff, bootstrap. Denegado.
 
+scripts/
+  traza.py        una consulta de punta a punta. Genera docs/05-una-traza.md.
+  holdout.py      el conjunto reservado. La credencial se pide por teclado.
+  serve.py        AgentOS + la ruta de voto. modelo_falso.py, el guion.
+  epoca.py        avanza la época. Acto humano, fechado. Denegado.
+
+docs/
+  00-el-problema  LA PUERTA. No supone nada. Empieza aquí si eres nuevo.
+  01..04          decisiones, estado del arte, arquitectura, medición
+  05-una-traza    generado por `rag traza`, no escrito a mano
+  99-glosario     cada término, y la tabla grada / fase / escalón
+
+.github/
+  workflows/ci.yml            corre sin ninguna clave
+  scripts/comprobar-mermaid   los 28 diagramas parsean de verdad
+  scripts/comprobar_enlaces   ningún enlace interno roto
+
 artefactos/entrada/   la bandeja. Suelta .md aquí.
-artefactos/corpus/    lo ingerido. ES el corpus. Denegado.
+artefactos/corpus/    lo ingerido. ES el corpus. 12 artefactos. Denegado.
 runs/                 el archivo. Nunca se borra.
 ```
 
@@ -90,11 +107,11 @@ humano y está denegado al agente.
 
   | | líneas | presupuesto |
   |---|---|---|
-  | `evals/` — bucle y arnés | 925 | ≤ 1.000, comparable a atlas-rai |
+  | `evals/` — bucle y arnés | 977 | ≤ 1.000, comparable a atlas-rai |
   | `cerebro/` | 1.916 | ≤ 2.000 |
   | `ingesta/` | 740 | ≤ 800 |
-  | `scripts/` + `tareas.py` | 1.668 | ≤ 1.500 · **excedido** |
-  | **total sin tests** | **5.249** | |
+  | `scripts/` + `tareas.py` | 1.882 | ≤ 1.500 · **excedido** |
+  | **total sin tests** | **5.515** | |
 
   Una versión anterior de esta línea decía «por debajo de 1.500 LOC» a secas,
   con 5.249 en el repo. Era una convención que el propio repo incumplía en su

@@ -458,7 +458,7 @@ semanas**. Antes de eso, un descubridor de analogías sería una máquina de
 generar trabajo sin manera de saber si el trabajo vale.
 
 Lo mismo con el carril de grafo, las comunidades y la reescritura de consultas.
-[Las cuatro costuras y sus disparadores están en la arquitectura](03-arquitectura.md#costuras).
+[Las cuatro costuras y sus disparadores están en la arquitectura](03-arquitectura.md#lo-que-no-está-y-su-trigger).
 
 Y una limitación que no tiene solución elegante: **el conjunto de pruebas es
 mayoritariamente sintético.** Lo escribió el autor mirando su propio corpus, no
