@@ -32,6 +32,7 @@ from __future__ import annotations
 
 import argparse
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -180,16 +181,68 @@ def probar() -> int:
     return 1
 
 
+def quitar_del_yaml(texto: str, ids: set[str]) -> tuple[str, list[str]]:
+    """Borra los bloques de las probes nombradas SIN reescribir el fichero.
+
+    `yaml.safe_dump` sobre el fichero entero perdería todos los comentarios, y
+    aquí los comentarios son la mitad del valor: explican por qué existe cada
+    categoría, por qué `fuera_de_alcance` es el freno y qué NO puede escribir el
+    bucle. Un fichero que pierde su explicación cada vez que se toca acaba sin
+    explicación.
+
+    Así que se corta por líneas: desde `  - id: P-XX` hasta el siguiente `  - `
+    del mismo nivel, o el final.
+    """
+    lineas = texto.splitlines(keepends=True)
+    fuera: list[str] = []
+    quitadas: list[str] = []
+    i = 0
+    while i < len(lineas):
+        m = re.match(r"^(\s*)-\s+id:\s*(\S+)\s*$", lineas[i])
+        if not (m and m.group(2) in ids):
+            fuera.append(lineas[i])
+            i += 1
+            continue
+
+        sangria = len(m.group(1))
+        quitadas.append(m.group(2))
+        j = i + 1
+        while j < len(lineas):
+            ln = lineas[j]
+            sin = ln.strip()
+            if not sin:
+                j += 1
+                continue
+            indent = len(ln) - len(ln.lstrip())
+            # El bloque acaba en el siguiente item del mismo nivel, en cualquier
+            # línea a menor sangría, o en un COMENTARIO alineado con el nivel de
+            # la lista: ese comentario encabeza lo que viene DESPUÉS, no cierra
+            # lo de antes. Sin esta tercera condición, mover una probe se lleva
+            # por delante el rótulo de la categoría siguiente.
+            if re.match(rf"^\s{{{sangria}}}-\s", ln) or indent < sangria:
+                break
+            if sin.startswith("#") and indent <= sangria:
+                break
+            j += 1
+        # Las líneas en blanco pegadas al final pertenecen a la separación entre
+        # bloques, no al bloque: se devuelven para no juntar los dos vecinos.
+        while j - 1 > i and not lineas[j - 1].strip():
+            j -= 1
+        i = j
+    # Quitar un bloque deja dos líneas en blanco juntas donde había una.
+    salida = re.sub(r"\n{3,}", "\n\n", "".join(fuera))
+    return salida, quitadas
+
+
 def anadir(ids: list[str]) -> int:
     """Mueve probes del golden set al holdout. Irreversible a propósito."""
     import yaml
 
     from evals.entorno import PROBES
 
-    datos = yaml.safe_load(PROBES.read_text(encoding="utf-8"))
-    quedan, movidas = [], []
-    for pr in datos["probes"]:
-        (movidas if pr["id"] in set(ids) else quedan).append(pr)
+    crudo = PROBES.read_text(encoding="utf-8")
+    datos = yaml.safe_load(crudo)
+    movidas = [pr for pr in datos["probes"] if pr["id"] in set(ids)]
     if not movidas:
         print(f"  no encontré ninguna de {ids} en el golden set")
         return 1
@@ -211,11 +264,12 @@ def anadir(ids: list[str]) -> int:
                  pr["consulta"], pr["espera"], pr["reglas"],
                  pr.get("requiere") or [], pr.get("clave_negativa")),
             )
-    datos["probes"] = quedan
-    PROBES.write_text(
-        yaml.safe_dump(datos, allow_unicode=True, sort_keys=False), encoding="utf-8"
+    nuevo, quitadas = quitar_del_yaml(crudo, {pr["id"] for pr in movidas})
+    PROBES.write_text(nuevo, encoding="utf-8")
+    print(
+        f"\n  {len(quitadas)} probe(s) al holdout: {', '.join(quitadas)}."
+        "\n  Ya no las verás más, y los comentarios del fichero siguen ahí.\n"
     )
-    print(f"\n  {len(movidas)} probe(s) al holdout. Ya no las verás más.\n")
     return 0
 
 

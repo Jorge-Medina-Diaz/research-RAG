@@ -1,0 +1,365 @@
+{
+ "fecha": "2026-08-12T09:42:47.333093+00:00",
+ "identidad": {
+  "huella_config": "5645f428a2b1",
+  "epoca": 0,
+  "huella_juez": "daacaeb903d7",
+  "corpus_sha": "b274b5ab9243",
+  "n_artefactos": 3,
+  "indice": "fragmento_5645f428a2b1"
+ },
+ "nivel": "completo",
+ "resumen": {
+  "pasan": 4,
+  "total": 21,
+  "no_medibles": 0,
+  "recall": NaN,
+  "p95_ms": 0
+ },
+ "reproducciones": {
+  "R2": {
+   "P-11": true,
+   "P-12": true,
+   "P-13": true,
+   "P-14": true,
+   "P-15": true,
+   "P-16": true,
+   "P-17": true,
+   "P-18": true,
+   "P-19": true,
+   "P-20": true,
+   "P-21": true
+  },
+  "R4": {
+   "P-01": true,
+   "P-02": true,
+   "P-03": true,
+   "P-07": true,
+   "P-08": true,
+   "P-09": true
+  }
+ },
+ "probes": [
+  {
+   "id": "P-01",
+   "categoria": "single_hop",
+   "clase": "dependiente",
+   "pass_rate": 0.0,
+   "n_puntuados": 1,
+   "n_sin_puntuar": 0,
+   "en_zona_de_aprendizaje": false,
+   "diagnostico": "prompt",
+   "incumple": {
+    "R4": 1
+   },
+   "motivos": {
+    "R4": "literales que no están en los fragmentos: ['08', '2026']"
+   }
+  },
+  {
+   "id": "P-02",
+   "categoria": "single_hop",
+   "clase": "dependiente",
+   "pass_rate": 0.0,
+   "n_puntuados": 1,
+   "n_sin_puntuar": 0,
+   "en_zona_de_aprendizaje": false,
+   "diagnostico": "prompt",
+   "incumple": {
+    "R4": 1
+   },
+   "motivos": {
+    "R4": "literales que no están en los fragmentos: ['08', '2026']"
+   }
+  },
+  {
+   "id": "P-03",
+   "categoria": "single_hop",
+   "clase": "dependiente",
+   "pass_rate": 0.0,
+   "n_puntuados": 1,
+   "n_sin_puntuar": 0,
+   "en_zona_de_aprendizaje": false,
+   "diagnostico": "prompt",
+   "incumple": {
+    "R4": 1
+   },
+   "motivos": {
+    "R4": "literales que no están en los fragmentos: ['08', '2026']"
+   }
+  },
+  {
+   "id": "P-04",
+   "categoria": "multi_hop",
+   "clase": "dependiente",
+   "pass_rate": 1.0,
+   "n_puntuados": 1,
+   "n_sin_puntuar": 0,
+   "en_zona_de_aprendizaje": false,
+   "diagnostico": "ninguno",
+   "incumple": {},
+   "motivos": {}
+  },
+  {
+   "id": "P-05",
+   "categoria": "multi_hop",
+   "clase": "dependiente",
+   "pass_rate": 1.0,
+   "n_puntuados": 1,
+   "n_sin_puntuar": 0,
+   "en_zona_de_aprendizaje": false,
+   "diagnostico": "ninguno",
+   "incumple": {},
+   "motivos": {}
+  },
+  {
+   "id": "P-06",
+   "categoria": "aggregation",
+   "clase": "dependiente",
+   "pass_rate": 1.0,
+   "n_puntuados": 1,
+   "n_sin_puntuar": 0,
+   "en_zona_de_aprendizaje": false,
+   "diagnostico": "ninguno",
+   "incumple": {},
+   "motivos": {}
+  },
+  {
+   "id": "P-07",
+   "categoria": "lexical_exact",
+   "clase": "dependiente",
+   "pass_rate": 0.0,
+   "n_puntuados": 1,
+   "n_sin_puntuar": 0,
+   "en_zona_de_aprendizaje": false,
+   "diagnostico": "prompt",
+   "incumple": {
+    "R4": 1
+   },
+   "motivos": {
+    "R4": "literales que no están en los fragmentos: ['08', '2026']"
+   }
+  },
+  {
+   "id": "P-08",
+   "categoria": "lexical_exact",
+   "clase": "dependiente",
+   "pass_rate": 0.0,
+   "n_puntuados": 1,
+   "n_sin_puntuar": 0,
+   "en_zona_de_aprendizaje": false,
+   "diagnostico": "prompt",
+   "incumple": {
+    "R4": 1
+   },
+   "motivos": {
+    "R4": "literales que no están en los fragmentos: ['08', '2026']"
+   }
+  },
+  {
+   "id": "P-09",
+   "categoria": "lexical_exact",
+   "clase": "invariante",
+   "pass_rate": 0.0,
+   "n_puntuados": 1,
+   "n_sin_puntuar": 0,
+   "en_zona_de_aprendizaje": false,
+   "diagnostico": "prompt",
+   "incumple": {
+    "R4": 1
+   },
+   "motivos": {
+    "R4": "literales que no están en los fragmentos: ['08', '2026']"
+   }
+  },
+  {
+   "id": "P-10",
+   "categoria": "temporal",
+   "clase": "invariante",
+   "pass_rate": 1.0,
+   "n_puntuados": 1,
+   "n_sin_puntuar": 0,
+   "en_zona_de_aprendizaje": false,
+   "diagnostico": "ninguno",
+   "incumple": {},
+   "motivos": {}
+  },
+  {
+   "id": "P-11",
+   "categoria": "fuera_de_alcance",
+   "clase": "dependiente",
+   "pass_rate": 0.0,
+   "n_puntuados": 1,
+   "n_sin_puntuar": 0,
+   "en_zona_de_aprendizaje": false,
+   "diagnostico": "prompt",
+   "incumple": {
+    "R2": 1
+   },
+   "motivos": {
+    "R2": "debía abstenerse y respondió: 'Segun la memoria, el punto relevante esta recogido en [[art:2026-08-12-agno-pgvector-indices-decorativos]].'"
+   }
+  },
+  {
+   "id": "P-12",
+   "categoria": "fuera_de_alcance",
+   "clase": "dependiente",
+   "pass_rate": 0.0,
+   "n_puntuados": 1,
+   "n_sin_puntuar": 0,
+   "en_zona_de_aprendizaje": false,
+   "diagnostico": "prompt",
+   "incumple": {
+    "R2": 1
+   },
+   "motivos": {
+    "R2": "debía abstenerse y respondió: 'Segun la memoria, el punto relevante esta recogido en [[art:2026-08-12-epocas-para-medir-un-corpus-que-crece]].'"
+   }
+  },
+  {
+   "id": "P-13",
+   "categoria": "fuera_de_alcance",
+   "clase": "invariante",
+   "pass_rate": 0.0,
+   "n_puntuados": 1,
+   "n_sin_puntuar": 0,
+   "en_zona_de_aprendizaje": false,
+   "diagnostico": "prompt",
+   "incumple": {
+    "R2": 1
+   },
+   "motivos": {
+    "R2": "debía abstenerse y respondió: 'Segun la memoria, el punto relevante esta recogido en [[art:2026-08-12-agno-pgvector-indices-decorativos]].'"
+   }
+  },
+  {
+   "id": "P-14",
+   "categoria": "fuera_de_alcance",
+   "clase": "invariante",
+   "pass_rate": 0.0,
+   "n_puntuados": 1,
+   "n_sin_puntuar": 0,
+   "en_zona_de_aprendizaje": false,
+   "diagnostico": "prompt",
+   "incumple": {
+    "R2": 1
+   },
+   "motivos": {
+    "R2": "debía abstenerse y respondió: 'Segun la memoria, el punto relevante esta recogido en [[art:2026-08-12-agno-env-fingerprint-ciego-al-corpus]].'"
+   }
+  },
+  {
+   "id": "P-15",
+   "categoria": "fuera_de_alcance",
+   "clase": "invariante",
+   "pass_rate": 0.0,
+   "n_puntuados": 1,
+   "n_sin_puntuar": 0,
+   "en_zona_de_aprendizaje": false,
+   "diagnostico": "prompt",
+   "incumple": {
+    "R2": 1
+   },
+   "motivos": {
+    "R2": "debía abstenerse y respondió: 'Segun la memoria, el punto relevante esta recogido en [[art:2026-08-12-agno-pgvector-indices-decorativos]].'"
+   }
+  },
+  {
+   "id": "P-16",
+   "categoria": "fuera_de_alcance",
+   "clase": "invariante",
+   "pass_rate": 0.0,
+   "n_puntuados": 1,
+   "n_sin_puntuar": 0,
+   "en_zona_de_aprendizaje": false,
+   "diagnostico": "prompt",
+   "incumple": {
+    "R2": 1
+   },
+   "motivos": {
+    "R2": "debía abstenerse y respondió: 'Segun la memoria, el punto relevante esta recogido en [[art:2026-08-12-agno-env-fingerprint-ciego-al-corpus]].'"
+   }
+  },
+  {
+   "id": "P-17",
+   "categoria": "fuera_de_alcance",
+   "clase": "invariante",
+   "pass_rate": 0.0,
+   "n_puntuados": 1,
+   "n_sin_puntuar": 0,
+   "en_zona_de_aprendizaje": false,
+   "diagnostico": "prompt",
+   "incumple": {
+    "R2": 1
+   },
+   "motivos": {
+    "R2": "debía abstenerse y respondió: 'Segun la memoria, el punto relevante esta recogido en [[art:2026-08-12-epocas-para-medir-un-corpus-que-crece]].'"
+   }
+  },
+  {
+   "id": "P-18",
+   "categoria": "fuera_de_alcance",
+   "clase": "invariante",
+   "pass_rate": 0.0,
+   "n_puntuados": 1,
+   "n_sin_puntuar": 0,
+   "en_zona_de_aprendizaje": false,
+   "diagnostico": "prompt",
+   "incumple": {
+    "R2": 1
+   },
+   "motivos": {
+    "R2": "debía abstenerse y respondió: 'Segun la memoria, el punto relevante esta recogido en [[art:2026-08-12-agno-pgvector-indices-decorativos]].'"
+   }
+  },
+  {
+   "id": "P-19",
+   "categoria": "fuera_de_alcance",
+   "clase": "invariante",
+   "pass_rate": 0.0,
+   "n_puntuados": 1,
+   "n_sin_puntuar": 0,
+   "en_zona_de_aprendizaje": false,
+   "diagnostico": "prompt",
+   "incumple": {
+    "R2": 1
+   },
+   "motivos": {
+    "R2": "debía abstenerse y respondió: 'Segun la memoria, el punto relevante esta recogido en [[art:2026-08-12-epocas-para-medir-un-corpus-que-crece]].'"
+   }
+  },
+  {
+   "id": "P-20",
+   "categoria": "fuera_de_alcance",
+   "clase": "invariante",
+   "pass_rate": 0.0,
+   "n_puntuados": 1,
+   "n_sin_puntuar": 0,
+   "en_zona_de_aprendizaje": false,
+   "diagnostico": "prompt",
+   "incumple": {
+    "R2": 1
+   },
+   "motivos": {
+    "R2": "debía abstenerse y respondió: 'Segun la memoria, el punto relevante esta recogido en [[art:2026-08-12-agno-env-fingerprint-ciego-al-corpus]].'"
+   }
+  },
+  {
+   "id": "P-21",
+   "categoria": "fuera_de_alcance",
+   "clase": "invariante",
+   "pass_rate": 0.0,
+   "n_puntuados": 1,
+   "n_sin_puntuar": 0,
+   "en_zona_de_aprendizaje": false,
+   "diagnostico": "prompt",
+   "incumple": {
+    "R2": 1
+   },
+   "motivos": {
+    "R2": "debía abstenerse y respondió: 'Segun la memoria, el punto relevante esta recogido en [[art:2026-08-12-agno-env-fingerprint-ciego-al-corpus]].'"
+   }
+  }
+ ],
+ "suspendidas": []
+}

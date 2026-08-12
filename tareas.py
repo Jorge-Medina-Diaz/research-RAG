@@ -97,6 +97,11 @@ def serve() -> None:
     _correr(PY, "scripts/serve.py")
 
 
+def falso() -> None:
+    """Modelo guionizado en :7799. Permite correr el nivel completo sin claves."""
+    _correr(PY, "scripts/modelo_falso.py")
+
+
 def sesiones() -> None:
     """Vuelca el tráfico real: de aquí salen las probes que valen."""
     _correr(PY, "scripts/sesiones.py", *sys.argv[2:])
@@ -130,7 +135,7 @@ def lint() -> None:
 TAREAS = {
     f.__name__: f
     for f in (
-        up, ingerir, epoca, serve, eval, calibrar, holdout, sesiones,
+        up, ingerir, epoca, serve, falso, eval, calibrar, holdout, sesiones,
         verificar, test, lint, extras, logs, down, limpiar,
     )
 }

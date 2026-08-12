@@ -211,7 +211,50 @@ def completo(probes: list[dict], *, epoca: int | None, p: Palancas, k: int) -> l
 # --------------------------------------------------------------------------- #
 
 
-def informe(filas: list[dict], suspendidas, ident: dict, *, es_nivel0: bool) -> dict:
+def reproducir_violaciones(
+    filas: list[dict], probes: list[dict], *, epoca: int | None, p: Palancas, k: int = 3
+) -> dict[str, dict[str, bool]]:
+    """Una violación de suelo tiene que REPRODUCIRSE para contar.
+
+    R4 a cero violaciones sobre ~20 probes, con un juez al ~95 % de
+    auto-consistencia, da una probabilidad cercana al 65 % de al menos una
+    violación espuria por corrida. El suelo más importante de la spec —el único
+    sin margen— bloquearía la promoción a cara o cruz, y el bucle gastaría
+    rondas persiguiendo fantasmas que no vuelven a aparecer.
+
+    Así que al detectar una violación se re-corren SOLO esas probes a k=3 y se
+    exige mayoría. Coste: tres llamadas por probe sospechosa, no una corrida
+    entera.
+
+    Devuelve {regla: {probe_id: confirmada}}.
+    """
+    sospechosas: dict[str, list[str]] = {}
+    for regla, tope in SUELOS_RECUENTO.items():
+        culpables = [f["id"] for f in filas if f.get("incumple", {}).get(regla, 0) > 0]
+        if len(culpables) > tope:
+            sospechosas[regla] = culpables
+    if not sospechosas:
+        return {}
+
+    ids = sorted({i for v in sospechosas.values() for i in v})
+    print(f"\n  reproduciendo {len(ids)} probe(s) sospechosa(s) a k={k}...")
+    sub = [pr for pr in probes if pr["id"] in ids]
+    refilas = {f["id"]: f for f in completo(sub, epoca=epoca, p=p, k=k)}
+
+    fuera: dict[str, dict[str, bool]] = {}
+    for regla, culpables in sospechosas.items():
+        fuera[regla] = {}
+        for pid in culpables:
+            veces = (refilas.get(pid, {}).get("incumple") or {}).get(regla, 0)
+            # mayoría de los intentos puntuados, no uno cualquiera
+            fuera[regla][pid] = veces * 2 >= k
+    return fuera
+
+
+def informe(
+    filas: list[dict], suspendidas, ident: dict, *, es_nivel0: bool,
+    reproducciones: dict[str, dict[str, bool]] | None = None,
+) -> dict:
     # Las no medibles quedan fuera del denominador. El número honesto es sobre
     # lo que de verdad se midió.
     medidas = [f for f in filas if f["diagnostico"] != "no-medible"]
@@ -225,7 +268,9 @@ def informe(filas: list[dict], suspendidas, ident: dict, *, es_nivel0: bool) -> 
         )
     else:
         pasan = sum(1 for f in medidas if (f.get("pass_rate") or 0) >= 1.0)
-        recall = float("nan")
+        # None y no float("nan"): NaN no es JSON válido y revienta al
+        # persistir el informe. «No se calculó» es ausencia, no un número raro.
+        recall = None
         p95 = 0
 
     print(f"\n{'─' * 68}")
@@ -276,9 +321,23 @@ def informe(filas: list[dict], suspendidas, ident: dict, *, es_nivel0: bool) -> 
         print("    —     R2/R4/R5/R6 no se comprueban en nivel 0: necesitan respuesta")
     else:
         for regla, tope in SUELOS_RECUENTO.items():
-            v = sum(f["incumple"].get(regla, 0) for f in medidas)
-            m = "ok  " if v <= tope else "ROTO"
-            print(f"    {m}  {regla} · {v} violación(es), tope {tope}")
+            culpables = [f["id"] for f in medidas if f["incumple"].get(regla, 0) > 0]
+            repro = (reproducciones or {}).get(regla)
+            if repro is None:
+                v = len(culpables)
+                m = "ok  " if v <= tope else "ROTO"
+                print(f"    {m}  {regla} · {v} violación(es), tope {tope}")
+            else:
+                confirmadas = [i for i in culpables if repro.get(i)]
+                espurias = [i for i in culpables if i in repro and not repro[i]]
+                m = "ok  " if len(confirmadas) <= tope else "ROTO"
+                extra = f", {len(espurias)} espuria(s) descartada(s)" if espurias else ""
+                print(
+                    f"    {m}  {regla} · {len(confirmadas)} confirmada(s) de "
+                    f"{len(culpables)} a k=3{extra}, tope {tope}"
+                )
+                if espurias:
+                    print(f"          espurias: {', '.join(espurias)}")
 
     print()
     return {
@@ -287,6 +346,7 @@ def informe(filas: list[dict], suspendidas, ident: dict, *, es_nivel0: bool) -> 
         "nivel": "0" if es_nivel0 else "completo",
         "resumen": {"pasan": pasan, "total": n, "no_medibles": len(no_medibles),
                     "recall": recall, "p95_ms": p95},
+        "reproducciones": reproducciones or {},
         "probes": filas,
         "suspendidas": [{"id": pr["id"], "motivo": m} for pr, m in suspendidas],
     }
@@ -374,7 +434,16 @@ def main() -> int:
             v = sum(1 for f in med if f["diagnostico"] == "ninguno") / max(len(med), 1)
             valores.append(v)
             print(f"  corrida {i + 1}/5: {v:.4f}")
-        r = ruido(valores, n_probes=len([x for x in activas if x.get("requiere")]))
+        # El denominador depende del nivel: en nivel 0 solo cuentan las probes
+        # medibles sin respuesta; en el completo, todas las activas. Usar el
+        # criterio del nivel 0 en una corrida completa inflaba la resolución
+        # —1/8 en vez de 1/21— y con ella el umbral de aceptación, así que
+        # descartaba mejoras reales por «indistinguibles del ruido».
+        n_denom = (
+            len([x for x in activas if medible_en_nivel0(x)]) if es_nivel0
+            else len(activas)
+        )
+        r = ruido(valores, n_probes=n_denom)
         print(f"\n  {r}\n")
         if not r.aceptable:
             print(
@@ -387,7 +456,13 @@ def main() -> int:
 
     filas = nivel0(activas, epoca=epoca, p=p) if es_nivel0 else \
         completo(activas, epoca=epoca, p=p, k=args.k)
-    inf = informe(filas, suspendidas, ident, es_nivel0=es_nivel0)
+    # Una violación de suelo se reproduce antes de contar. Solo en nivel
+    # completo: en nivel 0 no hay reglas de juez que reproducir.
+    repro = None
+    if not es_nivel0 and not args.solo:
+        repro = reproducir_violaciones(filas, activas, epoca=epoca, p=p)
+
+    inf = informe(filas, suspendidas, ident, es_nivel0=es_nivel0, reproducciones=repro)
 
     if args.json:
         Path(args.json).parent.mkdir(parents=True, exist_ok=True)

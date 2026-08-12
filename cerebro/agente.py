@@ -82,16 +82,31 @@ def construir_reordenador(p: Palancas = PALANCAS):
 
 
 def construir_modelo(id_modelo: str):
-    """Un id de modelo a su objeto de Agno, o al mock si no hay proveedor real."""
+    """Un id de modelo a su objeto de Agno.
+
+    Tres modos:
+
+      mock    no se llama nunca. Los caminos que usan modelo están cortados
+              aguas arriba; existe para que construir el agente no reviente.
+      falso   `scripts/modelo_falso.py`, un guion que habla el protocolo de
+              OpenAI. Ejercita el camino REAL de Agno —tool calls,
+              output_schema, references, rollouts— sin ninguna clave.
+      real    anthropic | openai | google según el id.
+    """
     import os
 
-    if (os.getenv("LLM_PROVIDER") or "mock").strip().lower() == "mock":
+    proveedor = (os.getenv("LLM_PROVIDER") or "mock").strip().lower()
+
+    if proveedor == "mock":
         from agno.models.openai import OpenAILike
 
-        # Nunca se llama de verdad: en modo mock los caminos que usan modelo
-        # están cortados aguas arriba. Existe para que construir el agente no
-        # reviente y el pipeline se pueda probar entero sin claves.
         return OpenAILike(id="mock", api_key="mock", base_url="http://localhost:1/v1")
+
+    if proveedor == "falso":
+        from agno.models.openai import OpenAILike
+
+        url = os.getenv("MODELO_FALSO_URL", "http://127.0.0.1:7799/v1")
+        return OpenAILike(id=id_modelo, api_key="falso", base_url=url)
 
     fam = id_modelo.split("-")[0].lower()
     if fam == "claude":

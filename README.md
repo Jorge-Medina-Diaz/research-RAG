@@ -8,6 +8,10 @@ uv run rag up        # base de datos + comprobación. SIN NINGUNA CLAVE.
 uv run rag ingerir   # artefactos/entrada/*.md -> corpus
 uv run rag eval      # el golden set
 uv run rag serve     # AgentOS en :7788
+
+# y para correr el NIVEL COMPLETO sin claves:
+uv run rag falso     # modelo guionizado en :7799, en otra terminal
+#   LLM_PROVIDER=falso en .env
 ```
 
 ## Qué hace
@@ -61,20 +65,36 @@ Lo que está **hecho y verificado corriendo**:
 - 21 probes en seis categorías. Nivel 0 (solo recuperación, cero llamadas a LLM)
   funcionando: **6/8 medibles**, 13 fuera del denominador por no ser medibles sin
   respuesta.
-- 65 tests, ruff limpio.
+- 83 tests, ruff limpio.
 - Las tres propiedades de arriba, probadas: tocar la spec → NO COMPARABLE;
   cruzar épocas → NO COMPARABLE; leer el holdout desde el rol de la app →
   permiso denegado.
 
-Lo que **no está hecho**, y es la mayor parte de lo que falta:
+También verificado, y esto es lo que cambió:
 
-- **El nivel completo no se ha corrido nunca.** Todo lo verificado es en modo
-  mock. El juez, las reglas R3/R5/R6 y los rollouts con `k>1` están escritos y
-  sin ejecutar contra un modelo real. Espero fallos ahí.
+- **El nivel completo corre entero.** Contra `scripts/modelo_falso.py`, un guion
+  que habla el protocolo de OpenAI —incluido SSE, que es el que usa el motor de
+  rollouts—. Ejercita el camino real de Agno: dos vueltas de tool call, el
+  `output_schema` del juez, la extracción de `references`, el scorer y las tres
+  huellas. Con eso, `LLM_PROVIDER=falso` significa que el sistema funciona de
+  punta a punta sin ninguna clave, no solo el nivel 0.
+- **La reproducción a k=3** de las violaciones de suelo, que estaba prometida en
+  la spec y no existía.
+- **21/21 probes** pasan por el arnés completo sin romperlo. Con el modelo
+  guionizado dan 4/21, y ese perfil es el correcto: las 11 de
+  `fuera_de_alcance` fallan R2 porque el guion nunca se abstiene.
+
+Lo que **no está hecho**:
+
+- **No se ha corrido contra un modelo real.** La fontanería está verificada; la
+  calidad no. Lo que queda para la primera corrida con clave es solo eso — pero
+  es lo que decide si el sistema sirve.
 - **α no está medido.** La puerta de la Fase 0 sigue cerrada. `rag calibrar`
-  existe y necesita un proveedor de LLM.
-- **σ no está medido.** El criterio transversal —2σ ≤ 0,08— no se ha comprobado,
-  así que formalmente no hay derecho a correr el bucle todavía.
+  funciona y necesita un modelo real: contra el guionizado no hay nada que
+  calibrar.
+- **σ no está medido de verdad.** El mecanismo funciona y da σ=0,0000 contra el
+  modelo guionizado, que es determinista. Eso valida la tubería y no dice nada
+  del ruido real, que es varianza del modelo y del juez.
 - **El golden set son 21 probes y 3 artefactos.** Es un esqueleto. La Fase 0
   pide ≥30 probes sobre un corpus real, y el corpus lo tienes que escribir tú.
 - **Cero tráfico real**, así que el golden set es 100 % sintético. Consecuencia
@@ -89,7 +109,7 @@ Lo que **no está hecho**, y es la mayor parte de lo que falta:
   costuras con su trigger en `.claude/commands/extender-rag.md`, y el trigger es
   una categoría del golden set cayendo, no una corazonada.
 
-Tamaño: **2.876 líneas de código** en 5.043 totales (43 % es prosa: cada decisión
+Tamaño: **~3.200 líneas de código** en 5409 totales (43 % es prosa: cada decisión
 no obvia lleva escrito por qué). El presupuesto era 1.500 y está superado casi al
 doble; la mitad del exceso son la ingesta y el contrato, que `atlas-rai` no tiene
 porque su corpus son cinco ficheros estáticos, y la otra mitad es candidata a
@@ -114,14 +134,11 @@ está**, sin lanzar ningún error.
 
 ## Deuda conocida
 
-- `evals/correr.py` (404 líneas) hace demasiado: informe, diff, ruido y dos
-  niveles de medición en un fichero.
-- La reproducción a k=3 de una violación de suelo está en la spec y **no está
-  implementada** en el arnés.
+- `evals/correr.py` (~480 líneas) hace demasiado: informe, diff, ruido,
+  reproducción y dos niveles de medición en un fichero.
 - El reordenador está escrito y nunca se ha ejecutado: `reranker` viene en
   `none`.
-- `rag holdout --anadir` reescribe `probes.yaml` con `yaml.safe_dump` y pierde
-  los comentarios del fichero, que son la mitad de su valor.
+- El corpus son 3 artefactos y no son tuyos.
 
 ## Licencia
 
