@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import pytest
 
-from evals.correr import comparables, medible_en_nivel0
+from evals.correr import comparables, medible_en_nivel0, palancas_movidas
 from evals.entorno import CATEGORIAS, cargar, suelo_de_estrato
 from scripts.holdout import quitar_del_yaml
 
@@ -27,17 +27,36 @@ def test_dos_corridas_identicas_son_comparables():
 @pytest.mark.parametrize(
     ("clave", "otro", "trozo"),
     [
-        ("huella_config", "bbb", "configuración"),
         ("epoca", 1, "sistema y corpus"),
         ("huella_juez", "kkk", "cambiar la regla"),
     ],
 )
-def test_cualquier_huella_distinta_impide_comparar(clave, otro, trozo):
-    """Las tres, no dos. Un delta con cualquiera de ellas movida mezcla causas
-    y no se puede atribuir a ninguna."""
+def test_cambiar_el_instrumento_o_el_objeto_impide_comparar(clave, otro, trozo):
+    """La época mueve el objeto medido; el juez mueve la regla. Ninguna de las
+    dos es un tratamiento, así que ninguna deja un delta atribuible."""
     ok, motivos = comparables(BASE | {clave: otro}, BASE)
     assert not ok
     assert trozo in " ".join(motivos)
+
+
+def test_mover_UNA_palanca_si_es_comparable():
+    """Es el caso central del bucle: si esto se negara, el bucle no podría
+    comparar nunca. Una versión anterior lo negaba sobre el papel y solo
+    seguía viva porque la huella no hasheaba `top_k`."""
+    a = BASE | {"palancas": {"top_k": 12, "k_rrf": 60}}
+    b = BASE | {"palancas": {"top_k": 20, "k_rrf": 60}}
+    assert comparables(a, b)[0]
+    assert palancas_movidas(a, b) == ["top_k"]
+
+
+def test_mover_DOS_palancas_no_es_comparable():
+    """«Una palanca por ronda» como código de salida, no como convención en un
+    markdown que nadie ejecuta."""
+    a = BASE | {"palancas": {"top_k": 12, "k_rrf": 60}}
+    b = BASE | {"palancas": {"top_k": 20, "k_rrf": 10}}
+    ok, motivos = comparables(a, b)
+    assert not ok
+    assert "k_rrf" in motivos[0] and "top_k" in motivos[0]
 
 
 def test_el_motivo_dice_QUE_cambio_y_no_solo_que_algo_cambio():

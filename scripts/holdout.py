@@ -1,31 +1,57 @@
 """
-El holdout, y por qué no vive en una carpeta.
+El holdout: un conjunto de probes que el bucle de mejora NO puede ver.
 
     uv run rag holdout --instalar     # crea el esquema y el rol restringido
     uv run rag holdout --anadir P-30  # mueve una probe del golden set al holdout
     uv run rag holdout --correr       # UNA vez al final de una sesión
 
+Para qué sirve: si eliges la mejor de cincuenta configuraciones mirando siempre
+el mismo conjunto, acabas eligiendo la que mejor se ajusta a ESE conjunto, no la
+mejor. El holdout es el conjunto que no se mira, y por eso es la única defensa
+real contra optimizar ruido.
+
+## Por qué no vive en una carpeta
+
 `.claude/settings.json` puede denegar `Read(evals/holdout/**)` todo lo que
-quiera: `Bash(uv:*)` ejecuta Python arbitrario, y con eso se lee cualquier
-fichero del disco. Es una barrera contra un agente que se despista, no contra
-uno que busca la salida. Lo dice el propio artículo que inspira este repo.
+quiera: si el agente puede ejecutar Python, `open()` se salta esa denegación
+—que solo cubre la herramienta `Read`—. Es una barrera contra un agente que se
+despista, no contra uno que busca la salida.
 
-El remedio no es un deny-list mejor. Es **mover la frontera del sistema de
-ficheros a un sitio donde haga falta una credencial que el proceso no tiene**:
+Así que el holdout vive en el esquema `holdout` de Postgres, y el rol de la
+aplicación tiene `REVOKE SELECT` sobre él. Eso sí lo comprueba el servidor.
 
-  · El holdout vive en el esquema `holdout` de Postgres.
-  · El rol `rag_bucle` —el del DATABASE_URL de `.env`— tiene REVOKE sobre él.
-  · La credencial de `rag_dueno` vive en `.env.owner`, que está denegado a la
-    lectura y fuera del repo.
+## Qué compra esto exactamente, y qué NO
 
-`uv run python -c "..."` sigue siendo Python arbitrario. Y sigue sin poder hacer
-un SELECT sobre `holdout.probes`: no tiene el grant. Esa asimetría es el punto —
-el agente puede escribir lo que quiera, y no puede hacer que su escritura cuente.
+Una versión anterior de este fichero guardaba la credencial del dueño en
+`.env.owner`, protegido por el mismo deny-list que acabo de declarar
+insuficiente. Era circular, y un lector externo lo detectó a la primera. La
+credencial ya no toca el disco: se pide por teclado en el momento.
 
-Tres capas, y solo la tercera aguanta:
-  1. intención   deny-list de permisos
-  2. detección   el digest del juez entra en la huella: tocarlo invalida todo
-  3. aislamiento este fichero
+**Lo que compra:**
+
+  · Un agente que no busca el holdout no puede tropezar con él.
+  · Leerlo exige que haya una persona delante escribiendo una contraseña. Sin
+    nadie que teclee, el comando aborta a los 60 segundos.
+  · Todo acceso queda registrado en `holdout.acceso`, donde el rol del bucle
+    puede INSERT y no puede DELETE ni UPDATE.
+
+    (El plazo es un hilo con `join(timeout)` y no un `if sys.stdin.isatty()`:
+    en Windows bajo MSYS, `isatty` devuelve True aunque redirijas la entrada y
+    `getpass` lee de la consola, así que la comprobación obvia no detecta nada
+    y el comando se queda colgado. Comprobado.)
+
+**Lo que NO compra, y conviene decirlo:** ningún mecanismo local detiene a un
+agente que ejecuta código arbitrario con tu mismo usuario. Puede esperar a que
+escribas la contraseña, leer tu historial de shell, o instalar un keylogger. La
+versión hermética exige que el holdout viva en una máquina a la que el agente no
+llegue. Esto es la versión práctica: sube el coste y deja rastro.
+
+## Las tres capas, con su alcance real
+
+  1. intención     deny-list de permisos       → un agente que se despista
+  2. detección     el digest del juez en la    → hace RUIDOSA la manipulación:
+                   huella                        no la impide, la delata
+  3. coste+rastro  este fichero                → exige una persona, y registra
 """
 
 from __future__ import annotations
@@ -134,14 +160,6 @@ def instalar(clave: str) -> int:
         con.execute(INSTALAR)  # type: ignore[arg-type]
         # Las tablas creadas antes de existir el rol siguen siendo del dueño.
         con.execute(REASIGNAR.format(rol=ROL_BUCLE))  # type: ignore[arg-type]
-    env_owner = RAIZ / ".env.owner"
-    if not env_owner.exists():
-        env_owner.write_text(
-            "# La credencial del DUEÑO. NO la lee el coding agent:\n"
-            "# .claude/settings.json deniega Read(.env.owner).\n"
-            f"DATABASE_URL_DUENO={dsn()}\n",
-            encoding="utf-8",
-        )
     print(
         f"""
   Esquema `holdout` creado y rol `{ROL_BUCLE}` con REVOKE sobre él.
@@ -155,11 +173,79 @@ def instalar(clave: str) -> int:
 
       uv run rag holdout --probar
 
-  Si ese comando NO da «permiso denegado», la barrera no está puesta y el
-  holdout es un fichero con otro nombre.
+  Si ese comando NO da «permiso denegado», la barrera no está puesta.
+
+  La credencial del dueño NO se guarda en ningún sitio: `--anadir` y `--correr`
+  la piden por teclado. Eso significa que abrir el holdout exige una persona
+  delante, y que un proceso desatendido no puede.
 """
     )
     return 0
+
+
+def credencial_del_dueno() -> str:
+    """La pide por teclado. NUNCA se lee de un fichero del repo.
+
+    Guardarla en `.env.owner` la dejaba al alcance de un `open()`, protegida solo
+    por el deny-list que este mismo fichero declara insuficiente. Pedirla por
+    `getpass` mueve el requisito de «un fichero que el agente promete no leer» a
+    «una persona delante del teclado» — que es más débil que un HSM y más fuerte
+    que una promesa.
+
+    En un shell no interactivo `getpass` falla, y eso es lo correcto: un proceso
+    desatendido no debe poder abrir el holdout.
+    """
+    usuario = os.getenv("HOLDOUT_USUARIO", "ai")
+    host = os.getenv("HOLDOUT_HOST", "localhost:5533")
+    base = os.getenv("HOLDOUT_BASE", "ai")
+
+    clave = _pedir_clave(f"  contraseña de {usuario}@{host} (no se guarda): ")
+    if not clave:
+        raise SystemExit("  contraseña vacía.")
+    return f"postgresql://{usuario}:{clave}@{host}/{base}"
+
+
+#: Segundos que se espera a que alguien teclee. Una persona delante tarda menos;
+#: un proceso desatendido no teclea nunca.
+ESPERA_TECLADO = int(__import__('os').getenv('HOLDOUT_ESPERA', '60'))
+
+
+def _pedir_clave(mensaje: str) -> str:
+    """`getpass` con plazo, en un hilo.
+
+    Sin plazo, el comando se cuelga para siempre en un shell no interactivo, y
+    una barrera que BLOQUEA es peor que una que falla: el proceso se queda ahí y
+    nadie se entera.
+
+    Y no vale comprobar `sys.stdin.isatty()` antes: en Windows bajo MSYS
+    devuelve True aunque redirijas la entrada, y `getpass` lee de la consola
+    directamente en vez de stdin. Comprobado — por eso esto es un hilo con
+    `join(timeout)` y no un `if`.
+    """
+    import getpass
+    import threading
+
+    caja: list[str] = []
+
+    def leer() -> None:
+        try:
+            caja.append(getpass.getpass(mensaje))
+        except (EOFError, KeyboardInterrupt, OSError):
+            pass
+
+    hilo = threading.Thread(target=leer, daemon=True)
+    hilo.start()
+    hilo.join(ESPERA_TECLADO)
+
+    if not caja:
+        # El hilo es daemon: muere con el proceso aunque siga bloqueado leyendo.
+        raise SystemExit(
+            f"\n\n  Nadie tecleó en {ESPERA_TECLADO}s. El holdout necesita una\n"
+            "  persona delante: la credencial se pide por teclado y no se guarda\n"
+            "  en ningún sitio.\n\n"
+            "  Que esto no funcione desatendido NO es un fallo. Es la barrera.\n"
+        )
+    return caja[0]
 
 
 def probar() -> int:
@@ -247,10 +333,7 @@ def anadir(ids: list[str]) -> int:
         print(f"  no encontré ninguna de {ids} en el golden set")
         return 1
 
-    url = os.getenv("DATABASE_URL_DUENO")
-    if not url:
-        print("\n  hace falta DATABASE_URL_DUENO (está en .env.owner).\n")
-        return 1
+    url = credencial_del_dueno()
 
     import psycopg
 
@@ -292,14 +375,7 @@ def correr(ciclo: str) -> int:
     from evals.correr import completo as correr_completo
     from evals.correr import hay_llm, identidad, informe, nivel0
 
-    url = os.getenv("DATABASE_URL_DUENO")
-    if not url:
-        print(
-            "\n  Falta DATABASE_URL_DUENO. Está en .env.owner, y el coding agent\n"
-            "  no puede leerlo: eso es exactamente el punto. Cárgalo tú:\n\n"
-            "      export DATABASE_URL_DUENO=...   (o ponlo en el entorno)\n"
-        )
-        return 1
+    url = credencial_del_dueno()
 
     with psycopg.connect(dsn(url), row_factory=dict_row) as con:
         filas = con.execute("select * from holdout.probes order by id").fetchall()

@@ -84,9 +84,21 @@ humano y está denegado al agente.
 - Un `try/except` alrededor de trabajo de base de datos **no es** manejo de
   errores: deja la transacción abortada y convierte el COMMIT en un ROLLBACK
   silencioso. Usa `almacen.punto_de_guardado()`.
-- Presupuesto de tamaño: **por debajo de 1.500 LOC**. `atlas-rai` resuelve el
-  bucle entero en 966. Todo lo que pase de ahí es un defecto, no una
-  funcionalidad.
+- **Presupuesto de tamaño, por componente.** La comparación honesta con
+  `atlas-rai` (966 líneas) es solo contra el bucle y su arnés, que es lo
+  único que aquel repo hace. Aquí:
+
+  | | líneas | presupuesto |
+  |---|---|---|
+  | `evals/` — bucle y arnés | 925 | ≤ 1.000, comparable a atlas-rai |
+  | `cerebro/` | 1.916 | ≤ 2.000 |
+  | `ingesta/` | 740 | ≤ 800 |
+  | `scripts/` + `tareas.py` | 1.668 | ≤ 1.500 · **excedido** |
+  | **total sin tests** | **5.249** | |
+
+  Una versión anterior de esta línea decía «por debajo de 1.500 LOC» a secas,
+  con 5.249 en el repo. Era una convención que el propio repo incumplía en su
+  cara: exactamente el tipo de afirmación muerta que este proyecto persigue.
 
 ## Lo que NO se automatiza, nunca
 

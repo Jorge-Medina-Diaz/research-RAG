@@ -3,8 +3,8 @@
 > Una memoria de I+D sobre Agno, construida al revés: **primero el instrumento
 > que mide, después el sistema que se mide**.
 
-![tests](https://img.shields.io/badge/tests-83%20passing-brightgreen)
-![ruff](https://img.shields.io/badge/ruff-clean-brightgreen)
+[![ci](https://github.com/Jorge-Medina-Diaz/research-RAG/actions/workflows/ci.yml/badge.svg)](https://github.com/Jorge-Medina-Diaz/research-RAG/actions/workflows/ci.yml)
+![tests](https://img.shields.io/badge/tests-84-brightgreen)
 ![agno](https://img.shields.io/badge/agno-2.8.6-blue)
 ![python](https://img.shields.io/badge/python-3.12-blue)
 ![license](https://img.shields.io/badge/license-MIT-lightgrey)
@@ -34,6 +34,28 @@ no significaría nada.
 sistema **no ha pasado todavía su propia puerta de calidad**, y eso es
 deliberado. Ver [Estado honesto](#estado-honesto).
 
+**Qué es y qué no es.** Es un proyecto **personal y de un solo usuario**,
+pensado para correr en un portátil. No es un producto, no tiene despliegue, y
+varias decisiones que aquí son correctas serían malas en un sistema
+multi-inquilino. Lo que puede tener valor para alguien de fuera no es el
+código sino el **método**: cómo se mide un buscador cuyo corpus crece, y qué
+hay que negarse a hacer para que el número signifique algo.
+
+---
+
+## Por dónde empezar
+
+| si eres… | empieza por | por qué |
+|---|---|---|
+| **alguien que no ha construido un RAG** | **[00 · El problema, explicado desde cero](docs/00-el-problema.md)** | No supone nada. Empieza en «tengo cuatrocientas notas» y llega hasta el código, explicando cada concepto al usarlo |
+| **alguien que sí, y quiere ver si esto le sirve** | [05 · Una consulta de punta a punta](docs/05-una-traza.md) | Datos reales de una ejecución: qué encontró cada carril, cómo se fusionaron, qué respondió, qué dictaminó el juez |
+| **alguien evaluando las decisiones** | [01 · Decisiones](docs/01-decisiones.md) y [02 · Estado del arte](docs/02-estado-del-arte.md) | Siete decisiones con sus alternativas descartadas, y qué se tomó de la literatura frente a qué es extrapolación propia |
+| **alguien que va a tocar el código** | [CLAUDE.md](CLAUDE.md) y [03 · Arquitectura](docs/03-arquitectura.md) | El mapa del repositorio y el detalle componente a componente |
+| **alguien que tropieza con una palabra** | [99 · Glosario](docs/99-glosario.md) | Cada término con su definición general y qué significa aquí |
+
+El resto de este README es el resumen. Los cuatro mecanismos de abajo están
+explicados con más calma, y suponiendo menos, en el documento 00.
+
 ---
 
 ## El problema, en un diagrama
@@ -62,7 +84,15 @@ sea.
 
 ---
 
-## Las cuatro decisiones
+## Los cuatro mecanismos
+
+> **Una aclaración de nomenclatura**, porque hay tres listas numeradas en este
+> repositorio y confundirlas es fácil. Estos son los **cuatro mecanismos** que
+> sostienen la propiedad central. Aparte están las **cuatro decisiones de
+> alcance** —qué se construye y qué no— en
+> [00 · El problema §3](docs/00-el-problema.md#3--las-cuatro-decisiones-de-dónde-salen),
+> y las **siete decisiones de implementación** —cómo funciona por dentro— en
+> [01 · Decisiones](docs/01-decisiones.md).
 
 ```mermaid
 mindmap
@@ -104,7 +134,7 @@ timeline
 $ uv run rag ingerir            # el artefacto nuevo entra en la época 1
 $ uv run rag eval
   época 0  ·  corpus 4 artefactos · sha eb94ec7b       <- el corpus SÍ cambió
-  pasan 6/8   recall@top_k 1.00                        <- la medición NO se movió
+  pasan 15/27  recall@top_k 0.85                       <- la medición NO se movió
 ```
 
 ### 2 · Tres huellas propias, no las de Agno
@@ -303,13 +333,16 @@ uv run rag test        83 tests. Sin red, sin claves, sin base de datos.
 
 ## Documentación
 
-| | |
-|---|---|
-| [Decisiones clave](docs/01-decisiones.md) | Siete decisiones con su contexto, alternativas descartadas y consecuencias |
-| [Estado del arte](docs/02-estado-del-arte.md) | Qué existe, qué se tomó, qué se descartó y por qué |
-| [Arquitectura](docs/03-arquitectura.md) | El detalle técnico, componente a componente |
-| [La medición](docs/04-medicion.md) | Spec, reglas, juez, épocas y estadística |
-| [CLAUDE.md](CLAUDE.md) | Mapa del repo para agentes de código |
+| | | supone |
+|---|---|---|
+| **[00 · El problema](docs/00-el-problema.md)** | **Empieza aquí.** Qué es un RAG, por qué hay que medirlo, de dónde sale cada decisión de alcance | **nada** |
+| [01 · Decisiones](docs/01-decisiones.md) | Siete decisiones de implementación, con contexto, alternativas descartadas y consecuencias | el 00 |
+| [02 · Estado del arte](docs/02-estado-del-arte.md) | Qué existe, qué se tomó, qué se descartó y por qué. Con referencias | el 00 |
+| [03 · Arquitectura](docs/03-arquitectura.md) | El detalle técnico, componente a componente | el 00 |
+| [04 · La medición](docs/04-medicion.md) | Spec, reglas, juez, épocas y estadística | el 00 |
+| **[05 · Una traza](docs/05-una-traza.md)** | Una consulta real de punta a punta, generada por `rag traza` | poco |
+| [99 · Glosario](docs/99-glosario.md) | Cada término, con su definición general y qué significa aquí | nada |
+| [CLAUDE.md](CLAUDE.md) | Mapa del repo para agentes de código | el 03 |
 
 ---
 
@@ -320,14 +353,16 @@ uv run rag test        83 tests. Sin red, sin claves, sin base de datos.
 | | |
 |---|---|
 | `rag up` en limpio, sin claves | Postgres 17 + pgvector, preflight en verde |
-| Ingesta → índice → recuperación | 3 artefactos, 15 fragmentos, HNSW y GIN creados |
-| Fusión de carriles | `{denso: 11, lexico: 1}` → RRF lo pone primero |
-| Nivel completo contra el guion | 21/21 probes atraviesan el arnés |
-| Reproducción a k=3 | 11 R2 y 6 R4 confirmadas |
+| Ingesta → índice → recuperación | 12 artefactos, 60 fragmentos, HNSW y GIN creados a mano porque Agno no los crea |
+| Fusión de carriles | Los dos carriles vivos y contribuyendo. En la [traza](docs/05-una-traza.md), el artefacto que acaba **segundo** no fue primero en ninguno: salió 7.º en denso y 8.º en léxico y ganó por acuerdo |
+| Nivel completo contra el guion | El arnés procesa las 41 sin romperse. **Pasan 22 de 41**, y el perfil es el correcto: el guion responde siempre, así que acierta las de recuperar y falla 8 de las 11 de `fuera_de_alcance` |
+| Reproducción a k=3 | Las 8 violaciones de R2 y las 11 de R4 se confirman al re-correrlas; ninguna era espuria |
 | Tocar la spec → comparar | **NO COMPARABLE** |
 | Cruzar épocas → comparar | **NO COMPARABLE** |
+| Mover **una** palanca → comparar | comparable, y el informe **nombra** la palanca: `top_k 12 → 20` |
+| Mover **dos** palancas → comparar | **NO COMPARABLE**: el delta no se puede atribuir a ninguna |
 | `SELECT` al holdout desde Python arbitrario | **permission denied** |
-| Tests / ruff | 83 pasan / limpio |
+| Tests / ruff / diagramas | 84 pasan / limpio / 28 de 28 mermaid parsean, comprobado en CI |
 
 **No hecho, y es lo que decide si esto sirve:**
 
@@ -338,7 +373,7 @@ uv run rag test        83 tests. Sin red, sin claves, sin base de datos.
 - **σ no está medido de verdad.** El mecanismo da `0,0000` contra el guion, que
   es determinista por construcción. Valida la tubería y no dice nada del ruido
   real, que es varianza del modelo y del juez.
-- **El golden set son 21 probes sobre 3 artefactos**, y los tres son del propio
+- **El golden set son 41 probes sobre 12 artefactos**, y los doce son del propio
   desarrollo, no material de investigación real.
 - **Cero tráfico real**, así que el golden set es 100 % sintético. Consecuencia
   ineludible: **el bucle solo puede mover palancas de recuperación**; las de

@@ -92,6 +92,11 @@ def eval() -> None:  # noqa: A001 — es el nombre del comando, no del builtin
     _correr(PY, "evals/correr.py", *sys.argv[2:])
 
 
+def traza() -> None:
+    """Una consulta de punta a punta: carriles, fusion, respuesta, veredicto."""
+    _correr(PY, "scripts/traza.py", *sys.argv[2:])
+
+
 def serve() -> None:
     """Levanta AgentOS en http://localhost:7788, con la ruta de voto."""
     _correr(PY, "scripts/serve.py")
@@ -135,7 +140,7 @@ def lint() -> None:
 TAREAS = {
     f.__name__: f
     for f in (
-        up, ingerir, epoca, serve, falso, eval, calibrar, holdout, sesiones,
+        up, ingerir, epoca, serve, falso, eval, traza, calibrar, holdout, sesiones,
         verificar, test, lint, extras, logs, down, limpiar,
     )
 }

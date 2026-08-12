@@ -1,6 +1,36 @@
 # Decisiones clave
 
-Cada una en el mismo formato: **contexto**, **decisión**, **alternativas
+> **Antes de leer esto**, conviene haber pasado por [00 · El problema](00-el-problema.md).
+> Allí están explicados desde cero los conceptos que aquí se usan sin definir:
+> qué es un carril, qué es RRF, qué es una época, por qué hay que medir. Si
+> tropiezas con una palabra, está en el [glosario](99-glosario.md).
+
+## Dos conjuntos de decisiones, que no son el mismo
+
+Este proyecto tomó decisiones en dos momentos distintos, y confundirlos es fácil
+porque los dos conjuntos se han llamado «las decisiones» en algún sitio.
+
+**Las cuatro de alcance** se tomaron antes de escribir una línea de código y
+definen *qué se construye*: hasta dónde llega la versión 1, qué contrato tiene
+la entrada, dónde se despliega, y cuánto se reutiliza del proyecto anterior.
+**Están explicadas con su porqué en
+[00 · El problema, sección 3](00-el-problema.md#3--las-cuatro-decisiones-de-dónde-salen).**
+
+**Las siete de implementación** son las de este documento, y se tomaron
+construyendo. Definen *cómo funciona por dentro*, y casi todas nacieron de
+tropezar con algo.
+
+| | en una frase | nació de |
+|---|---|---|
+| **D1** | Medir sobre una foto fija del corpus, aunque el corpus siga creciendo | que el detector de identidad heredado se negaba siempre |
+| **D2** | No usar el `fingerprint` de Agno para decidir si dos mediciones se comparan | leer su código y ver que no mira ni el corpus ni la búsqueda |
+| **D3** | Hacer que relajar la especificación sea **detectable**, no solo desaconsejado | que «no toques el juez» no es una garantía si es una frase |
+| **D4** | Una pregunta de prueba puede quedar obsoleta; que lo diga en voz alta | que el corpus crece y las preguntas «fuera de alcance» dejan de serlo |
+| **D5** | Si una regla necesita criterio para saber si se cumple, no es una regla | que un juez LLM sobre reglas mecánicas es caro y peor |
+| **D6** | Mezclar los dos carriles por **puesto** y no por puntuación | que sumar puntuaciones de escalas distintas no significa nada |
+| **D7** | El bucle no toca el prompt: lo propone y lo firma una persona | que un golden set sintético no ordena bien la generación |
+
+Cada una viene en el mismo formato: **contexto**, **decisión**, **alternativas
 descartadas** y **consecuencias**. Sin alternativas descartadas no es una
 decisión, es un hecho.
 

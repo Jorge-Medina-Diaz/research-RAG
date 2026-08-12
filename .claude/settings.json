@@ -13,7 +13,6 @@
     ],
     "deny": [
       "Read(.env)",
-      "Read(.env.owner)",
 
       "Edit(cerebro/spec.md)",
       "Write(cerebro/spec.md)",

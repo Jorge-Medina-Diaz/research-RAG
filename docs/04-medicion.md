@@ -114,11 +114,24 @@ flowchart LR
     style E fill:#e6f2ff,stroke:#0080ff
 ```
 
-R4 a cero, con un juez al ~95 % de auto-consistencia sobre 30 probes, da una
-probabilidad cercana al **78 %** de al menos una violación espuria por corrida.
-El suelo más importante bloquearía la promoción a cara o cruz y el bucle
-gastaría rondas persiguiendo fantasmas. Coste de la defensa: tres llamadas por
-probe sospechosa, no una corrida entera.
+Supón un juez con un 95 % de auto-consistencia — es decir, que ante el mismo
+caso repetido da el mismo veredicto 19 de cada 20 veces. **Esa cifra es un
+supuesto ilustrativo, no una medición de este sistema**: α todavía no está
+medida. Con ese supuesto y las 41 probes del golden set actual, la
+probabilidad de al menos un veredicto espurio por corrida es
+`1 − 0,95⁴¹ ≈ **88 %**`.
+
+> Nótese que el número **empeora al crecer el conjunto**, y eso es correcto:
+> más preguntas son más oportunidades de que el juez se equivoque en alguna.
+> Es la razón por la que un suelo sin margen no escala sin reproducción.
+Con un suelo de «cero violaciones», eso significa que **dos de cada tres
+corridas bloquearían la promoción por un fantasma**, y el bucle gastaría
+rondas persiguiéndolo. Coste de la defensa: tres llamadas por probe
+sospechosa, no una corrida entera.
+
+> El número exacto importa menos que su orden de magnitud: con cualquier juez
+> realista y un suelo sin margen, las violaciones espurias son **lo normal**,
+> no la excepción. Por eso el suelo se comprueba dos veces.
 
 ---
 
@@ -176,7 +189,7 @@ que a ese modelo le gusta de sí mismo.
 
 ## El golden set
 
-21 probes en seis categorías, más dos clases transversales.
+41 probes en seis categorías, más dos clases transversales.
 
 ```mermaid
 flowchart TB
@@ -268,7 +281,7 @@ flowchart LR
 **El nivel 0 solo mide lo comprobable sin respuesta.** Una probe de
 `fuera_de_alcance` pregunta si el sistema se calla, y para eso hace falta que
 hable; una probe sin `requiere` tiene recall trivialmente 1,0. Esas quedan
-**fuera del denominador**: contarlas como fallo daría 6/21 cuando la cifra
+**fuera del denominador**: contarlas como fallo daría 15/41 cuando la cifra
 honesta es 6/8.
 
 ---
@@ -395,7 +408,7 @@ pierdes la única defensa que tienes contra estar optimizando ruido.
 
 ```
 [x] `rag up` funciona en un clon limpio SIN ninguna clave de API
-[ ] ≥30 probes activas, ≥5 por categoría          <- hay 21
+[ ] ≥30 probes activas, ≥5 por categoría          <- hay 41, y ≥3 por categoría
 [x] ≥12 probes invariantes
 [x] Holdout inaccesible desde el rol de la aplicación
 [x] Épocas estampadas y el filtro verificado

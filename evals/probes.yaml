@@ -241,3 +241,248 @@ probes:
       la memoria.» — atribuirse la cifra ajena es el fallo más sutil del lote.
     reglas: [R2, R3]
     clave_negativa: recall del contexto situacional en mi corpus
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # P-22 … P-41 · el lote que reequilibra el conjunto.
+  #
+  # Antes de esto había 21 probes y 11 eran de `fuera_de_alcance`: el 52 %. Un
+  # sistema que contestara «No lo tengo en la memoria.» a absolutamente todo
+  # sacaba 11/21, y ese es el óptimo degenerado que la categoría existe para
+  # impedir — alcanzable desde dentro del propio conjunto.
+  #
+  # La salida NO fue quitar probes del freno —para eso está el suelo de estrato—
+  # sino escribir corpus real que preguntar. Ocho artefactos más, y de ahí estas
+  # veinte. El freno queda en 11 de 41, un 27 %.
+  # ══════════════════════════════════════════════════════════════════════════
+
+  # ---- single_hop: un artefacto, un dato ----
+
+  - id: P-22
+    categoria: single_hop
+    clase: dependiente
+    consulta: ¿En qué línea de pgvector.py está comentado el predicado @@?
+    espera: Responde 1157, citando el teardown de hybrid_search.
+    reglas: [R1, R3, R4]
+    requiere: [2026-08-12-agno-hybrid-search-predicado-comentado]
+
+  - id: P-23
+    categoria: single_hop
+    clase: dependiente
+    consulta: ¿Cuántos operadores de filtro implementa de verdad PgVector?
+    espera: >-
+      Siete —EQ, IN, GT, LT, NOT, AND, OR— frente a los doce que anuncia
+      agno/filters.py.
+    reglas: [R1, R3, R4]
+    requiere: [2026-08-12-agno-filtros-operadores-anunciados-no-implementados]
+
+  - id: P-24
+    categoria: single_hop
+    clase: dependiente
+    consulta: ¿Por qué el carril léxico devolvía cero resultados?
+    espera: >-
+      Porque plainto_tsquery une todos los términos con AND y ninguna pregunta
+      en lenguaje natural tenía los cuatro o cinco lexemas en un mismo fragmento.
+    reglas: [R1, R3]
+    requiere: [2026-08-12-plainto-tsquery-hace-and-y-devuelve-cero]
+
+  - id: P-25
+    categoria: single_hop
+    clase: dependiente
+    consulta: ¿Qué valor de k usa Qdrant en su RRF por defecto?
+    espera: 2, frente al 60 de Cormack. Cita el artefacto de RRF.
+    reglas: [R1, R3, R4]
+    requiere: [2026-08-12-rrf-k-60-de-donde-sale-el-sesenta]
+
+  - id: P-26
+    categoria: single_hop
+    clase: dependiente
+    consulta: ¿Cuál es el acuerdo entre anotadores humanos que reporta RAGChecker?
+    espera: 70,09 sobre 100. Es un dato reportado por el paper, no medido aquí.
+    reglas: [R1, R3, R4]
+    requiere: [2026-08-12-ragchecker-la-aritmetica-no-la-dependencia]
+
+  - id: P-27
+    categoria: single_hop
+    clase: dependiente
+    consulta: ¿Por qué isatty no sirve para saber si puedo pedir una contraseña?
+    espera: >-
+      Porque bajo MSYS y Git Bash en Windows devuelve True aunque la entrada esté
+      redirigida: la comprobación pasa y getpass se cuelga igual.
+    reglas: [R1, R3]
+    requiere: [2026-08-12-getpass-no-falla-se-cuelga]
+
+  # ---- lexical_exact: el carril denso solo no basta ----
+
+  - id: P-28
+    categoria: lexical_exact
+    clase: dependiente
+    consulta: ¿websearch_to_tsquery o plainto_tsquery? ¿Cuál era el que rompía?
+    espera: >-
+      plainto_tsquery es el que une con AND. websearch_to_tsquery es una de las
+      salidas. Distingue los dos símbolos sin confundirlos.
+    reglas: [R1, R3, R4]
+    requiere: [2026-08-12-plainto-tsquery-hace-and-y-devuelve-cero]
+
+  - id: P-29
+    categoria: lexical_exact
+    clase: dependiente
+    consulta: ¿Qué versión exacta de RAGChecker se publicó, y en qué fecha?
+    espera: 0.1.9, septiembre de 2024. Sin redondear ni convertir.
+    reglas: [R1, R3, R4]
+    requiere: [2026-08-12-ragchecker-la-aritmetica-no-la-dependencia]
+
+  - id: P-30
+    categoria: lexical_exact
+    clase: dependiente
+    consulta: ¿Cómo se llama la variable de entorno que fija el plazo del holdout?
+    espera: HOLDOUT_ESPERA, con 60 segundos por defecto.
+    reglas: [R1, R3, R4]
+    requiere: [2026-08-12-getpass-no-falla-se-cuelga]
+
+  - id: P-31
+    categoria: lexical_exact
+    clase: dependiente
+    consulta: ¿LTE o LT? ¿Cuál tuve que usar para filtrar por época, y por qué?
+    espera: >-
+      LT("epoca", n+1), porque LTE está en agno/filters.py pero PgVector no lo
+      traduce y lanza ValueError.
+    reglas: [R1, R3, R4]
+    requiere: [2026-08-12-agno-filtros-operadores-anunciados-no-implementados]
+
+  # ---- multi_hop: la respuesta no está en ningún artefacto por separado ----
+
+  - id: P-32
+    categoria: multi_hop
+    clase: dependiente
+    consulta: >-
+      Si la fusión de Agno suma escalas incomparables, ¿de dónde saqué el número
+      concreto que uso en la mía?
+    espera: >-
+      Cruza dos artefactos: la suma lineal ponderada de hybrid_search es el
+      problema, y RRF con k=60 de Cormack et al. es la respuesta. Cita los dos.
+    reglas: [R1, R3, R5]
+    requiere:
+      - 2026-08-12-agno-hybrid-search-predicado-comentado
+      - 2026-08-12-rrf-k-60-de-donde-sale-el-sesenta
+
+  - id: P-33
+    categoria: multi_hop
+    clase: dependiente
+    consulta: >-
+      ¿Qué tienen en común el carril léxico vacío y la huella que no hasheaba
+      top_k?
+    espera: >-
+      Los dos son componentes que parecían vivos y no lo estaban, y ninguno
+      lanzaba error. Debe nombrar el patrón y citar al menos dos artefactos, sin
+      fundirlos en una afirmación que ninguno sostiene.
+    reglas: [R1, R3, R5]
+    requiere:
+      - 2026-08-12-plainto-tsquery-hace-and-y-devuelve-cero
+      - 2026-08-12-un-detector-que-siempre-dispara-esta-apagado
+
+  - id: P-34
+    categoria: multi_hop
+    clase: dependiente
+    consulta: >-
+      ¿Por qué un suelo sin margen necesita reproducción, y qué número del corpus
+      lo justifica?
+    espera: >-
+      Une el suelo en recuento con el ruido del juez: 1-0,95^21 ≈ 66 % de
+      veredicto espurio por corrida. Debe marcar el 95 % como supuesto, no como
+      medición de este sistema.
+    reglas: [R1, R3, R4, R5]
+    requiere:
+      - 2026-08-12-suelos-en-recuento-no-en-tasa
+      - 2026-08-12-ragchecker-la-aritmetica-no-la-dependencia
+
+  - id: P-35
+    categoria: multi_hop
+    clase: dependiente
+    consulta: >-
+      El fingerprint de Agno es ciego al corpus. ¿Reproduje ese mismo fallo en mi
+      propio código?
+    espera: >-
+      Sí: huella_config solo hasheaba INDEX_BOUND, así que top_k y k_rrf quedaban
+      fuera. Cruza el teardown de Agno con la decisión propia y cita los dos.
+    reglas: [R1, R3, R5]
+    requiere:
+      - 2026-08-12-agno-env-fingerprint-ciego-al-corpus
+      - 2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento
+
+  - id: P-36
+    categoria: multi_hop
+    clase: dependiente
+    consulta: >-
+      ¿Por qué no puedo comparar dos corridas si ingiero artefactos, y cómo
+      convive eso con que la configuración sí pueda cambiar?
+    espera: >-
+      La época congela el objeto medido; las palancas son el tratamiento. Cruza
+      épocas con la decisión sobre tratamiento e instrumento, y los presenta como
+      dos artefactos, no como uno.
+    reglas: [R1, R3, R5]
+    requiere:
+      - 2026-08-12-epocas-para-medir-un-corpus-que-crece
+      - 2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento
+
+  # ---- aggregation: barre el corpus y resume ----
+
+  - id: P-37
+    categoria: aggregation
+    clase: dependiente
+    consulta: ¿Qué fallos silenciosos he documentado, de cualquier origen?
+    espera: >-
+      Enumera al menos cuatro, de artefactos distintos: índices no creados,
+      carril léxico vacío, huella que no hashea las palancas vivas, validador de
+      mermaid corriendo sobre un tercio de los diagramas. Cita cada uno.
+    reglas: [R1, R3]
+    requiere:
+      - 2026-08-12-plainto-tsquery-hace-and-y-devuelve-cero
+      - 2026-08-12-un-detector-que-siempre-dispara-esta-apagado
+
+  - id: P-38
+    categoria: aggregation
+    clase: dependiente
+    consulta: ¿Qué decisiones he tomado que van en contra de lo que hace el framework?
+    espera: >-
+      RRF propio en vez de SearchType.hybrid, índices creados a mano en vez de
+      optimize(), identidad propia en vez de env_fingerprint. Cita el artefacto
+      de cada una.
+    reglas: [R1, R3]
+    requiere:
+      - 2026-08-12-agno-hybrid-search-predicado-comentado
+      - 2026-08-12-agno-env-fingerprint-ciego-al-corpus
+
+  - id: P-39
+    categoria: aggregation
+    clase: dependiente
+    consulta: ¿Qué he aprendido sobre medir con pocas muestras?
+    espera: >-
+      Suelos en recuento y no en tasa, resolución 1/n, techo humano de 70,09,
+      reproducción a k=3. Debe atribuir cada pieza a su artefacto y no fundirlas.
+    reglas: [R1, R3, R5]
+    requiere:
+      - 2026-08-12-suelos-en-recuento-no-en-tasa
+      - 2026-08-12-ragchecker-la-aritmetica-no-la-dependencia
+
+  # ---- temporal: qué sigue vigente ----
+
+  - id: P-40
+    categoria: temporal
+    clase: dependiente
+    consulta: >-
+      ¿Sigue vigente lo que dice mi corpus sobre cómo se decide si dos corridas
+      son comparables?
+    espera: >-
+      Da la versión vigente —objeto, instrumento y tratamiento separados— y si
+      algún artefacto declara superar a otro, nombra el superado.
+    reglas: [R1, R3, R6]
+    requiere: [2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento]
+
+  - id: P-41
+    categoria: temporal
+    clase: invariante
+    consulta: ¿Cuál es el hallazgo más reciente del corpus, y de qué fecha es?
+    espera: >-
+      Da la fecha del artefacto, no la de hoy, y no inventa un orden si varios
+      comparten fecha: en ese caso lo dice.
+    reglas: [R1, R3, R4, R6]

@@ -36,7 +36,6 @@ sys.path.insert(0, str(RAIZ))
 
 from cerebro.almacen import epoca_medicion, migrar, sha_corpus  # noqa: E402
 from cerebro.config import (  # noqa: E402
-    INDEX_BOUND,
     PALANCAS,
     Palancas,
     huella,
@@ -85,7 +84,12 @@ def identidad(p: Palancas, epoca: int | None, usar_juez: bool) -> dict[str, Any]
 
     sha, n = sha_corpus()
     return {
-        "huella_config": huella(p, INDEX_BOUND),
+        # Sobre TODAS las palancas, no solo las que reindexan: `huella(p,
+        # INDEX_BOUND)` dejaba `top_k`, `k_rrf`, `fts_modo` y los pesos fuera
+        # del hash, que es justo el juego que el bucle mueve. La huella no
+        # niega la comparación (ver `comparables`); nombra el brazo.
+        "huella_config": huella(p, tuple(sorted(p.dict()))),
+        "palancas": p.dict(),
         "epoca": epoca,
         "huella_juez": JuezDeSpec(p, usar_juez=usar_juez).digest()[:12],
         "corpus_sha": sha,
@@ -94,15 +98,53 @@ def identidad(p: Palancas, epoca: int | None, usar_juez: bool) -> dict[str, Any]
     }
 
 
+def palancas_movidas(a: dict, b: dict) -> list[str]:
+    """Qué palancas difieren entre dos corridas, por nombre.
+
+    Compara la forma JSON, no el objeto: `carriles` y `peso_carril` son tuplas
+    en memoria y listas al volver del fichero, y `("denso","lexico")` distinto
+    de `["denso","lexico"]` marcaría como movida una palanca que nadie tocó.
+    """
+    pa, pb = a.get("palancas") or {}, b.get("palancas") or {}
+    norm = lambda v: json.dumps(v, sort_keys=True, default=str)  # noqa: E731
+    return sorted(
+        k for k in pa.keys() | pb.keys() if norm(pa.get(k)) != norm(pb.get(k))
+    )
+
+
 def comparables(a: dict, b: dict) -> tuple[bool, list[str]]:
+    """Dos corridas son comparables si midieron lo mismo con la misma regla, y
+    si su diferencia se puede atribuir a UNA causa.
+
+    La distinción que hace falta aquí, y que costó encontrar: la configuración
+    es el TRATAMIENTO, no el instrumento. Una versión anterior la trataba como
+    causa de negativa —«la configuración cambió: el delta mezclaría dos cosas»—
+    y eso, aplicado de verdad, mata el bucle: mover `top_k` y comparar es
+    literalmente lo único que el bucle hace. Aquel código no mataba el bucle
+    solo porque la huella hasheaba únicamente las palancas que reindexan, así
+    que mover `top_k` no la cambiaba. Es decir: funcionaba por el fallo, y el
+    fallo era el mismo que este repo le reprocha a `env_fingerprint` cuatro
+    veces — un parámetro que se lee como vivo y no lo está.
+
+    Lo que sí impide comparar es que cambie el instrumento (el juez, la spec) o
+    el objeto (la época, y con ella el corpus visible). Y una tercera cosa, que
+    no es una huella sino un recuento: si se movieron DOS palancas, el delta no
+    se puede atribuir a ninguna. La regla «una palanca por ronda» deja de ser
+    disciplina y pasa a ser un código de salida.
+    """
     motivos = []
     for clave, explica in (
-        ("huella_config", "la configuración cambió: el delta mezclaría dos cosas"),
         ("epoca", "épocas distintas: el delta mezclaría sistema y corpus"),
         ("huella_juez", "el juez o la spec cambiaron: no es agregación, es cambiar la regla"),
     ):
         if a.get(clave) != b.get(clave):
             motivos.append(f"{clave}: {a.get(clave)} != {b.get(clave)} — {explica}")
+
+    if len(movidas := palancas_movidas(a, b)) > 1:
+        motivos.append(
+            f"{len(movidas)} palancas movidas a la vez ({', '.join(movidas)}) — "
+            "el delta no se puede atribuir a ninguna: mueve una y vuelve"
+        )
     return not motivos, motivos
 
 
@@ -216,11 +258,11 @@ def reproducir_violaciones(
 ) -> dict[str, dict[str, bool]]:
     """Una violación de suelo tiene que REPRODUCIRSE para contar.
 
-    R4 a cero violaciones sobre ~20 probes, con un juez al ~95 % de
-    auto-consistencia, da una probabilidad cercana al 65 % de al menos una
-    violación espuria por corrida. El suelo más importante de la spec —el único
-    sin margen— bloquearía la promoción a cara o cruz, y el bucle gastaría
-    rondas persiguiendo fantasmas que no vuelven a aparecer.
+    Supuesto ilustrativo (α no está medida todavía): un juez con 95 % de
+    auto-consistencia sobre las 21 probes del golden set da 1-0,95^21 ~= 66 %
+    de probabilidad de al menos un veredicto espurio por corrida. El suelo más
+    importante de la spec —el único sin margen— bloquearía la promoción a cara
+    o cruz, y el bucle gastaría rondas persiguiendo fantasmas.
 
     Así que al detectar una violación se re-corren SOLO esas probes a k=3 y se
     exige mayoría. Coste: tres llamadas por probe sospechosa, no una corrida
@@ -365,6 +407,16 @@ def diffear(actual: dict, base_path: Path) -> int:
             "  un número que mezcla dos causas y no se puede atribuir a ninguna.\n"
         )
         return 2
+
+    # Nombrar el brazo. Un delta sin la palanca que lo causó es un número
+    # suelto: dentro de tres semanas nadie sabrá a qué atribuirlo.
+    if movidas := palancas_movidas(actual["identidad"], base["identidad"]):
+        pa = actual["identidad"]["palancas"]
+        pb = base["identidad"]["palancas"]
+        k = movidas[0]
+        print(f"    palanca: {k}  {pb.get(k)!r} → {pa.get(k)!r}")
+    else:
+        print("    misma configuración: esto mide RUIDO, no una mejora")
 
     pas_b = {f["id"]: f["diagnostico"] == "ninguno"
              for f in base["probes"] if f["diagnostico"] != "no-medible"}

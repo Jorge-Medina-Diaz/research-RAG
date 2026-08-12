@@ -1,0 +1,108 @@
+# CI que hace ciertos los badges del README.
+#
+# Un badge estático que dice «83 passing» y que nadie comprueba es, literalmente,
+# «un parámetro que se lee como vivo y no lo está» — la frase que este repo usa
+# cuatro veces para criticar a Agno. Un lector externo lo señaló, y tenía razón.
+#
+# Todo lo de aquí corre SIN NINGUNA CLAVE de API, que es la propiedad que hace
+# posible tener CI en un proyecto de este tipo: los embeddings en modo mock son
+# deterministas y la señal de nivel 0 no llama a ningún modelo.
+
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: pgvector/pgvector:pg17
+        env:
+          POSTGRES_USER: ai
+          POSTGRES_PASSWORD: ai
+          POSTGRES_DB: ai
+        ports: ['5533:5432']
+        options: >-
+          --health-cmd "pg_isready -U ai -d ai"
+          --health-interval 2s
+          --health-timeout 5s
+          --health-retries 30
+
+    env:
+      DATABASE_URL: postgresql+psycopg://ai:ai@localhost:5533/ai
+      EMBEDDINGS_PROVIDER: mock
+      LLM_PROVIDER: mock
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: instalar uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: entorno
+        run: uv sync --extra dev
+
+      - name: lint
+        run: uv run ruff check .
+
+      - name: tests
+        run: uv run pytest -q
+
+      # Las tres comprobaciones de abajo son las que de verdad justifican tener
+      # CI: no comprueban que el código corra, comprueban que las AFIRMACIONES
+      # del README sigan siendo ciertas.
+
+      - name: 'el entorno arranca sin ninguna clave'
+        run: uv run rag verificar
+
+      - name: 'la ingesta y el nivel 0 funcionan de punta a punta'
+        run: |
+          cp -r artefactos/corpus/2026/*.md artefactos/entrada/
+          uv run rag ingerir
+          uv run rag eval --json runs/ci.json
+
+      - name: 'los índices HNSW y GIN existen de verdad'
+        run: |
+          uv run python - <<'PY'
+          from cerebro.almacen import conexion, ESQUEMA
+          from cerebro.config import tabla_fragmentos
+          with conexion() as con:
+              filas = con.execute(
+                  "select indexname from pg_indexes where schemaname=%s and tablename=%s",
+                  (ESQUEMA, tabla_fragmentos()),
+              ).fetchall()
+          nombres = {f["indexname"] for f in filas}
+          # Agno no los crea: si esto falla, `almacen.crear_indices()` dejó de
+          # llamarse y `hnsw_m` volvió a ser una palanca sobre nada.
+          assert any(n.endswith("_hnsw") for n in nombres), nombres
+          assert any(n.endswith("_gin") for n in nombres), nombres
+          print("  hnsw y gin presentes:", sorted(nombres))
+          PY
+
+      # «Una palanca por ronda» como código de salida. Que tocar la spec cambie
+      # el digest del juez lo fija `tests/test_arnes.py`; aquí se comprueba de
+      # punta a punta lo único que el nivel 0 puede comprobar, porque en nivel 0
+      # no hay juez y su huella no entra en la identidad.
+      - name: 'el diff se niega cuando se mueven dos palancas'
+        run: |
+          uv run rag eval --json runs/ci-base.json || true
+          sed -i 's/^    top_k: int = .*/    top_k: int = 20/' cerebro/config.py
+          uv run rag eval --diff runs/ci-base.json | tee /tmp/uno.txt || true
+          grep -q 'palanca: top_k' /tmp/uno.txt
+          sed -i 's/^    k_rrf: int = .*/    k_rrf: int = 10/' cerebro/config.py
+          uv run rag eval --diff runs/ci-base.json | tee /tmp/dos.txt || true
+          grep -q 'palancas movidas a la vez' /tmp/dos.txt
+          git checkout cerebro/config.py
+
+      - name: 'los diagramas mermaid parsean'
+        run: |
+          npm install --silent --no-save mermaid@11 jsdom
+          node .github/scripts/comprobar-mermaid.mjs .

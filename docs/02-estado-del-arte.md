@@ -88,7 +88,7 @@ optimizador diga «esto debería mejorar el recall porque…», ignóralo y míd
 
 | | Condición de entrada |
 |---|---|
-| **GEPA** | `max_metric_calls ≈ 150` contra un golden set de 21 probes son ~7 pasadas: elegiría entre candidatos con estimaciones ruidosísimas, y con un juez sin calibrar estaría optimizando el ruido del juez. **Entra con n ≥ 120 probes y α ≥ 0,70** |
+| **GEPA** | `max_metric_calls ≈ 150` contra un golden set de 41 probes son ~3,7 pasadas: elegiría entre candidatos con estimaciones ruidosísimas, y con un juez sin calibrar estaría optimizando el ruido del juez. **Entra con n ≥ 120 probes y α ≥ 0,70** |
 | **ACE / playbook evolutivo** | Es Fase 2. Antes hay que tener el bucle barato corriendo |
 | **AFlow / MAP-Elites** | Fase 4. Con ~12 palancas de grada 1-2 y un solo evaluador, el frente de Pareto y el archivo bastan |
 
@@ -341,15 +341,16 @@ poder venderse a cambio de `recall`.
 
 Y aquí, dos refinamientos propios:
 
-1. **Los suelos que importan van en recuento, no en tasa.** Con n≈30 el
-   semiancho del intervalo de confianza al 95 % ronda ±16 puntos: un suelo de
-   «0,85» no es exigible porque el instrumento no lo distingue de 0,72. Cero
-   violaciones sí es exigible a cualquier n.
+1. **Los suelos que importan van en recuento, no en tasa.** Con las 41 probes
+   actuales el semiancho del intervalo de confianza al 95 % ronda ±11 puntos:
+   un suelo de «0,85» no es exigible porque el instrumento no lo distingue de
+   0,75. Cero violaciones sí es exigible a cualquier n.
 2. **Una violación tiene que reproducirse.** R4 a cero, con un juez al ~95 % de
-   auto-consistencia sobre 30 probes, da una probabilidad cercana al 78 % de al
-   menos una violación espuria por corrida. El suelo más importante bloquearía
-   la promoción a cara o cruz. Se re-corren solo las sospechosas a k=3 y se
-   exige mayoría.
+   auto-consistencia —supuesto ilustrativo, no una medición de este sistema—
+   sobre 41 probes, da `1 − 0,95⁴¹ ≈ 88 %` de probabilidad de al menos una
+   violación espuria por corrida. El suelo más importante bloquearía la
+   promoción a cara o cruz. Se re-corren solo las sospechosas a k=3 y se exige
+   mayoría.
 
 ---
 
@@ -374,3 +375,116 @@ bi-temporalidad en espíritu, McNemar.
 
 Nada de eso está medido contra una alternativa. Están construidos, verificados
 como mecanismo, y pendientes de la primera corrida con un modelo real.
+
+
+---
+
+## Referencias
+
+Ordenadas por la sección donde aparecen. Los identificadores están transcritos a
+mano: si alguno no resuelve, el título y el año bastan para encontrarlo.
+
+### Recuperación y fusión
+
+- Cormack, G. V., Clarke, C. L. A. & Buettcher, S. (2009). *Reciprocal Rank
+  Fusion Outperforms Condorcet and Individual Rank Learning Methods.* SIGIR '09,
+  758–759. [doi:10.1145/1571941.1572114](https://doi.org/10.1145/1571941.1572114)
+  — de aquí sale `k = 60`.
+- Khattab, O. & Zaharia, M. (2020). *ColBERT: Efficient and Effective Passage
+  Search via Contextualized Late Interaction over BERT.* SIGIR '20.
+  [arXiv:2004.12832](https://arxiv.org/abs/2004.12832) — fuera de alcance aquí,
+  anotado por si el corpus crece un orden de magnitud.
+- Gao, L., Ma, X., Lin, J. & Callan, J. (2022). *Precise Zero-Shot Dense
+  Retrieval without Relevance Labels* (HyDE).
+  [arXiv:2212.10496](https://arxiv.org/abs/2212.10496) — costura, no construida.
+- Anthropic (2024). *Introducing Contextual Retrieval.*
+  <https://www.anthropic.com/news/contextual-retrieval> — construido y apagado
+  por defecto. La cifra de mejora que reporta es **auto-reportada y sobre otro
+  corpus**; en este no está medida.
+
+### Grafos de conocimiento
+
+- Edge, D. et al. (2024). *From Local to Global: A Graph RAG Approach to
+  Query-Focused Summarization.*
+  [arXiv:2404.16130](https://arxiv.org/abs/2404.16130) — descartado, con
+  disparador escrito.
+- Guo, Z. et al. (2024). *LightRAG: Simple and Fast Retrieval-Augmented
+  Generation.* [arXiv:2410.05779](https://arxiv.org/abs/2410.05779) —
+  actualización incremental del grafo; interesante si hubiera grafo.
+- Gutiérrez, B. J. et al. (2024). *HippoRAG: Neurobiologically Inspired
+  Long-Term Memory for Large Language Models.*
+  [arXiv:2405.14831](https://arxiv.org/abs/2405.14831)
+- Traag, V. A., Waltman, L. & van Eck, N. J. (2019). *From Louvain to Leiden:
+  guaranteeing well-connected communities.* Scientific Reports 9, 5233.
+  [doi:10.1038/s41598-019-41695-z](https://doi.org/10.1038/s41598-019-41695-z)
+- Rasmussen, P. et al. (2025). *Zep: A Temporal Knowledge Graph Architecture for
+  Agent Memory.* [arXiv:2501.13956](https://arxiv.org/abs/2501.13956) — tomado
+  en espíritu (bi-temporalidad), no en implementación.
+
+### Evaluación
+
+- Ru, D. et al. (2024). *RAGChecker: A Fine-grained Framework for Diagnosing
+  Retrieval-Augmented Generation.*
+  [arXiv:2408.08067](https://arxiv.org/abs/2408.08067) — se copia la aritmética,
+  no la dependencia. De aquí sale el techo de **70,09** de acuerdo entre
+  anotadores humanos.
+- Yang, X. et al. (2024). *CRAG — Comprehensive RAG Benchmark.*
+  [arXiv:2406.04744](https://arxiv.org/abs/2406.04744) — calibra expectativas
+  sobre cuánto se puede esperar de un RAG bien hecho.
+- Zheng, L. et al. (2023). *Judging LLM-as-a-Judge with MT-Bench and Chatbot
+  Arena.* [arXiv:2306.05685](https://arxiv.org/abs/2306.05685) — sesgos de
+  posición y verbosidad.
+- Wang, P. et al. (2023). *Large Language Models are not Fair Evaluators.*
+  [arXiv:2305.17926](https://arxiv.org/abs/2305.17926)
+- Panickssery, A., Bowman, S. R. & Feng, S. (2024). *LLM Evaluators Recognize
+  and Favor Their Own Generations.* NeurIPS 2024.
+  [arXiv:2404.13076](https://arxiv.org/abs/2404.13076) — el
+  auto-reconocimiento **causa** la auto-preferencia. Es el motivo del `assert`
+  de tres familias disjuntas.
+
+### Acuerdo entre anotadores y estadística
+
+- Hayes, A. F. & Krippendorff, K. (2007). *Answering the Call for a Standard
+  Reliability Measure for Coding Data.* Communication Methods and Measures 1(1),
+  77–89. [doi:10.1080/19312450709336664](https://doi.org/10.1080/19312450709336664)
+  — la α y sus umbrales de referencia (0,667 tentativo, 0,80 firme). Por qué
+  aquí la puerta está en 0,60 se explica en el
+  [glosario](99-glosario.md#de-la-medición).
+- McNemar, Q. (1947). *Note on the sampling error of the difference between
+  correlated proportions or percentages.* Psychometrika 12(2), 153–157.
+  [doi:10.1007/BF02295996](https://doi.org/10.1007/BF02295996) — el test
+  correcto para dos configuraciones sobre las mismas preguntas.
+- Benjamini, Y. & Hochberg, Y. (1995). *Controlling the False Discovery Rate.*
+  JRSS B 57(1), 289–300.
+  [doi:10.1111/j.2517-6161.1995.tb02031.x](https://doi.org/10.1111/j.2517-6161.1995.tb02031.x)
+  — **no** se usa: controla FDR entre muchas comparaciones, y aquí se prueba una
+  palanca por ronda.
+- Deng, A., Xu, Y., Kohavi, R. & Walker, T. (2013). *Improving the Sensitivity
+  of Online Controlled Experiments by Utilizing Pre-Experiment Data* (CUPED).
+  WSDM '13. [doi:10.1145/2433396.2433413](https://doi.org/10.1145/2433396.2433413)
+  — diferido: con n pequeño y resultados binarios, θ sale confiadamente
+  equivocado.
+- Tsamardinos, I., Greasidou, E. & Borboudakis, G. (2018). *Bootstrapping the
+  out-of-sample predictions for efficient and accurate cross-validation.*
+  Machine Learning 107, 1895–1922.
+  [doi:10.1007/s10994-018-5714-4](https://doi.org/10.1007/s10994-018-5714-4) —
+  la maldición del ganador, y por qué existe el holdout.
+
+### Optimización de prompts y auto-mejora
+
+- Khattab, O. et al. (2023). *DSPy: Compiling Declarative Language Model Calls
+  into Self-Improving Pipelines.*
+  [arXiv:2310.03714](https://arxiv.org/abs/2310.03714)
+- Agrawal, L. A. et al. (2025). *GEPA: Reflective Prompt Evolution Can Outperform
+  Reinforcement Learning.*
+  [arXiv:2507.19457](https://arxiv.org/abs/2507.19457) — diferido hasta
+  n ≥ 120 probes y α ≥ 0,70.
+
+### El marco propio y su origen
+
+Las nociones de **RAI frente a RSI**, las **gradas**, las **fases** con puertas,
+la **escalera de escalones**, el **juez que devuelve diagnóstico**, los **suelos
+duros / ε-constraint** y **«no reviertas: invalida»** vienen de la serie de
+entradas publicadas por el autor del proyecto, y están resumidas en el
+[glosario](99-glosario.md#de-la-doctrina-de-auto-mejora). Este repositorio es su
+implementación y, en varios puntos, su corrección.
