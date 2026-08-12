@@ -4,7 +4,7 @@
 > que mide, después el sistema que se mide**.
 
 [![ci](https://github.com/Jorge-Medina-Diaz/research-RAG/actions/workflows/ci.yml/badge.svg)](https://github.com/Jorge-Medina-Diaz/research-RAG/actions/workflows/ci.yml)
-![tests](https://img.shields.io/badge/tests-151-brightgreen)
+![tests](https://img.shields.io/badge/tests-154-brightgreen)
 ![agno](https://img.shields.io/badge/agno-2.8.6-blue)
 ![python](https://img.shields.io/badge/python-3.12-blue)
 ![license](https://img.shields.io/badge/license-MIT-lightgrey)
@@ -554,6 +554,7 @@ uv run rag comunidades detecta comunidades. --resumir gasta LLM
 uv run rag analogias   la cola cross-dominio. --minar propone
 uv run rag topologia   puentes, agujeros y deriva. Cero llamadas
 uv run rag ajeno       ingiere un corpus que NO escribiste tú (Agno, offline)
+uv run rag puerta      dónde está la puerta 0. --sigma la mide gratis
 uv run rag mutar       rompe el recuperador a propósito y mide qué ve el arnés
 uv run rag disparadores  ¿qué costura pide construirse? Por recall, y con
                        la cobertura del golden set al lado

@@ -112,6 +112,11 @@ def topologia() -> None:
     _correr(PY, "scripts/fase3.py", "topologia", *sys.argv[2:])
 
 
+def puerta() -> None:
+    """La puerta 0. --sigma la mide gratis; --casos prepara la calibracion."""
+    _correr(PY, "scripts/calibrar_preparar.py", *sys.argv[2:])
+
+
 def ajeno() -> None:
     """Ingiere un corpus que NO escribiste tu: los docstrings de Agno."""
     _correr(PY, "scripts/ajeno.py", *sys.argv[2:])
@@ -194,7 +199,7 @@ TAREAS = {
     for f in (
         up, ingerir, epoca, serve, falso, eval, traza, calibrar, holdout, sesiones,
         grafo, comunidades, analogias, topologia, gepa, propuestas, jobs,
-        disparadores, mutar, ajeno,
+        disparadores, mutar, ajeno, puerta,
         verificar, test, lint, extras, logs, down, limpiar,
     )
 }

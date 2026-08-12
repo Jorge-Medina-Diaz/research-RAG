@@ -143,6 +143,29 @@ def _cuanto(valor: float, suelo: float, n: int) -> str:
     return ""
 
 
+def _margen_latencia(p95: int) -> str:
+    """Avisa cuando el p95 se acerca al suelo, no solo cuando lo rompe.
+
+    Existe porque el reordenador local, la primera vez que se ejecutó, llevó una
+    consulta de 145 ms a 5.257 ms: p95 de 5,3 s con un suelo de 8. No lo rompía
+    —así que el informe habría dicho `ok`— y estaba a un 66 % del límite con una
+    palanca de GRADA 2, de las que el bucle mueve sin pedir permiso.
+
+    Un suelo que solo habla cuando ya se ha roto no protege de una palanca que
+    puede saltárselo de una vez. Este avisa a partir del 50 %.
+    """
+    if not p95:
+        return ""
+    fraccion = p95 / SUELO_P95_MS
+    if fraccion < 0.5:
+        return ""
+    return (
+        f"\n          ← al {fraccion:.0%} del suelo. Con `reranker=local` esto"
+        " sube a ~5,3 s de golpe,\n"
+        "          y esa palanca es de grada 2: el bucle la mueve sin preguntar."
+    )
+
+
 def _cadenas_supera() -> int:
     """Cuántos artefactos vigentes declaran `supera:` con algo dentro.
 
@@ -491,7 +514,8 @@ def informe(
         m = "ok  " if ok_recall else "ROTO"
         print(f"    {m}  recall@top_k ≥ {SUELO_RECALL} ({recall:.2f})"
               + _cuanto(recall, SUELO_RECALL, len(medidas)))
-        print(f"    {'ok  ' if ok_p95 else 'ROTO'}  latencia p95 ≤ 8s ({p95/1000:.1f}s)")
+        print(f"    {'ok  ' if ok_p95 else 'ROTO'}  latencia p95 ≤ 8s ({p95/1000:.1f}s)"
+              + _margen_latencia(p95))
         print("    —     R2/R4/R5/R6 no se comprueban en nivel 0: necesitan respuesta")
     else:
         # El recall TAMBIÉN aquí. Es la métrica primaria de la spec y durante

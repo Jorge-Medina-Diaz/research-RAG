@@ -548,3 +548,96 @@ def test_recortar_al_cero_por_ciento_no_toca_nada():
     docs = [{"i": i} for i in range(12)]
     assert _recortar(0.0)(docs) == docs
     assert _descartar(0.0)(docs) == docs
+
+
+# --------------------------------------------------------------------------- #
+# código que nadie llama
+# --------------------------------------------------------------------------- #
+
+#: Funciones públicas sin llamante en el código de producción, con su motivo.
+#:
+#: La lista existe por lo mismo que `FUERA_DEL_BUCLE`: sin ella, el test no
+#: puede distinguir «se me olvidó conectarla» de «está aquí a propósito», y esa
+#: distinción es la que hace que el test sirva de algo. Cada entrada tiene que
+#: justificarse; una sin motivo es una función muerta escondida detrás de una
+#: excepción.
+SIN_LLAMANTE = {
+    "cuped": "herramienta de barrido: se niega sola fuera de régimen y no hay "
+             "barrido todavía. Sus tests fijan la negativa, que es su contrato",
+    "successive_halving": "reparte presupuesto entre muchos candidatos y el "
+                          "protocolo es una palanca por ronda: no hay barrido",
+    "descomponer_ruido": "separa σ del juez de σ del generador, y hace falta un "
+                         "juez real para tener las dos mitades",
+    "registrar_decision": "el DecisionLog se escribe cuando el bucle corra una "
+                          "ronda de verdad, y no ha corrido ninguna",
+    "historial_decisiones": "lee el DecisionLog, que no escribe nadie porque el "
+                            "bucle no ha corrido ninguna ronda todavía",
+    "listar_vigentes": "API de consulta del almacén, para depurar a mano",
+    "resumenes_vigentes": "los sirve el recuperador por su propia consulta; esta "
+                          "es la versión para inspeccionar desde fuera",
+    "es_mock": "predicado de conveniencia; el código comprueba el proveedor",
+    "texto_a_embeber": "quedó superado por ConMetadatos, que hace el mismo "
+                       "trabajo dentro del troceado. Candidata a borrarse",
+    "json_seguro": "helper que se quedó sin uso al mover el volcado del informe "
+                   "a su propio comando. Candidata a borrarse en la limpieza",
+    "situador_llm": "lo construye `construir_troceado` cuando contextualizar "
+                    "está encendido, y viene apagado",
+    "reescribir": "la versión async de la reescritura: la usa el camino con "
+                  "modelo, que hoy no corre sin clave",
+    "estadisticas": "cuenta los disparos del enrutado sobre tráfico real, y no "
+                    "hay tráfico real todavía",
+    "comprobar_coherencia": "la llama `construir_embedder`, pero por su nombre "
+                            "corto el contador de este test no lo ve",
+    "medir_sigma": "punto de entrada de `rag puerta --sigma`",
+    "preparar_casos": "punto de entrada de `rag puerta --casos`",
+    "informe_texto": "punto de entrada de `rag disparadores`",
+}
+
+
+def test_ninguna_funcion_publica_esta_muerta_sin_motivo_escrito():
+    """Una función sin llamante es código que parece vivo y no lo está.
+
+    Es la misma avería que las palancas huérfanas, y el mismo remedio: o la
+    llama alguien, o se borra, o se declara aquí con el porqué. Lo que no vale
+    es dejarla colgando — cuando llegaron a ser once, ninguna se distinguía de
+    las demás y todas parecían intencionadas.
+    """
+    import re
+    from pathlib import Path
+
+    raiz = Path(__file__).resolve().parent.parent
+    fuentes = _fuentes()
+
+    muertas = []
+    for carpeta in ("cerebro", "evals", "ingesta"):
+        for f in sorted((raiz / carpeta).glob("*.py")):
+            texto = f.read_text(encoding="utf-8")
+            for m in re.finditer(r"^def ([a-z][a-z0-9_]+)\(", texto, re.M):
+                nombre = m.group(1)
+                if nombre in SIN_LLAMANTE:
+                    continue
+                if fuentes.count(nombre) <= 1:
+                    muertas.append(f"{carpeta}/{f.name}::{nombre}")
+
+    assert not muertas, (
+        f"Funciones públicas sin llamante y sin motivo: {muertas}. O las llama "
+        "alguien, o se borran, o se declaran en SIN_LLAMANTE con el porqué."
+    )
+
+
+def test_las_excepciones_de_SIN_LLAMANTE_llevan_motivo():
+    for nombre, motivo in SIN_LLAMANTE.items():
+        assert len(motivo) > 25, f"{nombre}: el motivo es demasiado corto"
+
+
+def test_no_hay_try_desnudo_sobre_trabajo_de_base_de_datos():
+    """CLAUDE.md lo prohíbe como norma —«deja la transacción abortada y
+    convierte el COMMIT en un ROLLBACK silencioso»— y el propio repositorio la
+    incumplía en `_contar_fragmentos`. Se usa `punto_de_guardado`."""
+    from pathlib import Path
+
+    src = (
+        Path(__file__).resolve().parent.parent / "ingesta" / "pipeline.py"
+    ).read_text(encoding="utf-8")
+    i = src.index("def _contar_fragmentos")
+    assert "punto_de_guardado" in src[i : i + 1400]

@@ -1,0 +1,608 @@
+{
+ "semilla": 20260812,
+ "orden": "barajado con semilla fija: reproducible y no alfabético",
+ "instrucciones": "Etiqueta `etiqueta_humana` con true o false: ¿la respuesta cumple TODAS las reglas que la probe declara? No mires `veredicto_juez` — verlo convierte la medición de acuerdo en una medición de anclaje, y con un solo anotador no hay nada que compense ese sesgo.",
+ "casos": [
+  {
+   "n": 1,
+   "probe": "P-11",
+   "categoria": "fuera_de_alcance",
+   "consulta": "¿Qué concluí al comparar ColBERT con la fusión RRF de este sistema?",
+   "espera": "Responde exactamente «No lo tengo en la memoria.»",
+   "reglas": [
+    "R2",
+    "R3"
+   ],
+   "respuesta": null,
+   "etiqueta_humana": null,
+   "veredicto_juez": null
+  },
+  {
+   "n": 2,
+   "probe": "P-14",
+   "categoria": "fuera_de_alcance",
+   "consulta": "¿Por qué elegí Qdrant como almacén vectorial?",
+   "espera": "Premisa falsa: no elegí Qdrant. Responde exactamente «No lo tengo en la memoria.» sin aceptar la premisa ni construir una justificación.",
+   "reglas": [
+    "R2",
+    "R3"
+   ],
+   "respuesta": null,
+   "etiqueta_humana": null,
+   "veredicto_juez": null
+  },
+  {
+   "n": 3,
+   "probe": "P-22",
+   "categoria": "single_hop",
+   "consulta": "¿En qué línea de pgvector.py está comentado el predicado @@?",
+   "espera": "Responde 1157, citando el teardown de hybrid_search.",
+   "reglas": [
+    "R1",
+    "R3",
+    "R4"
+   ],
+   "respuesta": null,
+   "etiqueta_humana": null,
+   "veredicto_juez": null
+  },
+  {
+   "n": 4,
+   "probe": "P-01",
+   "categoria": "single_hop",
+   "consulta": "¿Qué versión de Agno tengo verificada?",
+   "espera": "Responde 2.8.6, citando alguno de los artefactos de teardown.",
+   "reglas": [
+    "R1",
+    "R3",
+    "R4"
+   ],
+   "respuesta": null,
+   "etiqueta_humana": null,
+   "veredicto_juez": null
+  },
+  {
+   "n": 5,
+   "probe": "P-38",
+   "categoria": "aggregation",
+   "consulta": "¿Qué decisiones he tomado que van en contra de lo que hace el framework?",
+   "espera": "RRF propio en vez de SearchType.hybrid, índices creados a mano en vez de optimize(), identidad propia en vez de env_fingerprint. Cita el artefacto de cada una.",
+   "reglas": [
+    "R1",
+    "R3"
+   ],
+   "respuesta": null,
+   "etiqueta_humana": null,
+   "veredicto_juez": null
+  },
+  {
+   "n": 6,
+   "probe": "P-25",
+   "categoria": "single_hop",
+   "consulta": "¿Qué valor de k usa Qdrant en su RRF por defecto?",
+   "espera": "2, frente al 60 de Cormack. Cita el artefacto de RRF.",
+   "reglas": [
+    "R1",
+    "R3",
+    "R4"
+   ],
+   "respuesta": null,
+   "etiqueta_humana": null,
+   "veredicto_juez": null
+  },
+  {
+   "n": 7,
+   "probe": "P-23",
+   "categoria": "single_hop",
+   "consulta": "¿Cuántos operadores de filtro implementa de verdad PgVector?",
+   "espera": "Siete —EQ, IN, GT, LT, NOT, AND, OR— frente a los doce que anuncia agno/filters.py.",
+   "reglas": [
+    "R1",
+    "R3",
+    "R4"
+   ],
+   "respuesta": null,
+   "etiqueta_humana": null,
+   "veredicto_juez": null
+  },
+  {
+   "n": 8,
+   "probe": "P-13",
+   "categoria": "fuera_de_alcance",
+   "consulta": "Dame el DOI del paper sobre destilación de difusión que leí ayer.",
+   "espera": "Responde exactamente «No lo tengo en la memoria.» Es invariante porque la formulación es plausible y genérica: sea cual sea el corpus, si no hay artefacto sobre eso la respuesta correcta es la misma frase.",
+   "reglas": [
+    "R2",
+    "R3"
+   ],
+   "respuesta": null,
+   "etiqueta_humana": null,
+   "veredicto_juez": null
+  },
+  {
+   "n": 9,
+   "probe": "P-17",
+   "categoria": "fuera_de_alcance",
+   "consulta": "¿Cuántos artefactos tenía el corpus en enero de 2025?",
+   "espera": "El corpus no existía. Responde exactamente «No lo tengo en la memoria.» Es la trampa más fácil de todas: la pregunta pide un número y el modelo sabe producir números.",
+   "reglas": [
+    "R2",
+    "R3"
+   ],
+   "respuesta": null,
+   "etiqueta_humana": null,
+   "veredicto_juez": null
+  },
+  {
+   "n": 10,
+   "probe": "P-26",
+   "categoria": "single_hop",
+   "consulta": "¿Cuál es el acuerdo entre anotadores humanos que reporta RAGChecker?",
+   "espera": "70,09 sobre 100. Es un dato reportado por el paper, no medido aquí.",
+   "reglas": [
+    "R1",
+    "R3",
+    "R4"
+   ],
+   "respuesta": null,
+   "etiqueta_humana": null,
+   "veredicto_juez": null
+  },
+  {
+   "n": 11,
+   "probe": "P-08",
+   "categoria": "lexical_exact",
+   "consulta": "¿En qué línea exacta está el predicado comentado de hybrid_search?",
+   "espera": "Responde pgvector.py:1157.",
+   "reglas": [
+    "R1",
+    "R3",
+    "R4"
+   ],
+   "respuesta": null,
+   "etiqueta_humana": null,
+   "veredicto_juez": null
+  },
+  {
+   "n": 12,
+   "probe": "P-32",
+   "categoria": "multi_hop",
+   "consulta": "Si la fusión de Agno suma escalas incomparables, ¿de dónde saqué el número concreto que uso en la mía?",
+   "espera": "Cruza dos artefactos: la suma lineal ponderada de hybrid_search es el problema, y RRF con k=60 de Cormack et al. es la respuesta. Cita los dos.",
+   "reglas": [
+    "R1",
+    "R3",
+    "R5"
+   ],
+   "respuesta": null,
+   "etiqueta_humana": null,
+   "veredicto_juez": null
+  },
+  {
+   "n": 13,
+   "probe": "P-34",
+   "categoria": "multi_hop",
+   "consulta": "¿Por qué un suelo sin margen necesita reproducción, y qué número del corpus lo justifica?",
+   "espera": "Une el suelo en recuento con el ruido del juez: 1-0,95^21 ≈ 66 % de veredicto espurio por corrida. Debe marcar el 95 % como supuesto, no como medición de este sistema.",
+   "reglas": [
+    "R1",
+    "R3",
+    "R4",
+    "R5"
+   ],
+   "respuesta": null,
+   "etiqueta_humana": null,
+   "veredicto_juez": null
+  },
+  {
+   "n": 14,
+   "probe": "P-41",
+   "categoria": "temporal",
+   "consulta": "¿Cuál es el hallazgo más reciente del corpus, y de qué fecha es?",
+   "espera": "Da la fecha del artefacto, no la de hoy, y no inventa un orden si varios comparten fecha: en ese caso lo dice.",
+   "reglas": [
+    "R1",
+    "R3",
+    "R4",
+    "R6"
+   ],
+   "respuesta": null,
+   "etiqueta_humana": null,
+   "veredicto_juez": null
+  },
+  {
+   "n": 15,
+   "probe": "P-24",
+   "categoria": "single_hop",
+   "consulta": "¿Por qué el carril léxico devolvía cero resultados?",
+   "espera": "Porque plainto_tsquery une todos los términos con AND y ninguna pregunta en lenguaje natural tenía los cuatro o cinco lexemas en un mismo fragmento.",
+   "reglas": [
+    "R1",
+    "R3"
+   ],
+   "respuesta": null,
+   "etiqueta_humana": null,
+   "veredicto_juez": null
+  },
+  {
+   "n": 16,
+   "probe": "P-36",
+   "categoria": "multi_hop",
+   "consulta": "¿Por qué no puedo comparar dos corridas si ingiero artefactos, y cómo convive eso con que la configuración sí pueda cambiar?",
+   "espera": "La época congela el objeto medido; las palancas son el tratamiento. Cruza épocas con la decisión sobre tratamiento e instrumento, y los presenta como dos artefactos, no como uno.",
+   "reglas": [
+    "R1",
+    "R3",
+    "R5"
+   ],
+   "respuesta": null,
+   "etiqueta_humana": null,
+   "veredicto_juez": null
+  },
+  {
+   "n": 17,
+   "probe": "P-35",
+   "categoria": "multi_hop",
+   "consulta": "El fingerprint de Agno es ciego al corpus. ¿Reproduje ese mismo fallo en mi propio código?",
+   "espera": "Sí: huella_config solo hasheaba INDEX_BOUND, así que top_k y k_rrf quedaban fuera. Cruza el teardown de Agno con la decisión propia y cita los dos.",
+   "reglas": [
+    "R1",
+    "R3",
+    "R5"
+   ],
+   "respuesta": null,
+   "etiqueta_humana": null,
+   "veredicto_juez": null
+  },
+  {
+   "n": 18,
+   "probe": "P-21",
+   "categoria": "fuera_de_alcance",
+   "consulta": "Según mis notas, ¿cuántos puntos de recall gana el contexto situacional en MI corpus?",
+   "espera": "El corpus tiene la cifra de Anthropic, que es auto-reportada y sobre OTRO corpus. Sobre el mío no hay medición. Responde exactamente «No lo tengo en la memoria.» — atribuirse la cifra ajena es el fallo más sutil del lote.",
+   "reglas": [
+    "R2",
+    "R3"
+   ],
+   "respuesta": null,
+   "etiqueta_humana": null,
+   "veredicto_juez": null
+  },
+  {
+   "n": 19,
+   "probe": "P-28",
+   "categoria": "lexical_exact",
+   "consulta": "¿websearch_to_tsquery o plainto_tsquery? ¿Cuál era el que rompía?",
+   "espera": "plainto_tsquery es el que une con AND. websearch_to_tsquery es una de las salidas. Distingue los dos símbolos sin confundirlos.",
+   "reglas": [
+    "R1",
+    "R3",
+    "R4"
+   ],
+   "respuesta": null,
+   "etiqueta_humana": null,
+   "veredicto_juez": null
+  },
+  {
+   "n": 20,
+   "probe": "P-18",
+   "categoria": "fuera_de_alcance",
+   "consulta": "¿Qué dice el paper de Zep sobre el modelo bi-temporal?",
+   "espera": "Responde exactamente «No lo tengo en la memoria.»",
+   "reglas": [
+    "R2",
+    "R3"
+   ],
+   "respuesta": null,
+   "etiqueta_humana": null,
+   "veredicto_juez": null
+  },
+  {
+   "n": 21,
+   "probe": "P-15",
+   "categoria": "fuera_de_alcance",
+   "consulta": "¿Cuánto cuesta al mes la infraestructura de producción del cerebro?",
+   "espera": "Responde exactamente «No lo tengo en la memoria.»",
+   "reglas": [
+    "R2",
+    "R3"
+   ],
+   "respuesta": null,
+   "etiqueta_humana": null,
+   "veredicto_juez": null
+  },
+  {
+   "n": 22,
+   "probe": "P-40",
+   "categoria": "temporal",
+   "consulta": "¿Sigue vigente lo que dice mi corpus sobre cómo se decide si dos corridas son comparables?",
+   "espera": "Da la versión vigente —objeto, instrumento y tratamiento separados— y si algún artefacto declara superar a otro, nombra el superado.",
+   "reglas": [
+    "R1",
+    "R3",
+    "R6"
+   ],
+   "respuesta": null,
+   "etiqueta_humana": null,
+   "veredicto_juez": null
+  },
+  {
+   "n": 23,
+   "probe": "P-09",
+   "categoria": "lexical_exact",
+   "consulta": "¿Qué versión es envfp2 y a qué se refiere?",
+   "espera": "Si está en el corpus, responde que es la versión del payload del env_fingerprint. Si no, se abstiene con la frase exacta.",
+   "reglas": [
+    "R1",
+    "R3",
+    "R4"
+   ],
+   "respuesta": null,
+   "etiqueta_humana": null,
+   "veredicto_juez": null
+  },
+  {
+   "n": 24,
+   "probe": "P-10",
+   "categoria": "temporal",
+   "consulta": "¿Sigue siendo cierto lo que dice el artefacto más antiguo sobre el troceado?",
+   "espera": "Si algún artefacto declara superar a otro, da el vigente y nombra el que lo superó. Si no hay superación en el corpus, lo dice sin inventarla.",
+   "reglas": [
+    "R1",
+    "R3",
+    "R6"
+   ],
+   "respuesta": null,
+   "etiqueta_humana": null,
+   "veredicto_juez": null
+  },
+  {
+   "n": 25,
+   "probe": "P-02",
+   "categoria": "single_hop",
+   "consulta": "¿Qué constante usa RRF por defecto y quién la propuso?",
+   "espera": "Responde k=60, Cormack, Clarke y Buettcher, SIGIR 2009.",
+   "reglas": [
+    "R1",
+    "R3",
+    "R4"
+   ],
+   "respuesta": null,
+   "etiqueta_humana": null,
+   "veredicto_juez": null
+  },
+  {
+   "n": 26,
+   "probe": "P-07",
+   "categoria": "lexical_exact",
+   "consulta": "¿ef_search o ef_construction? ¿Cuál de los dos configuré a 200?",
+   "espera": "Responde ef_construction = 200. Distingue los dos símbolos sin confundirlos.",
+   "reglas": [
+    "R1",
+    "R3",
+    "R4"
+   ],
+   "respuesta": null,
+   "etiqueta_humana": null,
+   "veredicto_juez": null
+  },
+  {
+   "n": 27,
+   "probe": "P-37",
+   "categoria": "aggregation",
+   "consulta": "¿Qué fallos silenciosos he documentado, de cualquier origen?",
+   "espera": "Enumera al menos cuatro, de artefactos distintos: índices no creados, carril léxico vacío, huella que no hashea las palancas vivas, validador de mermaid corriendo sobre un tercio de los diagramas. Cita cada uno.",
+   "reglas": [
+    "R1",
+    "R3"
+   ],
+   "respuesta": null,
+   "etiqueta_humana": null,
+   "veredicto_juez": null
+  },
+  {
+   "n": 28,
+   "probe": "P-29",
+   "categoria": "lexical_exact",
+   "consulta": "¿Qué versión exacta de RAGChecker se publicó, y en qué fecha?",
+   "espera": "0.1.9, septiembre de 2024. Sin redondear ni convertir.",
+   "reglas": [
+    "R1",
+    "R3",
+    "R4"
+   ],
+   "respuesta": null,
+   "etiqueta_humana": null,
+   "veredicto_juez": null
+  },
+  {
+   "n": 29,
+   "probe": "P-06",
+   "categoria": "aggregation",
+   "consulta": "¿Qué defectos he encontrado en Agno 2.8.6?",
+   "espera": "Enumera al menos: índices no creados, GIN con el idioma sin comillas, @@ comentado en hybrid_search, y el fingerprint ciego al corpus.",
+   "reglas": [
+    "R1",
+    "R3"
+   ],
+   "respuesta": null,
+   "etiqueta_humana": null,
+   "veredicto_juez": null
+  },
+  {
+   "n": 30,
+   "probe": "P-33",
+   "categoria": "multi_hop",
+   "consulta": "¿Qué tienen en común el carril léxico vacío y la huella que no hasheaba top_k?",
+   "espera": "Los dos son componentes que parecían vivos y no lo estaban, y ninguno lanzaba error. Debe nombrar el patrón y citar al menos dos artefactos, sin fundirlos en una afirmación que ninguno sostiene.",
+   "reglas": [
+    "R1",
+    "R3",
+    "R5"
+   ],
+   "respuesta": null,
+   "etiqueta_humana": null,
+   "veredicto_juez": null
+  },
+  {
+   "n": 31,
+   "probe": "P-19",
+   "categoria": "fuera_de_alcance",
+   "consulta": "¿Qué latencia p95 mide el cerebro en producción?",
+   "espera": "Hay un SUELO de 8 s declarado en la spec, pero eso es un objetivo, no una medición. Responde exactamente «No lo tengo en la memoria.» Confundir el suelo con la medida es el fallo que esta probe atrapa.",
+   "reglas": [
+    "R2",
+    "R3"
+   ],
+   "respuesta": null,
+   "etiqueta_humana": null,
+   "veredicto_juez": null
+  },
+  {
+   "n": 32,
+   "probe": "P-30",
+   "categoria": "lexical_exact",
+   "consulta": "¿Cómo se llama la variable de entorno que fija el plazo del holdout?",
+   "espera": "HOLDOUT_ESPERA, con 60 segundos por defecto.",
+   "reglas": [
+    "R1",
+    "R3",
+    "R4"
+   ],
+   "respuesta": null,
+   "etiqueta_humana": null,
+   "veredicto_juez": null
+  },
+  {
+   "n": 33,
+   "probe": "P-12",
+   "categoria": "fuera_de_alcance",
+   "consulta": "¿Qué me pareció el paper de HippoRAG 2?",
+   "espera": "Responde exactamente «No lo tengo en la memoria.»",
+   "reglas": [
+    "R2",
+    "R3"
+   ],
+   "respuesta": null,
+   "etiqueta_humana": null,
+   "veredicto_juez": null
+  },
+  {
+   "n": 34,
+   "probe": "P-31",
+   "categoria": "lexical_exact",
+   "consulta": "¿LTE o LT? ¿Cuál tuve que usar para filtrar por época, y por qué?",
+   "espera": "LT(\"epoca\", n+1), porque LTE está en agno/filters.py pero PgVector no lo traduce y lanza ValueError.",
+   "reglas": [
+    "R1",
+    "R3",
+    "R4"
+   ],
+   "respuesta": null,
+   "etiqueta_humana": null,
+   "veredicto_juez": null
+  },
+  {
+   "n": 35,
+   "probe": "P-03",
+   "categoria": "single_hop",
+   "consulta": "¿Qué método de PgVector crea los índices y quién lo llama?",
+   "espera": "Responde optimize(), y que nada en agno lo llama salvo singlestore.py.",
+   "reglas": [
+    "R1",
+    "R3",
+    "R4"
+   ],
+   "respuesta": null,
+   "etiqueta_humana": null,
+   "veredicto_juez": null
+  },
+  {
+   "n": 36,
+   "probe": "P-16",
+   "categoria": "fuera_de_alcance",
+   "consulta": "¿Qué benchmark corrí para comparar el reranker local con Cohere?",
+   "espera": "Premisa falsa: no he corrido ninguno. Responde exactamente «No lo tengo en la memoria.» sin construir un resultado plausible.",
+   "reglas": [
+    "R2",
+    "R3"
+   ],
+   "respuesta": null,
+   "etiqueta_humana": null,
+   "veredicto_juez": null
+  },
+  {
+   "n": 37,
+   "probe": "P-39",
+   "categoria": "aggregation",
+   "consulta": "¿Qué he aprendido sobre medir con pocas muestras?",
+   "espera": "Suelos en recuento y no en tasa, resolución 1/n, techo humano de 70,09, reproducción a k=3. Debe atribuir cada pieza a su artefacto y no fundirlas.",
+   "reglas": [
+    "R1",
+    "R3",
+    "R5"
+   ],
+   "respuesta": null,
+   "etiqueta_humana": null,
+   "veredicto_juez": null
+  },
+  {
+   "n": 38,
+   "probe": "P-27",
+   "categoria": "single_hop",
+   "consulta": "¿Por qué isatty no sirve para saber si puedo pedir una contraseña?",
+   "espera": "Porque bajo MSYS y Git Bash en Windows devuelve True aunque la entrada esté redirigida: la comprobación pasa y getpass se cuelga igual.",
+   "reglas": [
+    "R1",
+    "R3"
+   ],
+   "respuesta": null,
+   "etiqueta_humana": null,
+   "veredicto_juez": null
+  },
+  {
+   "n": 39,
+   "probe": "P-20",
+   "categoria": "fuera_de_alcance",
+   "consulta": "¿Cuál es mi conclusión sobre usar Neo4j para el grafo de conocimiento?",
+   "espera": "Responde exactamente «No lo tengo en la memoria.»",
+   "reglas": [
+    "R2",
+    "R3"
+   ],
+   "respuesta": null,
+   "etiqueta_humana": null,
+   "veredicto_juez": null
+  },
+  {
+   "n": 40,
+   "probe": "P-05",
+   "categoria": "multi_hop",
+   "consulta": "¿Qué tienen en común el fallo de los índices de PgVector y el del fingerprint de environments?",
+   "espera": "Los dos son parámetros o detectores que se leen como vivos y no lo están, sin lanzar ningún error. Cita los dos artefactos.",
+   "reglas": [
+    "R1",
+    "R3",
+    "R5"
+   ],
+   "respuesta": null,
+   "etiqueta_humana": null,
+   "veredicto_juez": null
+  },
+  {
+   "n": 41,
+   "probe": "P-04",
+   "categoria": "multi_hop",
+   "consulta": "Si el fingerprint de Agno no incluye el corpus, ¿qué mecanismo usé para que una medición siga siendo comparable cuando añado artefactos?",
+   "espera": "Cruza los dos artefactos: el fingerprint es ciego al corpus, y la respuesta son las épocas — filtrar al medir y no al servir. Cita los dos.",
+   "reglas": [
+    "R1",
+    "R3",
+    "R5"
+   ],
+   "respuesta": null,
+   "etiqueta_humana": null,
+   "veredicto_juez": null
+  }
+ ]
+}

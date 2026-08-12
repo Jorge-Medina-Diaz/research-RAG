@@ -55,6 +55,13 @@ def construir_knowledge(p: Palancas = PALANCAS) -> Knowledge:
     return Knowledge(name="cerebro", vector_db=construir_vector_db(p), max_results=p.top_k)
 
 
+#: El cross-encoder del reordenador local. ~90 MB y corre en CPU.
+#:
+#: Se eligió por poder correr, no por calidad: es inglés y este corpus es
+#: mixto. La alternativa multilingüe decente son ~2 GB y no termina en CPU.
+MODELO_REORDENADOR = "cross-encoder/ms-marco-MiniLM-L-6-v2"
+
+
 def construir_reordenador(p: Palancas = PALANCAS):
     """Reordenador nativo de Agno, aplicado por nosotros sobre el pool fusionado.
 
@@ -77,8 +84,24 @@ def construir_reordenador(p: Palancas = PALANCAS):
                 "reranker='local' necesita sentence-transformers. Instálalo con "
                 "`uv run rag extras`, o usa reranker='none'."
             ) from e
+        # `bge-reranker-v2-m3` era el modelo por defecto y NO es viable aquí:
+        # son ~2,2 GB y un cross-encoder sobre 40 documentos en CPU no termina
+        # en un tiempo aceptable. La primera vez que se intentó correr —después
+        # de meses con la palanca escrita y nunca ejecutada— ni siquiera acabó
+        # una sola consulta.
+        #
+        # Eso no es un detalle de rendimiento, es un problema de GOBERNANZA:
+        # `reranker` es de grada 2, o sea de las que el bucle mueve **sin pedir
+        # permiso**, y moverla a `local` con aquel modelo reventaba el suelo de
+        # latencia de 8 s por diseño. Una palanca que el bucle puede flipar y
+        # que rompe un suelo al fliparla es una trampa puesta a su propio
+        # optimizador.
+        #
+        # El modelo pequeño es inglés y este corpus es mixto, así que ordena
+        # peor. Es la elección honesta: un reordenador que corre y ordena
+        # regular es medible; uno que no termina, no.
         return SentenceTransformerReranker(
-            model="BAAI/bge-reranker-v2-m3", top_n=p.reranker_top_n
+            model=MODELO_REORDENADOR, top_n=p.reranker_top_n
         )
     return None
 

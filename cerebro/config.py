@@ -158,6 +158,16 @@ class Palancas:
 
     #: none | local | cohere. "local" descarga un modelo la primera vez y corre
     #: en CPU (`uv run rag extras`); "cohere" necesita COHERE_API_KEY.
+    #:
+    #: MEDIDO, y es la primera vez que esta palanca se ejecutó: pasa de 145 ms a
+    #: **5.257 ms** por consulta. Multiplica la latencia por 36 y deja el p95 a
+    #: 5,3 s con un suelo de 8. Con el modelo que traía por defecto
+    #: —`bge-reranker-v2-m3`, ~2,2 GB— ni siquiera terminaba una consulta.
+    #:
+    #: Y es de GRADA 2, o sea de las que el bucle mueve sin pedir permiso. Una
+    #: palanca que el optimizador puede flipar y que casi rompe un suelo al
+    #: fliparla es una trampa puesta a su propio bucle, así que hay un guardián
+    #: de latencia en `evals/correr.py` que la caza en la misma corrida.
     reranker: Literal["none", "local", "cohere"] = "none"
     reranker_top_n: int = 12
 

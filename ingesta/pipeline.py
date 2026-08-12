@@ -39,6 +39,7 @@ from cerebro.almacen import (
     epoca_abierta,
     invalidar,
     migrar,
+    punto_de_guardado,
 )
 from cerebro.config import PALANCAS, Palancas, tabla_fragmentos
 from ingesta.contrato import Artefacto, RechazoAdmision, admitir, sha_contenido
@@ -280,13 +281,22 @@ def _contar_fragmentos(artefacto_id: str, p: Palancas) -> int:
     tabla = f'{ESQUEMA}."{tabla_fragmentos(p)}"'
     with conexion() as con:
         try:
-            fila = con.execute(
-                f"select count(*) as n from {tabla} "  # noqa: S608
-                "where meta_data->>'artefacto_id' = %s and "
-                "coalesce(meta_data->>'vigente','true') = 'true'",
-                (artefacto_id,),
-            ).fetchone()
-            return int(fila["n"]) if fila else 0
+            # `punto_de_guardado` y no un `try` desnudo. CLAUDE.md lo dice
+            # como norma —«un try/except alrededor de trabajo de base de datos
+            # NO es manejo de errores: deja la transacción abortada y convierte
+            # el COMMIT en un ROLLBACK silencioso»— y este era el único sitio
+            # del repositorio que la incumplía, en el repositorio que la
+            # escribe. Aquí importa de verdad: la tabla puede no existir todavía
+            # cuando se cuenta por primera vez, y el `except` dejaba la
+            # transacción muerta para todo lo que viniera después.
+            with punto_de_guardado(con, "contar-fragmentos"):
+                fila = con.execute(
+                    f"select count(*) as n from {tabla} "  # noqa: S608
+                    "where meta_data->>'artefacto_id' = %s and "
+                    "coalesce(meta_data->>'vigente','true') = 'true'",
+                    (artefacto_id,),
+                ).fetchone()
+                return int(fila["n"]) if fila else 0
         except Exception:
             return 0
 

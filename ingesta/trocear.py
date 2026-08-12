@@ -23,8 +23,18 @@ from agno.knowledge.document.base import Document
 
 from cerebro.config import PALANCAS, Palancas
 
-#: Plantilla del contexto situacional. Su sha entra en la huella del índice:
-#: cambiar el texto de esta plantilla cambia cada vector del corpus.
+#: Plantilla del contexto situacional.
+#:
+#: Su sha NO entra en la huella del índice, y el comentario que había aquí decía
+#: que sí. Lo que entra en `INDEX_BOUND` es el booleano `contextualizar`, así
+#: que cambiar el TEXTO de esta plantilla cambia cada vector del corpus **sin
+#: cambiar el nombre de la tabla**: dos corpus distintos servidos desde el mismo
+#: índice, sin que nada lo señale. Es la avería que `INDEX_BOUND` existe para
+#: impedir, en el comentario que la describe.
+#:
+#: No se arregla metiendo el sha en INDEX_BOUND —eso obligaría a re-embeber al
+#: cambiar una coma del prompt— sino sabiendo que reindexar es obligatorio si se
+#: toca. Queda escrito aquí porque el comentario anterior afirmaba lo contrario.
 PLANTILLA_CONTEXTO = """\
 Este es un fragmento de un artefacto de investigación titulado «{titulo}»
 ({tipo}, dominio {dominio}).
@@ -141,18 +151,67 @@ class ContextoSituacional(ChunkingStrategy):
         trozos = self.base.chunk(document)
         meta = document.meta_data or {}
         for t in trozos:
-            try:
-                contexto = self.situador(document.content, t.content, meta)
-            except Exception:
-                # Un fallo del situador degrada a fragmento sin contexto. Lo que
-                # NO puede pasar es que la ingesta entera se caiga a medias y deje
-                # el índice con la mitad de los fragmentos contextualizados y la
-                # otra mitad no: eso serían dos configuraciones en una tabla.
-                raise
+            # NO degrada, y el `raise` es deliberado. El comentario que había
+            # aquí decía «un fallo del situador degrada a fragmento sin
+            # contexto» y el código hacía `raise` justo debajo: se contradecían
+            # en cuatro líneas.
+            #
+            # Gana el código. Degradar dejaría el índice con la mitad de los
+            # fragmentos contextualizados y la otra mitad no — dos
+            # configuraciones dentro de una misma tabla, y ningún sitio donde se
+            # note. Es la única etapa del pipeline donde degradar es PEOR que
+            # caerse, porque `contextualizar` es de grada 3 y su valor entra en
+            # el nombre de la tabla: la tabla diría que todo está
+            # contextualizado y sería mentira en la mitad de las filas.
+            contexto = self.situador(document.content, t.content, meta)
             if contexto:
                 t.content = f"{contexto.strip()}\n\n{t.content}"
                 t.meta_data = {**(t.meta_data or {}), "contextualizado": True}
         return trozos
+
+
+def situador_llm(p: Palancas = PALANCAS):
+    """El situador que faltaba: una llamada por fragmento, con la plantilla.
+
+    `contextualizar=True` exigía un `situador` y **no existía ninguno en el
+    repositorio**: encender la palanca era un `ValueError` garantizado. Estuvo
+    así desde que se escribió, con la plantilla `PLANTILLA_CONTEXTO` completa,
+    sin usar, y con un comentario diciendo que su sha entra en la huella del
+    índice — cosa que tampoco era cierta, porque lo que entra en `INDEX_BOUND`
+    es el booleano, no el texto.
+
+    Devuelve `None` si no hay modelo, y entonces `construir_troceado` se niega
+    con su mensaje en vez de fabricar un situador que no puede llamar a nada.
+
+    **El coste hay que decirlo por delante**: una llamada de LLM por fragmento.
+    Con 270 fragmentos son 270 llamadas cada vez que se reingiere, y por eso la
+    palanca es de grada 3 y viene apagada. La técnica es la de Anthropic, y la
+    mejora que reportan es sobre OTRO corpus: aquí no está medida.
+    """
+    from cerebro.agente import SISTEMA, construir_modelo
+
+    modelo = construir_modelo(SISTEMA)
+    if modelo is None:
+        return None
+
+    from agno.agent import Agent
+
+    redactor = Agent(model=modelo, markdown=False)
+
+    def situar(documento: str, fragmento: str, meta: dict[str, Any]) -> str:
+        prompt = PLANTILLA_CONTEXTO.format(
+            titulo=meta.get("titulo", "?"),
+            tipo=meta.get("tipo", "?"),
+            dominio=meta.get("dominio", "?"),
+            # El documento entero en cada llamada: es lo que hace cara la
+            # técnica y es también lo que la hace funcionar. Recortarlo para
+            # ahorrar sería quedarse con el coste y perder el efecto.
+            documento=documento[:12000],
+            fragmento=fragmento,
+        )
+        return (redactor.run(prompt).content or "").strip()
+
+    return situar
 
 
 def construir_troceado(
@@ -160,6 +219,9 @@ def construir_troceado(
 ) -> ChunkingStrategy:
     base: ChunkingStrategy = ConMetadatos(estrategia_base(p), p, meta=meta)
     if p.contextualizar:
+        # Se construye aquí si no lo pasan. Antes no se construía en ningún
+        # sitio, así que la rama de abajo era el único destino posible.
+        situador = situador or situador_llm(p)
         if situador is None:
             raise ValueError(
                 "contextualizar=True necesita un situador (un cliente de LLM). "
