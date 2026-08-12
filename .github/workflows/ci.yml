@@ -129,13 +129,22 @@ jobs:
       # el digest del juez lo fija `tests/test_arnes.py`; aquí se comprueba de
       # punta a punta lo único que el nivel 0 puede comprobar, porque en nivel 0
       # no hay juez y su huella no entra en la identidad.
+      # Las palancas se mueven RELATIVO al valor actual, nunca a un número
+      # escrito aquí. Estaban escritos —`top_k: int = 20`— y la ronda 1 del
+      # bucle dejó `top_k` en 20: el `sed` pasó a no cambiar nada, el diff dijo
+      # «misma configuración: esto mide RUIDO» y la comprobación se cayó.
+      #
+      # Se cayó, que es lo correcto. Pero se cayó por obsolescencia y no por el
+      # defecto que vigila, y una prueba que puede quedarse vieja al ritmo al
+      # que el bucle mueve palancas es una prueba que va a mentir. Bumpear el
+      # valor leído hace que el no-op sea imposible por construcción.
       - name: 'el diff se niega cuando se mueven dos palancas'
         run: |
           uv run rag eval --json runs/ci-base.json || true
-          sed -i 's/^    top_k: int = .*/    top_k: int = 20/' cerebro/config.py
+          uv run python .github/scripts/mover_palanca.py top_k
           uv run rag eval --diff runs/ci-base.json | tee /tmp/uno.txt || true
           grep -q 'palanca: top_k' /tmp/uno.txt
-          sed -i 's/^    k_rrf: int = .*/    k_rrf: int = 10/' cerebro/config.py
+          uv run python .github/scripts/mover_palanca.py k_rrf
           uv run rag eval --diff runs/ci-base.json | tee /tmp/dos.txt || true
           grep -q 'palancas movidas a la vez' /tmp/dos.txt
           git checkout cerebro/config.py
