@@ -372,13 +372,30 @@ lanza un error.
 
 ---
 
+## Tres repos que el código menciona y que no vas a poder abrir
+
+Los comentarios citan tres proyectos anteriores míos, **privados**, para dejar
+constancia de dónde sale cada decisión. No hacen falta para nada: el repo es
+autocontenido. Pero si te preguntas qué son:
+
+| | |
+|---|---|
+| **CVs-SaaS** | Un RAG anterior de 51k LOC con grafo bi-temporal sobre Apache AGE, retriever de cinco carriles y motor de coherencia. De ahí salen las piezas extraídas —RRF, el protocolo de reordenador, el proveedor determinista de embeddings— y, sobre todo, **las cicatrices**: cada «esto no se hace así» del código apunta a algo que allí se rompió |
+| **atlas-rai** | La implementación de referencia del bucle de auto-mejora, 966 líneas. Este repo calca su esqueleto —spec, palancas por grada, juez con diagnóstico, permisos como gobernanza— y lo escala a un corpus que crece |
+| **rag-glue** | Un paquete de medición sin dependencias. De ahí vienen la identidad de corrida por huellas y la regla «si no capturas el score en el instante de la búsqueda, no existe» |
+
+Cuando el código dice *«atlas-rai tiene este defecto por defecto»* o *«el
+`try/except` que en CVs-SaaS convertía el COMMIT en un ROLLBACK silencioso»*, es
+literal: son fallos medidos, no hipótesis.
+
 ## Créditos
 
 El marco conceptual —RAI frente a RSI, gradas, fases, puertas, la escalera de
 escalones, el juez que devuelve diagnóstico— viene del trabajo de
 [Ashpreet Bedi](https://www.ashpreetbedi.com/recursive-auto-improvement) sobre
 auto-mejora recursiva de agentes. La extensión al caso del **corpus vivo** —las
-épocas, la tercera huella, la caducidad de probes— es propia y **no está
+épocas, la tercera huella, la caducidad de probes, la separación entre lo que el
+bucle puede tocar solo y lo que firma una persona— es propia y **no está
 validada en ningún benchmark publicado**.
 
 Construido sobre [Agno](https://github.com/agno-agi/agno).
