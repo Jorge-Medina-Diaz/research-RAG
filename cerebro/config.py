@@ -174,10 +174,15 @@ class Palancas:
     # ---- fase 3 · el grafo. Todo esto viene apagado y su disparador está
     # ---- escrito: `multi_hop` por debajo de 0,60 tras agotar grada 1 y 2.
 
-    #: Enciende el tercer carril. Sin esto, `grafo_*` son palancas sobre nada —y
-    #: ese es exactamente el defecto que el repo persigue, así que el assert de
-    #: abajo comprueba que no queden vivas cuando el carril está apagado.
-    grafo_activo: bool = False
+    #: El tercer carril se enciende AÑADIÉNDOLO A `carriles`, no con un booleano
+    #: aparte. Hubo un `grafo_activo: bool` y era un segundo interruptor para lo
+    #: mismo: `carriles` decía dos y el booleano decía tres, y el peso que el
+    #: enrutado asignaba a «grafo» se descartaba en silencio porque `grafo` no
+    #: estaba en `carriles`. Dos fuentes de verdad para un hecho es la forma más
+    #: barata de fabricar un parámetro muerto.
+    #:
+    #:     carriles    = ("denso", "lexico", "grafo")
+    #:     peso_carril = (1.0, 1.0, 1.0)
 
     #: Probabilidad de teletransporte del PPR. Alto = casi las semillas;
     #: bajo = el paseo se va al centro del grafo y devuelve siempre lo popular.
@@ -295,7 +300,7 @@ _GRADAS: dict[str, int] = {
     **dict.fromkeys(
         (
             "reranker", "reranker_top_n", "reescritura", "instrucciones",
-            "enrutado", "grafo_activo", "grafo_alfa", "grafo_top_k",
+            "enrutado", "grafo_alfa", "grafo_top_k",
             "grafo_semillas", "comunidades_en_respuesta",
             "analogia_min", "analogia_max", "aprendizaje",
         ),
@@ -330,11 +335,38 @@ _REINDEXA: dict[str, str] = {
 #: «algo va mal» en «toca esto».
 DIAGNOSTICO_A_PALANCAS: dict[str, tuple[str, ...]] = {
     "cobertura": ("top_k", "top_k_por_carril", "reescritura", "fts_modo",
-                  "filtro_tipo", "filtro_dominio", "troceado", "tam_fragmento"),
+                  "filtro_tipo", "filtro_dominio", "troceado", "tam_fragmento",
+                  # El carril de grafo es una respuesta a `cobertura`: el
+                  # fragmento no llegó porque está a un salto, no porque el
+                  # embedding fallara. Sin estas cinco aquí, el bucle no podía
+                  # encender el grafo NUNCA — doce palancas construidas y
+                  # ninguna alcanzable, que es la avería que este mapa existe
+                  # para impedir, colada en el mapa mismo.
+                  "carriles", "grafo_top_k", "grafo_semillas",
+                  "enrutado", "comunidades_en_respuesta"),
     "ordenacion": ("peso_carril", "k_rrf", "reranker", "reranker_top_n",
-                   "umbral_similitud", "pool_fusion"),
-    "sintesis": ("instrucciones", "pool_fusion", "filtro_tipo"),
-    "prompt": ("instrucciones",),
+                   "umbral_similitud", "pool_fusion", "grafo_alfa", "enrutado"),
+    "sintesis": ("instrucciones", "pool_fusion", "filtro_tipo",
+                 "comunidades_en_respuesta"),
+    "prompt": ("instrucciones", "aprendizaje"),
+}
+
+#: Palancas que el bucle NO puede mover aunque sean baratas, con el motivo. Sin
+#: esta lista, el assert de alcanzabilidad no distingue «se me olvidó
+#: conectarla» de «está fuera a propósito», y esa distinción es justo la que
+#: hace que el assert sirva de algo.
+FUERA_DEL_BUCLE: dict[str, str] = {
+    "analogia_min": "la ventana de analogías se calibra con rechazos firmados, "
+                    "no optimizando una métrica de recuperación que no la mide",
+    "analogia_max": "ídem",
+    "idioma_fts": "cambiarlo obliga a recrear el índice GIN, y no es un ajuste "
+                  "sino una decisión sobre el idioma del corpus",
+    "solo_vigentes": "lo decide el enrutado por la FORMA de la consulta; "
+                     "fijarlo global rompería R6 para todas",
+    "ef_search": "afecta a la latencia de producción, no a la calidad medida",
+    "ef_search_eval": "es la palanca gemela, solo para medir: subirla al medir "
+                      "es lo que separa el sesgo del post-filtrado por época "
+                      "del recall malo, y eso no se optimiza, se fija",
 }
 
 #: Palancas de GENERACIÓN. Un golden set sintético no ordena bien arquitecturas
@@ -452,28 +484,103 @@ for _diag, _palancas in DIAGNOSTICO_A_PALANCAS.items():
     )
 
 assert len(PALANCAS.carriles) == len(PALANCAS.peso_carril), (
-    "peso_carril tiene que tener un valor por carril, en el mismo orden."
+    "peso_carril tiene que tener un valor por carril, en el mismo orden. Y con "
+    f"{len(PALANCAS.carriles)} carril(es) y {len(PALANCAS.peso_carril)} peso(s) "
+    "el `zip` descartaría el sobrante en silencio, que es cómo un carril acaba "
+    "pesando 1,0 sin que nadie lo haya decidido."
+)
+
+_CARRILES_VALIDOS = {"denso", "lexico", "grafo"}
+_carriles_raros = set(PALANCAS.carriles) - _CARRILES_VALIDOS
+assert not _carriles_raros, (
+    f"`carriles` nombra carriles que no existen: {sorted(_carriles_raros)}. "
+    f"Los implementados son {sorted(_CARRILES_VALIDOS)}. Un carril inventado se "
+    "salta en el bucle de recuperación sin decir nada y su peso queda huérfano."
+)
+
+# --- alcanzabilidad: toda palanca barata tiene que poder moverla el bucle ---
+#
+# El assert de censura doble comprueba la dirección fácil: que cada diagnóstico
+# tenga alguna palanca barata. Este comprueba la difícil, y es la que faltaba:
+# que cada palanca barata esté abierta por ALGÚN diagnóstico.
+#
+# Sin él se pueden construir doce palancas de grada 2 —el carril de grafo, el
+# enrutado, las comunidades, el aprendizaje— y que el bucle no pueda tocar
+# ninguna, porque nadie se acordó de añadirlas al mapa. Estarían en la tabla de
+# palancas, tendrían grada, tendrían tests, y serían inalcanzables. Es
+# exactamente «un parámetro que se lee como vivo y no lo está», dentro del
+# fichero que existe para impedirlo. Pasó, y por eso este assert existe.
+_alcanzables = {p for ps in DIAGNOSTICO_A_PALANCAS.values() for p in ps}
+_baratas = {c for c in _CAMPOS if _GRADAS.get(c, 4) <= 2}
+_huerfanas = _baratas - _alcanzables - set(FUERA_DEL_BUCLE) - FAMILIA_GENERACION
+assert not _huerfanas, (
+    f"Palancas de grada 1-2 que ningún diagnóstico abre: {sorted(_huerfanas)}. "
+    "El bucle no puede moverlas nunca, así que construirlas no sirvió de nada. "
+    "O las añades a DIAGNOSTICO_A_PALANCAS, o las declaras en FUERA_DEL_BUCLE "
+    "con el motivo escrito. Lo que no vale es dejarlas colgando."
+)
+
+_fuera_inexistentes = set(FUERA_DEL_BUCLE) - _CAMPOS
+assert not _fuera_inexistentes, (
+    f"FUERA_DEL_BUCLE excluye palancas que no existen: {sorted(_fuera_inexistentes)}. "
+    "Una exclusión sobre nada oculta que la palanca real sigue huérfana."
+)
+
+# --- la dirección inversa de las gradas: entradas fantasma ---
+#
+# `_sin_grada` comprueba que toda palanca tenga grada. Faltaba lo contrario: que
+# toda grada corresponda a una palanca. Al borrar `grafo_activo` su entrada
+# sobrevivió en `_GRADAS` y en `_REINDEXA` sin que nada se quejara — un
+# parámetro fantasma en el único fichero cuyo propósito declarado es no tener
+# ninguno.
+_gradas_fantasma = set(_GRADAS) - _CAMPOS
+assert not _gradas_fantasma, (
+    f"_GRADAS asigna grada a palancas que no existen: {sorted(_gradas_fantasma)}."
+)
+_reindexa_fantasma = set(_REINDEXA) - _CAMPOS
+assert not _reindexa_fantasma, (
+    f"_REINDEXA nombra palancas que no existen: {sorted(_reindexa_fantasma)}."
 )
 
 
 # --------------------------------------------------------------------------- #
 # Lo que NO existe aquí
 # --------------------------------------------------------------------------- #
+#
 # Palancas que aparecen en la literatura de auto-mejora de RAG y que este repo
 # NO tiene. Están escritas para que nadie las dé por disponibles al leer la
 # lista de arriba: un bucle que cree tener palancas inexistentes produce
 # propuestas inaplicables y las cuenta como trabajo hecho.
 #
-#   - Carril de grafo (PPR sobre igraph). No hay grafo. Costura: se construye si
-#     `multi_hop` cae por debajo de 0,60 tras agotar las palancas de grada 1-2.
-#   - Comunidades (Leiden + resúmenes). No hay. Con este tamaño de corpus, el
-#     índice global cabe en un prompt: 450 artefactos son ~11k tokens.
-#   - Recuperación multi-salto. El agente puede llamar a la búsqueda varias
-#     veces, pero eso es agencia, no un parámetro.
-#   - Routing aprendido entre subsistemas. Solo hay un subsistema.
-#   - HyDE y multi-consulta. Hook disponible en `reescritura`, sin implementar:
-#     solapan con el contexto situacional y cuestan una llamada en el camino
-#     crítico. Peso bajo, no exclusión.
+# ATENCIÓN AL LEER ESTE BLOQUE. Durante una sesión dijo «no hay grafo», «no hay
+# comunidades» y «HyDE sin implementar» mientras las tres cosas existían 350
+# líneas más arriba, en este mismo fichero. Y `.claude/commands/extender-rag.md`
+# manda leerlo «en especial» para decidir qué construir: el comando que existe
+# para decidir apuntaba al párrafo que mentía. Es la avería simétrica a la que el
+# bloque previene —hacer creer que NO tienes una palanca que sí tienes— y es peor,
+# porque lleva a reconstruir lo construido.
 #
-# Y una corrección a atlas-rai, que los declara inexistentes: la reescritura de
-# consulta SÍ tiene hook —Agent(knowledge_retriever=fn)— y aquí es una palanca.
+# Lo que de verdad no existe hoy:
+#
+# - RERANKER EJECUTADO. `reranker` tiene tres valores y solo se ha corrido con
+#   `none`. El código de `local` y `cohere` está escrito y nunca ha corrido.
+#
+# - CONTEXTO SITUACIONAL FUNCIONANDO. `contextualizar=True` exige un `situador`
+#   que no construye nadie: encender la palanca hoy es un ValueError en la
+#   ingesta. Ver `ingesta/trocear.py`.
+#
+# - MULTI-CONSULTA. Descomponer una pregunta en varias y fusionar. `reescritura`
+#   tiene el hook, y ningún modo lo hace.
+#
+# - COLBERT / interacción tardía multi-vector. Fuera de alcance a esta escala.
+#
+# - ROUTING APRENDIDO. `enrutado` es por REGLAS escritas a mano. Un clasificador
+#   entrenado necesita meses de tráfico que un usuario no produce.
+#
+# Lo que SÍ existe y este bloque llegó a negar: carril de grafo con PPR propio
+# (`cerebro/grafo.py`), comunidades por propagación de etiquetas
+# (`cerebro/comunidades.py`), analogías cross-dominio (`cerebro/analogias.py`),
+# topología (`cerebro/topologia.py`), HyDE en dos modos (`cerebro/reescritura.py`),
+# enrutado por reglas (`cerebro/enrutador.py`) y aprendizaje
+# (`cerebro/aprendizaje.py`). Todo ello descrito, con su medición y su estado de
+# encendido, en `docs/06-fases-2-3-4.md`.

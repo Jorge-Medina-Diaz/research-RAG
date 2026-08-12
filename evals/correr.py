@@ -41,6 +41,22 @@ from cerebro.config import (  # noqa: E402
     huella,
     tabla_fragmentos,
 )
+
+# Los suelos NO se definen aquí. Viven en `cerebro/suelos.py`, que está
+# denegado al agente y cuyo sha entra en el digest del juez — o sea, bajarlos
+# invalida toda medición anterior, igual que tocar la spec.
+#
+# Estaban aquí, como cuatro constantes sueltas, y eso era un agujero del tamaño
+# del mecanismo entero: la doctrina protegía `spec.md` —la DESCRIPCIÓN de la
+# función objetivo— mientras la función objetivo EJECUTABLE estaba en este
+# fichero, editable y sin hashear. Cambiar `SUELO_RECALL = 0.80` pasaba la
+# puerta, no movía `huella_juez`, y la corrida seguía siendo «comparable».
+from cerebro.suelos import (  # noqa: E402
+    SUELO_P95_MS,
+    SUELO_R6,
+    SUELO_RECALL,
+    SUELOS_RECUENTO,
+)
 from evals.entorno import (  # noqa: E402
     cargar,
     clasificar,
@@ -53,14 +69,6 @@ from evals.estadistica import (  # noqa: E402
     vuelcos,
     vuelcos_minimos_detectables,
 )
-
-#: Los suelos de spec.md. Un cambio que rompa uno no se acepta, mejore lo que
-#: mejore. En RECUENTO y no en tasa donde importa: con n≈15 el semiancho del IC
-#: al 95 % ronda ±25 puntos y un suelo de «0,85» no es exigible.
-SUELOS_RECUENTO = {"R2": 0, "R4": 0, "R5": 0}
-SUELO_RECALL = 0.85
-SUELO_R6 = 0.95
-SUELO_P95_MS = 8000
 
 
 def hay_llm() -> bool:
@@ -133,6 +141,30 @@ def _cuanto(valor: float, suelo: float, n: int) -> str:
             "          la propia spec, cumpliéndose sobre su suelo primario."
         )
     return ""
+
+
+def _cadenas_supera() -> int:
+    """Cuántos artefactos vigentes declaran `supera:` con algo dentro.
+
+    R6 dice «si un artefacto recuperado declara `supera`, nombra al sucesor».
+    Con cero cadenas en el corpus, el antecedente no se cumple nunca y **la
+    regla no puede fallar**: su tasa sale 1,00 sin haber medido nada.
+
+    Un suelo que aprueba en vacío es la peor clase de verde, porque es
+    indistinguible del bueno. Y este lleva verde desde el primer día sobre el
+    principio más citado del repositorio —«no reviertas: invalida»—, que ningún
+    artefacto del corpus ha ejercido todavía: la única línea `supera:` que hay
+    es una lista vacía.
+    """
+    from cerebro.almacen import ESQUEMA, conexion
+
+    with conexion() as con:
+        fila = con.execute(
+            f"""select count(*) n from {ESQUEMA}.artefacto
+                where valido_hasta is null
+                  and jsonb_array_length(coalesce(frontmatter->'supera','[]'::jsonb)) > 0"""
+        ).fetchone()
+    return int(fila["n"]) if fila else 0
 
 
 def _epoca_esta_abierta(numero: int | None) -> bool:
@@ -466,13 +498,33 @@ def informe(
         if con_r6:
             ok6 = sum(1 for f in con_r6 if f["incumple"].get("R6", 0) == 0)
             tasa6 = ok6 / len(con_r6)
-            aviso = (
-                "  ← con esta n, «≥ 0,95» es «cero fallos» disfrazado"
-                if len(con_r6) < 20 else ""
-            )
-            print(f"    {'ok  ' if tasa6 >= SUELO_R6 else 'ROTO'}  "
-                  f"R6 · lo superado se marca ≥ {SUELO_R6} "
-                  f"({tasa6:.2f} sobre {len(con_r6)}){aviso}")
+            n_supera = _cadenas_supera()
+            if not n_supera:
+                # VACÍO, no «ok». R6 dice «si un artefacto recuperado declara
+                # `supera`, nombra al sucesor». Con cero cadenas `supera` en el
+                # corpus, el antecedente nunca se cumple y la regla **no puede
+                # fallar**: sale 1,00 sin haber medido nada.
+                #
+                # Un suelo que aprueba en vacío es la peor clase de verde,
+                # porque es indistinguible del verde bueno. Y aquí lleva verde
+                # desde el primer día sobre el principio más citado del
+                # repositorio — «no reviertas: invalida» — que ningún artefacto
+                # del corpus ha ejercido todavía.
+                print(f"    VACÍO R6 · lo superado se marca — {len(con_r6)} probe(s) "
+                      "la declaran, pero el corpus\n"
+                      "          tiene CERO cadenas `supera:`. La regla no puede "
+                      "fallar, así que\n"
+                      "          su 1,00 no es un aprobado: es una medición que no "
+                      "ha ocurrido.")
+            else:
+                aviso = (
+                    "  ← con esta n, «≥ 0,95» es «cero fallos» disfrazado"
+                    if len(con_r6) < 20 else ""
+                )
+                print(f"    {'ok  ' if tasa6 >= SUELO_R6 else 'ROTO'}  "
+                      f"R6 · lo superado se marca ≥ {SUELO_R6} "
+                      f"({tasa6:.2f} sobre {len(con_r6)}, {n_supera} cadena(s)"
+                      f" en el corpus){aviso}")
 
         for regla, tope in SUELOS_RECUENTO.items():
             culpables = [f["id"] for f in medidas if f["incumple"].get(regla, 0) > 0]

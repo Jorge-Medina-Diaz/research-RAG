@@ -349,7 +349,9 @@ camino de fallo es la mitad del valor de un doble de pruebas.
 
 ---
 
-## Lo que NO está, y su trigger
+## Lo que NO estaba, y su trigger
+
+> **Construido desde entonces.** Lo de abajo describe el estado en el que estas costuras se diseñaron. Las fases 2, 3 y 4 están **construidas y apagadas** desde 2026-08-12: el código existe, tiene pruebas, y su interruptor sigue dependiendo de la medición. El estado real de cada una, con su cifra, está en [06 · Fases 2, 3 y 4](06-fases-2-3-4.md).
 
 | Costura | Se construye cuando |
 |---|---|

@@ -29,9 +29,11 @@ Y peor:
 La primera pregunta la resuelve un buscador. La segunda no: para responderla
 haría falta que el sistema notara un parecido que tú no has notado.
 
-Este proyecto ataca la primera y deja la segunda **diseñada y sin construir**,
-con un criterio explícito para cuándo construirla. El motivo está en la
-sección 8.
+Este proyecto ataca la primera de frente. La segunda está **construida y
+apagada**: el código existe y su interruptor depende de una medición que
+todavía no lo justifica. Por qué esa distinción no es una excusa está en la
+sección 8 y, con el detalle de cada pieza, en
+[06 · Fases 2, 3 y 4](06-fases-2-3-4.md).
 
 ---
 
@@ -91,7 +93,7 @@ En la primera versión de esta documentación aparecían como una tabla de cuatr
 filas sin explicación. Eso era exactamente lo que no había que hacer, y un
 lector externo lo señaló. Aquí va cada una con su porqué.
 
-### Decisión 1 · Fase 0 + Fase 1, y las demás diseñadas sin construir
+### Decisión 1 · Fase 0 + Fase 1 primero, y las demás con disparador escrito
 
 **Qué significa.** El proyecto tiene cinco fases posibles, de la 0 a la 4. La 0
 es *saber medir*. La 1 es *un bucle que mueve parámetros y comprueba si mejoró*.
@@ -108,8 +110,8 @@ porque no había ningún número contra el que comparar.
 La lección no es «los grafos son malos». Es que **construir la capacidad antes
 que la medición te deja sin manera de saber si la capacidad sirve**.
 
-**Por qué tiene sentido.** Cada costura no construida —el carril de grafo, las
-comunidades, las analogías— tiene un **disparador escrito**: una categoría
+**Por qué tiene sentido.** Cada costura —el carril de grafo, las comunidades,
+las analogías— tiene un **disparador escrito**: una categoría
 concreta del conjunto de pruebas cayendo por debajo de un número concreto. Por
 ejemplo, el carril de grafo se construye si las preguntas de tipo `multi_hop`
 bajan de 0,60 después de agotar los ajustes baratos.
@@ -118,9 +120,14 @@ Eso convierte «¿hace falta un grafo?» de una discusión de sobremesa en una
 consulta a un fichero JSON.
 
 > **El riesgo real de esta decisión**, dicho por delante: un disparador que
-> nunca se comprueba es lo mismo que no tener disparador. Si nadie corre el
-> conjunto de pruebas cada semana, las costuras se quedan sin construir por
-> inercia y no por criterio.
+> nunca se comprueba es lo mismo que no tener disparador.
+>
+> Y hay un riesgo simétrico que resultó ser el que se materializó. Las tres
+> costuras se construyeron **antes** de que su disparador saltara, y eso está
+> defendido en [06](06-fases-2-3-4.md#por-qué-construido-y-apagado-no-es-una-contradicción):
+> la puerta controla qué mueve el bucle solo, no qué código existe. Lo que no
+> se puede es leer «construido» como «probado que sirve». Del carril de grafo
+> hay una medición y dice **no se puede saber**.
 
 ### Decisión 2 · Contrato estricto en la entrada, con normalizador
 
@@ -450,9 +457,9 @@ corrida entera.
 
 ## 8 · Lo que este proyecto no hace, y por qué
 
-El requisito original incluía «autodescubrir conexiones y topologías». Eso no
-está construido. Vale la pena decir por qué, porque la respuesta no es
-«no dio tiempo».
+El requisito original incluía «autodescubrir conexiones y topologías». Está
+construido y **apagado**, y vale la pena decir por qué esa distinción importa,
+porque la respuesta no es «no dio tiempo» ni «ya está».
 
 Descubrir una analogía entre dos notas de temas distintos es fácil de proponer
 y muy difícil de **evaluar**. ¿Cómo sabes si una conexión propuesta es buena? El
@@ -460,12 +467,20 @@ y muy difícil de **evaluar**. ¿Cómo sabes si una conexión propuesta es buena
 admisión, cualquier sistema que proponga conexiones produce una lista que crece
 más rápido de lo que la revisas — que es la definición de ruido.
 
-Así que la costura existe, con su disparador: **fase 1 estable durante dos
-semanas**. Antes de eso, un descubridor de analogías sería una máquina de
-generar trabajo sin manera de saber si el trabajo vale.
+Así que existe [`cerebro/analogias.py`](../cerebro/analogias.py) con tres
+filtros baratos delante del modelo y una cola de firma detrás, y su
+disparador sigue siendo **fase 1 estable durante dos semanas**. Antes de eso,
+un descubridor de analogías es una máquina de generar trabajo sin manera de
+saber si el trabajo vale.
 
-Lo mismo con el carril de grafo, las comunidades y la reescritura de consultas.
-[Las cinco costuras y sus disparadores están en la arquitectura](03-arquitectura.md#lo-que-no-está-y-su-trigger).
+Y hay un límite duro que conviene saber: **con el embedder determinista esto
+no puede funcionar**. Los vectores de SHA-256 son casi ortogonales, así que
+toda distancia ronda 1,0 por construcción y la pregunta no se puede ni
+formular. `rag analogias` lo dice con esas palabras.
+
+Lo mismo con el carril de grafo, las comunidades y la reescritura de consultas:
+las tres construidas, las tres apagadas, cada una con su disparador y su
+medición en [06 · Fases 2, 3 y 4](06-fases-2-3-4.md).
 
 Y una limitación que no tiene solución elegante: **el conjunto de pruebas es
 mayoritariamente sintético.** Lo escribió el autor mirando su propio corpus, no

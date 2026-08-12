@@ -150,7 +150,12 @@ Y una versión barata sí está encendida siempre: `ConMetadatos` antepone a cad
 fragmento su título, tipo y temas. Cuesta cero llamadas y resuelve el caso más
 común —el fragmento 7 llega al índice sin decir de qué artefacto es—.
 
-### GraphRAG, LightRAG, HippoRAG — descartados, con trigger
+### GraphRAG, LightRAG, HippoRAG — la IDEA construida, el paquete descartado
+
+> **Actualización 2026-08-12.** Hay grafo y hay comunidades, con PPR propio y
+> propagación de etiquetas — no con igraph ni Leiden. Lo que sigue descartado
+> es adoptar GraphRAG como implementación. Ver [06](06-fases-2-3-4.md).
+
 
 | Enfoque | Qué aporta | Por qué no, aquí |
 |---|---|---|
@@ -268,7 +273,12 @@ anterior: con Apache AGE 1.5, un `SET` que sigue a un `MERGE` que crea una
 relación **se descarta en silencio**, así que toda arista nació con
 `properties: {}` y el modelo bi-temporal quedó decorativo.
 
-### Agno Learning Machines — diferido
+### Agno Learning Machines — construido y apagado
+
+> **Actualización 2026-08-12.** `cerebro/aprendizaje.py` monta
+> `LearnedKnowledge` (AGENTIC) y `DecisionLog`. La palanca `aprendizaje` viene
+> en `False`.
+
 
 `agno.learn` trae seis stores —UserProfile, UserMemory, SessionContext,
 EntityMemory, **LearnedKnowledge**, **DecisionLog**— con tres modos de
@@ -291,7 +301,14 @@ genere insights que no estén ya en los artefactos.
 
 ## 5 · Estadística
 
-### McNemar exacto — tomado, en lugar de Benjamini-Hochberg
+### McNemar exacto — el de una palanca por ronda; BH para los barridos
+
+> **Actualización 2026-08-12.** Benjamini-Hochberg, CUPED y successive halving
+> están implementados en `evals/estadistica.py`, y **el motivo por el que no
+> se usaban se conservó convertido en su condición de entrada**: cada uno la
+> comprueba y se niega cuando no se cumple. McNemar sigue siendo el del
+> protocolo de ronda.
+
 
 El protocolo es **una palanca por ronda, cinco rondas**. No hay multiplicidad
 que corregir, así que BH —que controla la tasa de falsos descubrimientos entre

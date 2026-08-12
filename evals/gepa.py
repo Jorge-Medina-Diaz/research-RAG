@@ -129,11 +129,11 @@ async def evolucionar(*, rondas: int = 3, forzar: bool = False) -> dict[str, Any
 
     from agno.agent import Agent
 
-    from cerebro.agente import construir_modelo
+    from cerebro.agente import SISTEMA, construir_modelo
     from cerebro.config import PALANCAS
     from evals.estadistica import benjamini_hochberg, mcnemar_exacto, vuelcos
 
-    modelo = construir_modelo(PALANCAS)
+    modelo = construir_modelo(SISTEMA)
     if modelo is None:
         return {"corrio": False, "motivos": ["no hay modelo disponible"]}
 
@@ -154,7 +154,13 @@ async def evolucionar(*, rondas: int = 3, forzar: bool = False) -> dict[str, Any
 
     base = list(PALANCAS.instrucciones)
     historia: list[dict[str, Any]] = []
-    mejor = {"instrucciones": base, "pasan": _medir(base)["pasan"], "generacion": 0}
+    # La línea base se mide ENTERA, incluido `por_probe`. Sin él, la primera
+    # ronda comparaba cada candidato contra un dict vacío: `vuelcos({}, …)`
+    # devuelve (0,0), McNemar da p=1,0, BH no rechaza nada, `mejor` no se
+    # actualiza — y como no se actualiza, tampoco adquiere `por_probe`, así
+    # que el bucle se quedaba atascado en la ronda 1 para siempre. Trescientas
+    # líneas que devolvían `propuesta: None` pasara lo que pasara.
+    mejor = {**_medir(base), "instrucciones": base, "generacion": 0}
 
     for ronda in range(1, rondas + 1):
         fallos = _fallos_de(mejor["instrucciones"])
@@ -221,8 +227,15 @@ def _prompt_reflexion(actuales: list[str], fallos: list[dict], *, semilla: int) 
     )
 
 
-def _fallos_de(instrucciones: list[str]) -> list[dict[str, str]]:
-    """Los fallos de la última corrida, con su regla y su motivo."""
+def _fallos_de(_instrucciones: list[str]) -> list[dict[str, str]]:
+    """Los fallos de la última corrida, con su regla y su motivo.
+
+    El parámetro se ignora **a propósito y con el nombre marcado**: los
+    fallos salen del último informe en disco, no de una corrida con esas
+    instrucciones. Es una limitación real —la reflexión de la ronda 3 lee
+    los fallos de la ronda 0— y estaba escondida en un argumento que se
+    recibía y se tiraba sin decirlo.
+    """
     from pathlib import Path
 
     f = Path(__file__).resolve().parent.parent / "runs" / "completo.json"

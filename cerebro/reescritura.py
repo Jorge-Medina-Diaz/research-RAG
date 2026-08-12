@@ -131,9 +131,12 @@ async def reescribir(
     # hyde y hyde_lexico necesitan modelo
     try:
         if modelo is None:
-            from cerebro.agente import construir_modelo
+            from cerebro.agente import SISTEMA, construir_modelo
 
-            modelo = construir_modelo(p)
+            # SISTEMA, no `p`. Aquí había try, así que degradaba en
+            # silencio: HyDE no habría funcionado nunca ni aunque se
+            # llamara, y el modo habría dicho `none·error:AttributeError`.
+            modelo = construir_modelo(SISTEMA)
         if modelo is None:
             return Reescrita(consulta, consulta, "none·sin-modelo")
 

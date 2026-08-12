@@ -4,7 +4,7 @@
 > que mide, después el sistema que se mide**.
 
 [![ci](https://github.com/Jorge-Medina-Diaz/research-RAG/actions/workflows/ci.yml/badge.svg)](https://github.com/Jorge-Medina-Diaz/research-RAG/actions/workflows/ci.yml)
-![tests](https://img.shields.io/badge/tests-122-brightgreen)
+![tests](https://img.shields.io/badge/tests-141-brightgreen)
 ![agno](https://img.shields.io/badge/agno-2.8.6-blue)
 ![python](https://img.shields.io/badge/python-3.12-blue)
 ![license](https://img.shields.io/badge/license-MIT-lightgrey)
@@ -52,6 +52,7 @@ hay que negarse a hacer para que el número signifique algo.
 | **alguien evaluando las decisiones** | [01 · Decisiones](docs/01-decisiones.md) y [02 · Estado del arte](docs/02-estado-del-arte.md) | Siete decisiones con sus alternativas descartadas, y qué se tomó de la literatura frente a qué es extrapolación propia |
 | **alguien que va a tocar el código** | [CLAUDE.md](CLAUDE.md) y [03 · Arquitectura](docs/03-arquitectura.md) | El mapa del repositorio y el detalle componente a componente |
 | **alguien que tropieza con una palabra** | [99 · Glosario](docs/99-glosario.md) | Cada término con su definición general y qué significa aquí |
+| **alguien que quiere saber qué hay construido y qué encendido** | **[06 · Fases 2, 3 y 4](docs/06-fases-2-3-4.md)** | Grafo, comunidades, analogías, topología, GEPA. Siete de nueve **apagadas**, cada una con la medición que lo justifica |
 
 El resto de este README es el resumen. Los cuatro mecanismos de abajo están
 explicados con más calma, y suponiendo menos, en el documento 00.
@@ -140,7 +141,7 @@ distribuye ya lleva los 13 en la época 0, así que el punto de partida es ese.
 ```console
 $ uv run rag eval                                  # línea base
   época 0 · corpus 12 artefactos · sha ab7051da5370
-  pasan 15/27   recall@top_k 0.85   p95 0.1s
+  pasan 18/27   recall@top_k 0.87   p95 0.1s
 
 $ uv run rag epoca avanzar                         # acto humano, fechado
 $ uv run rag ingerir                               # el nuevo entra en la época 1
@@ -149,7 +150,7 @@ $ uv run rag ingerir                               # el nuevo entra en la época
 
 $ uv run rag eval
   época 0 · corpus 13 artefactos · sha 8730bae6dcb6  <- el corpus SÍ cambió
-  pasan 15/27   recall@top_k 0.85   p95 0.1s         <- la medición NO se movió
+  pasan 18/27   recall@top_k 0.87   p95 0.1s         <- la medición NO se movió
 
 $ uv run rag eval --epoca 1 --diff runs/base.json   # y si intentas mezclarlas
   NO COMPARABLE:
@@ -530,7 +531,9 @@ uv run rag topologia   puentes, agujeros y deriva. Cero llamadas
 uv run rag propuestas  todo lo que espera tu firma
 uv run rag gepa        evolución de instrucciones. Propone; no aplica
 uv run rag jobs        --nocturno (gratis) · --mensual (gasta)
-uv run rag test        122 tests. Sin red, sin claves, sin base de datos.
+uv run rag traza       una consulta de punta a punta. Genera docs/05
+uv run rag verificar   comprueba el entorno y la versión de Agno
+uv run rag test        141 tests. Sin red, sin claves, sin base de datos.
 ```
 
 </details>
@@ -565,8 +568,8 @@ uv run rag test        122 tests. Sin red, sin claves, sin base de datos.
 | Comunidades | 3 sobre 14 artefactos, modularidad 0,350. Pesar las aristas por rareza del tema (IDF) la subió desde 0,240 y la cruzó por encima del umbral de significación |
 | Épocas, el aviso que faltaba | Medir contra una época **abierta** no está congelado, y el arnés no lo decía. Ahora avisa: me pasó en mi propio repo y el recall se movió al ingerir |
 | Fusión de carriles | Los dos vivos. En la [traza](docs/05-una-traza.md) hay fragmentos que entran sin ser primeros en ningún carril, por acuerdo entre los dos. **Con 60 fragmentos y 30 por carril esto no demuestra que el híbrido funcione** —cada carril ve la mitad del corpus—; demuestra que la fusión hace la aritmética que dice hacer |
-| Nivel completo contra el guion | El arnés procesa las 41 sin romperse. **Pasan 18 de 41.** De las 23 que fallan, 10 son de `fuera_de_alcance` —el guion responde siempre, así que fallar ahí es lo esperado— y **13 son de recuperación o generación, o sea fallos de verdad**: 6 `single_hop`, 6 `lexical_exact` y 1 `temporal`. Una versión anterior de esta fila decía «acierta las de recuperar», y no era cierto |
-| Reproducción a k=3 | Las 10 violaciones de R2 y las 13 de R4 se confirman al re-correrlas; ninguna era espuria |
+| Nivel completo contra el guion | El arnés procesa las 41 sin romperse. **Pasan 14 de 41.** El guion responde siempre, así que las de `fuera_de_alcance` fallan a propósito; el resto son fallos de verdad. El desglose por categoría y por diagnóstico está en `runs/completo.json`, que es la fuente — esta fila se ha equivocado dos veces por transcribirlo a mano |
+| Reproducción a k=3 | Todas las violaciones de R2 y R4 se confirman al re-correrlas a k=3; ninguna era espuria. Las cifras exactas, en `runs/completo.json` |
 | Determinismo del arnés | Tres corridas completas seguidas devuelven **el mismo conjunto exacto** de 18 probes aprobadas. Lo que se mide contra el guion es la fontanería, y la fontanería no tiembla |
 | Tocar la spec → comparar | **NO COMPARABLE** |
 | Cruzar épocas → comparar | **NO COMPARABLE** — y verificado de punta a punta: avanzar la época, ingerir un artefacto 13.º y volver a medir da **el mismo 15/27 con el mismo recall 0,85** mientras el sha del corpus cambia |
@@ -574,7 +577,7 @@ uv run rag test        122 tests. Sin red, sin claves, sin base de datos.
 | Mover **una** palanca → comparar | comparable, y el informe **nombra** la palanca: `top_k 12 → 20` |
 | Mover **dos** palancas → comparar | **NO COMPARABLE**: el delta no se puede atribuir a ninguna |
 | `SELECT` al holdout desde Python arbitrario | **permission denied** |
-| Tests / ruff / diagramas / enlaces | 122 pasan / limpio / 31 de 31 mermaid parsean / 48 de 48 enlaces internos resuelven. Los cuatro, comprobados en CI |
+| Tests / ruff / diagramas / enlaces | **141 pasan**, de los que **17 prueban COSTURAS** y no piezas / limpio / 31 de 31 mermaid / 50 de 50 enlaces. Los cuatro, comprobados en CI |
 
 **No hecho, y es lo que decide si esto sirve:**
 
@@ -585,11 +588,12 @@ uv run rag test        122 tests. Sin red, sin claves, sin base de datos.
 - **σ no está medido de verdad.** El mecanismo da `0,0000` contra el guion, que
   es determinista por construcción. Valida la tubería y no dice nada del ruido
   real, que es varianza del modelo y del juez.
-- **El suelo primario está ROTO**: recall 0,83 frente a 0,85. Y roto por 0,0167
-  cuando una sola probe mueve 0,0185, o sea **por menos de lo que puede
-  distinguir el instrumento**. Es el argumento de la propia spec —una tasa no
-  es exigible a esta n— cumpliéndose sobre su suelo más importante. El arnés
-  lo dice al lado del número en vez de bajar la portería.
+- **El suelo primario vuelve a pasar** (recall 0.87 ≥ 0,85) y llegó a romperse
+  por 0,0167 cuando una sola probe mueve 0,0185 — **por menos de lo que el
+  instrumento distingue**. El arnés lo dijo al lado del número en vez de bajar
+  la portería, y esa comprobación se queda. Lo que lo arregló no fue afinar
+  nada: fue descubrir que `metadatos_prepend`, una palanca de GRADA 3, no
+  anteponía nada desde el primer día.
 - **Siete de las nueve piezas de las fases 2, 3 y 4 están apagadas.** Están
   construidas y probadas; encenderlas depende de una medición que todavía no
   las justifica. El detalle de cada una en [06](docs/06-fases-2-3-4.md).

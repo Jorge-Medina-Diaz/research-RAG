@@ -132,7 +132,7 @@ def main() -> int:
 
     print(__doc__)
     print(f"\n  aprendizaje: {'encendido' if PALANCAS.aprendizaje else 'apagado'}")
-    print(f"  grafo:       {'encendido' if PALANCAS.grafo_activo else 'apagado'}\n")
+    print(f"  grafo:       {'encendido' if 'grafo' in PALANCAS.carriles else 'apagado'}\n")
     return 0
 
 

@@ -22,6 +22,9 @@
       "Write(cerebro/scorer.py)",
       "Edit(cerebro/reglas.py)",
       "Write(cerebro/reglas.py)",
+      "Edit(cerebro/suelos.py)",
+      "Write(cerebro/suelos.py)",
+      "Write(cerebro/reglas.py)",
       "Edit(evals/estadistica.py)",
       "Write(evals/estadistica.py)",
 

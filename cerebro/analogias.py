@@ -238,14 +238,18 @@ async def minar(
     """
     from agno.agent import Agent
 
-    from cerebro.agente import construir_modelo
+    from cerebro.agente import SISTEMA, construir_modelo
 
     ep = epoca if epoca is not None else epoca_abierta()
     cands = candidatas(epoca=ep, p=p, tope=tope * 3)
     if not cands:
         return {"candidatas": 0, "propuestas": 0, "descartadas": 0}
 
-    modelo = construir_modelo(p)
+    # SISTEMA, no `p`: `construir_modelo` toma un ID de modelo, no unas
+    # palancas. Con proveedor real hacía `Palancas.split('-')` → AttributeError,
+    # y aquí NO hay try: `rag jobs --mensual` se caía entero en cuanto
+    # hubiera una clave. En mock no se veía porque retorna antes de mirar.
+    modelo = construir_modelo(SISTEMA)
     if modelo is None:
         return {"candidatas": len(cands), "propuestas": 0, "descartadas": 0}
 

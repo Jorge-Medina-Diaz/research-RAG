@@ -1,7 +1,7 @@
 {
- "fecha": "2026-08-12T15:53:39.559767+00:00",
+ "fecha": "2026-08-12T16:48:10.786256+00:00",
  "identidad": {
-  "huella_config": "34580671ac3a",
+  "huella_config": "735bcf06ee85",
   "palancas": {
    "top_k": 12,
    "carriles": [
@@ -27,7 +27,6 @@
    "reranker_top_n": 12,
    "reescritura": "none",
    "enrutado": "none",
-   "grafo_activo": false,
    "grafo_alfa": 0.15,
    "grafo_top_k": 10,
    "grafo_semillas": 5,
@@ -60,8 +59,8 @@
    "hnsw_m": 16,
    "hnsw_ef_construction": 200
   },
-  "epoca": 0,
-  "huella_juez": "07db7994eee5",
+  "epoca": 1,
+  "huella_juez": "f9f0848cb649",
   "nivel": "completo",
   "corpus_sha": "020fe0950eea",
   "n_artefactos": 14,
@@ -69,10 +68,10 @@
  },
  "nivel": "completo",
  "resumen": {
-  "pasan": 17,
+  "pasan": 14,
   "total": 41,
   "no_medibles": 0,
-  "recall": 0.8333333333333334,
+  "recall": 0.8703703703703703,
   "p95_ms": 0
  },
  "reproducciones": {
@@ -86,7 +85,8 @@
    "P-17": true,
    "P-18": true,
    "P-19": true,
-   "P-20": true
+   "P-20": true,
+   "P-21": true
   },
   "R4": {
    "P-01": true,
@@ -98,6 +98,8 @@
    "P-22": true,
    "P-23": true,
    "P-25": true,
+   "P-26": true,
+   "P-28": true,
    "P-29": true,
    "P-30": true,
    "P-31": true,
@@ -168,7 +170,7 @@
     "R4": 1
    },
    "motivos": {
-    "R4": "literales que no están en los fragmentos: ['08', '2026']"
+    "R4": "literales que no están en los fragmentos: ['08', '12', '2026']"
    },
    "recall": 1.0
   },
@@ -326,7 +328,7 @@
     "R2": 1
    },
    "motivos": {
-    "R2": "debía abstenerse y respondió: 'Segun la memoria, el punto relevante esta recogido en [[art:2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrume'"
+    "R2": "debía abstenerse y respondió: 'Segun la memoria, el punto relevante esta recogido en [[art:2026-08-12-plainto-tsquery-hace-and-y-devuelve-cero]].'"
    },
    "recall": null
   },
@@ -347,7 +349,7 @@
     "R2": 1
    },
    "motivos": {
-    "R2": "debía abstenerse y respondió: 'Segun la memoria, el punto relevante esta recogido en [[art:2026-08-12-epocas-para-medir-un-corpus-que-crece]].'"
+    "R2": "debía abstenerse y respondió: 'Segun la memoria, el punto relevante esta recogido en [[art:2026-08-12-rrf-k-60-de-donde-sale-el-sesenta]].'"
    },
    "recall": null
   },
@@ -410,7 +412,7 @@
     "R2": 1
    },
    "motivos": {
-    "R2": "debía abstenerse y respondió: 'Segun la memoria, el punto relevante esta recogido en [[art:2026-08-12-agno-pgvector-indices-decorativos]].'"
+    "R2": "debía abstenerse y respondió: 'Segun la memoria, el punto relevante esta recogido en [[art:2026-08-12-epocas-para-medir-un-corpus-que-crece]].'"
    },
    "recall": null
   },
@@ -431,7 +433,7 @@
     "R2": 1
    },
    "motivos": {
-    "R2": "debía abstenerse y respondió: 'Segun la memoria, el punto relevante esta recogido en [[art:2026-08-12-agno-env-fingerprint-ciego-al-corpus]].'"
+    "R2": "debía abstenerse y respondió: 'Segun la memoria, el punto relevante esta recogido en [[art:2026-08-12-epocas-para-medir-un-corpus-que-crece]].'"
    },
    "recall": null
   },
@@ -452,7 +454,7 @@
     "R2": 1
    },
    "motivos": {
-    "R2": "debía abstenerse y respondió: 'Segun la memoria, el punto relevante esta recogido en [[art:2026-08-12-el-carril-de-grafo-construido-y-sin-encender]].'"
+    "R2": "debía abstenerse y respondió: 'Segun la memoria, el punto relevante esta recogido en [[art:2026-08-12-epocas-para-medir-un-corpus-que-crece]].'"
    },
    "recall": null
   },
@@ -473,7 +475,7 @@
     "R2": 1
    },
    "motivos": {
-    "R2": "debía abstenerse y respondió: 'Segun la memoria, el punto relevante esta recogido en [[art:2026-08-12-ragchecker-la-aritmetica-no-la-dependencia]].'"
+    "R2": "debía abstenerse y respondió: 'Segun la memoria, el punto relevante esta recogido en [[art:2026-08-12-rrf-k-60-de-donde-sale-el-sesenta]].'"
    },
    "recall": null
   },
@@ -494,7 +496,7 @@
     "R2": 1
    },
    "motivos": {
-    "R2": "debía abstenerse y respondió: 'Segun la memoria, el punto relevante esta recogido en [[art:2026-08-12-ragchecker-la-aritmetica-no-la-dependencia]].'"
+    "R2": "debía abstenerse y respondió: 'Segun la memoria, el punto relevante esta recogido en [[art:2026-08-12-rrf-k-60-de-donde-sale-el-sesenta]].'"
    },
    "recall": null
   },
@@ -527,13 +529,17 @@
     "R2",
     "R3"
    ],
-   "pass_rate": 1.0,
+   "pass_rate": 0.0,
    "n_puntuados": 1,
    "n_sin_puntuar": 0,
    "en_zona_de_aprendizaje": false,
-   "diagnostico": "ninguno",
-   "incumple": {},
-   "motivos": {},
+   "diagnostico": "prompt",
+   "incumple": {
+    "R2": 1
+   },
+   "motivos": {
+    "R2": "debía abstenerse y respondió: 'Segun la memoria, el punto relevante esta recogido en [[art:2026-08-12-epocas-para-medir-un-corpus-que-crece]].'"
+   },
    "recall": null
   },
   {
@@ -554,7 +560,7 @@
     "R4": 1
    },
    "motivos": {
-    "R4": "literales que no están en los fragmentos: ['08', '2026']"
+    "R4": "literales que no están en los fragmentos: ['08', '12', '2026']"
    },
    "recall": 1.0
   },
@@ -576,7 +582,7 @@
     "R4": 1
    },
    "motivos": {
-    "R4": "literales que no están en los fragmentos: ['08', '2026']"
+    "R4": "literales que no están en los fragmentos: ['08', '12', '2026']"
    },
    "recall": 1.0
   },
@@ -628,13 +634,17 @@
     "R3",
     "R4"
    ],
-   "pass_rate": 1.0,
+   "pass_rate": 0.0,
    "n_puntuados": 1,
    "n_sin_puntuar": 0,
    "en_zona_de_aprendizaje": false,
-   "diagnostico": "ninguno",
-   "incumple": {},
-   "motivos": {},
+   "diagnostico": "prompt",
+   "incumple": {
+    "R4": 1
+   },
+   "motivos": {
+    "R4": "literales que no están en los fragmentos: ['08', '12', '2026']"
+   },
    "recall": 1.0
   },
   {
@@ -663,13 +673,17 @@
     "R3",
     "R4"
    ],
-   "pass_rate": 1.0,
+   "pass_rate": 0.0,
    "n_puntuados": 1,
    "n_sin_puntuar": 0,
    "en_zona_de_aprendizaje": false,
-   "diagnostico": "ninguno",
-   "incumple": {},
-   "motivos": {},
+   "diagnostico": "prompt",
+   "incumple": {
+    "R4": 1
+   },
+   "motivos": {
+    "R4": "literales que no están en los fragmentos: ['08', '2026']"
+   },
    "recall": 1.0
   },
   {
@@ -690,7 +704,7 @@
     "R4": 1
    },
    "motivos": {
-    "R4": "literales que no están en los fragmentos: ['08', '2026']"
+    "R4": "literales que no están en los fragmentos: ['08', '12', '2026']"
    },
    "recall": 1.0
   },
@@ -712,7 +726,7 @@
     "R4": 1
    },
    "motivos": {
-    "R4": "literales que no están en los fragmentos: ['08', '2026']"
+    "R4": "literales que no están en los fragmentos: ['08', '12', '2026']"
    },
    "recall": 1.0
   },
@@ -734,7 +748,7 @@
     "R4": 1
    },
    "motivos": {
-    "R4": "literales que no están en los fragmentos: ['08', '12', '2026']"
+    "R4": "literales que no están en los fragmentos: ['08', '2026']"
    },
    "recall": 1.0
   },
@@ -772,7 +786,7 @@
    "diagnostico": "ninguno",
    "incumple": {},
    "motivos": {},
-   "recall": 1.0
+   "recall": 0.5
   },
   {
    "id": "P-34",
@@ -793,7 +807,7 @@
     "R4": 1
    },
    "motivos": {
-    "R4": "literales que no están en los fragmentos: ['08', '2026']"
+    "R4": "literales que no están en los fragmentos: ['08', '12', '2026']"
    },
    "recall": 0.5
   },
@@ -813,7 +827,7 @@
    "diagnostico": "ninguno",
    "incumple": {},
    "motivos": {},
-   "recall": 0.5
+   "recall": 1.0
   },
   {
    "id": "P-36",
@@ -831,7 +845,7 @@
    "diagnostico": "ninguno",
    "incumple": {},
    "motivos": {},
-   "recall": 0.5
+   "recall": 1.0
   },
   {
    "id": "P-37",
@@ -848,7 +862,7 @@
    "diagnostico": "ninguno",
    "incumple": {},
    "motivos": {},
-   "recall": 0.5
+   "recall": 1.0
   },
   {
    "id": "P-38",

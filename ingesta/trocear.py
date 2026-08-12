@@ -72,9 +72,25 @@ class ConMetadatos(ChunkingStrategy):
     Qué campos se anteponen es la palanca `metadatos_prepend`.
     """
 
-    def __init__(self, base: ChunkingStrategy, p: Palancas = PALANCAS) -> None:
+    def __init__(
+        self,
+        base: ChunkingStrategy,
+        p: Palancas = PALANCAS,
+        meta: dict[str, Any] | None = None,
+    ) -> None:
         self.base = base
         self.p = p
+        # Los metadatos, POR CONSTRUCCIÓN y no leídos del documento.
+        #
+        # Leerlos de `document.meta_data` era lo natural y no funcionaba:
+        # `TextReader.read()` trocea DENTRO de `read`, y el envoltorio del
+        # pipeline le pega los metadatos al documento DESPUÉS. Así que cuando
+        # esta clase preguntaba, el diccionario estaba vacío y la cabecera salía
+        # vacía — sin excepción, sin aviso, y con la palanca `metadatos_prepend`
+        # marcada como GRADA 3: moverla cambiaba el nombre de la tabla, obligaba
+        # a re-embeber el corpus entero pagando embeddings, y producía vectores
+        # idénticos. La palanca más cara del repositorio no cambiaba un byte.
+        self.meta = meta or {}
 
     def _cabecera(self, meta: dict[str, Any]) -> str:
         partes = []
@@ -89,7 +105,9 @@ class ConMetadatos(ChunkingStrategy):
 
     def chunk(self, document: Document) -> list[Document]:
         trozos = self.base.chunk(document)
-        cabecera = self._cabecera(document.meta_data or {})
+        # El del documento primero por si algún día llega relleno; el de
+        # construcción es el que de verdad tiene algo en el camino del pipeline.
+        cabecera = self._cabecera({**self.meta, **(document.meta_data or {})})
         if not cabecera:
             return trozos
         for t in trozos:
@@ -137,8 +155,10 @@ class ContextoSituacional(ChunkingStrategy):
         return trozos
 
 
-def construir_troceado(p: Palancas = PALANCAS, situador=None) -> ChunkingStrategy:
-    base: ChunkingStrategy = ConMetadatos(estrategia_base(p), p)
+def construir_troceado(
+    p: Palancas = PALANCAS, situador=None, meta: dict[str, Any] | None = None
+) -> ChunkingStrategy:
+    base: ChunkingStrategy = ConMetadatos(estrategia_base(p), p, meta=meta)
     if p.contextualizar:
         if situador is None:
             raise ValueError(

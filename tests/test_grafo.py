@@ -20,6 +20,7 @@ from cerebro.grafo import (
     describir,
     distancia_media,
     entropia_grado,
+    epoca_de_arista,
     modularidad,
     ppr,
 )
@@ -192,3 +193,23 @@ def test_un_agujero_es_un_par_de_comunidades_sin_ninguna_arista_entre_ellas():
 def test_dos_comunidades_conectadas_no_son_un_agujero():
     g = _grafo(("a", "b", 1.0), ("x", "y", 1.0), ("b", "x", 0.1))
     assert agujeros(g, {"a": 0, "b": 0, "x": 1, "y": 1}) == []
+
+
+# --- épocas ------------------------------------------------------------------ #
+
+
+def test_una_arista_pertenece_a_la_epoca_del_ULTIMO_de_sus_extremos():
+    """No a la época abierta. Sellarlas con `epoca_abierta()` dejaba el carril
+    de grafo muerto en toda corrida medida: los artefactos vivían en la época 0,
+    las aristas nacían con la 1, y el arnés filtra a la última CERRADA. El grafo
+    tenía sus nodos en `rag grafo` y devolvía cero en cuanto lo consultaba el
+    arnés — sin excepción y sin aviso, que es la firma de esta avería."""
+    epocas = {"viejo": 0, "nuevo": 3}
+    assert epoca_de_arista("viejo", "nuevo", epocas) == 3
+    assert epoca_de_arista("viejo", "viejo", epocas) == 0
+
+
+def test_dos_artefactos_de_la_misma_epoca_dan_una_arista_de_esa_epoca():
+    """Y por tanto visible para una medición filtrada a ella, que es el caso
+    normal y el que estaba roto."""
+    assert epoca_de_arista("a", "b", {"a": 2, "b": 2}) == 2

@@ -63,10 +63,21 @@ def cmd_grafo(a: argparse.Namespace) -> int:
     print("\n  construyendo el grafo desde el corpus…")
     r = construir()
     _linea()
-    print(f"  {r['nodos']} nodos · {r['aristas']} aristas\n")
+    print(f"  {r['nodos']} nodos · {r['aristas']} filas de arista "
+          "(un par unido por dos motivos son dos filas y un arco)\n")
     for tipo, n in sorted(r.items()):
-        if tipo not in ("nodos", "aristas"):
+        if tipo not in ("nodos", "aristas", "epoca_medicion", "visibles_al_medir"):
             print(f"    {n:4}  {tipo}")
+
+    # Lo que el ARNÉS ve, que no es lo mismo que lo que hay.
+    if r["aristas"] and not r["visibles_al_medir"]:
+        print(f"\n  ⚠  el arnés mide a la época {r['epoca_medicion']} y NINGUNA de")
+        print("     las aristas vigentes le llega. El carril de grafo devolvería")
+        print("     vacío en toda corrida medida, sin excepción y sin aviso.")
+    elif r["visibles_al_medir"] < r["aristas"]:
+        print(f"\n  el arnés (época {r['epoca_medicion']}) ve "
+              f"{r['visibles_al_medir']} de {r['aristas']}; el resto es de una "
+              "época posterior")
 
     g = cargar()
     d = describir(g)
@@ -79,9 +90,13 @@ def cmd_grafo(a: argparse.Namespace) -> int:
     if d["aislados"]:
         print(f"\n  {d['aislados']} aislado(s): les falta `relacionado_con`, o son "
               "un área nueva")
-    if not PALANCAS.grafo_activo:
-        print("\n  El carril está APAGADO (`grafo_activo=False`). Su disparador es")
-        print("  `multi_hop` por debajo de 0,60 tras agotar las palancas de grada 1-2.")
+    if "grafo" not in PALANCAS.carriles:
+        print("\n  El carril está APAGADO: `grafo` no está en `carriles`.")
+        print("  Para encenderlo, en cerebro/config.py:")
+        print('      carriles    = ("denso", "lexico", "grafo")')
+        print("      peso_carril = (1.0, 1.0, 1.0)")
+        print("  Su disparador es `multi_hop` por debajo de 0,60 tras agotar")
+        print("  las palancas de grada 1 y 2.")
     print()
     return 0
 

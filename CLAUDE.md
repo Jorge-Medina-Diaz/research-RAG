@@ -53,6 +53,12 @@ evals/
 
 scripts/
   traza.py        una consulta de punta a punta. Genera docs/05-una-traza.md.
+  fase3.py        grafo · comunidades · analogias · topologia
+  jobs.py         --nocturno (gratis) y --mensual (gasta). Van al cron del
+                  sistema, NO al scheduler de AgentOS: ese solo corre si el
+                  servidor está levantado, y de noche no lo está.
+  propuestas.py   la cola de firma. Un rechazo EXIGE motivo.
+  gepa_cli.py     evolución de instrucciones. Propone y no aplica.
   holdout.py      el conjunto reservado. La credencial se pide por teclado.
   serve.py        AgentOS + la ruta de voto. modelo_falso.py, el guion.
   epoca.py        avanza la época. Acto humano, fechado. Denegado.
@@ -61,15 +67,17 @@ docs/
   00-el-problema  LA PUERTA. No supone nada. Empieza aquí si eres nuevo.
   01..04          decisiones, estado del arte, arquitectura, medición
   05-una-traza    generado por `rag traza`, no escrito a mano
+  06-fases-2-3-4  grafo, comunidades, analogías, topología. Construidas y
+                  APAGADAS, con la medición de cada una.
   99-glosario     cada término, y la tabla grada / fase / escalón
 
 .github/
   workflows/ci.yml            corre sin ninguna clave
-  scripts/comprobar-mermaid   los 29 diagramas parsean de verdad
+  scripts/comprobar-mermaid   los 31 diagramas parsean de verdad
   scripts/comprobar_enlaces   ningún enlace interno roto
 
 artefactos/entrada/   la bandeja. Suelta .md aquí.
-artefactos/corpus/    lo ingerido. ES el corpus. 13 artefactos. Denegado.
+artefactos/corpus/    lo ingerido. ES el corpus. 14 artefactos. Denegado.
 runs/                 el archivo. Nunca se borra.
 ```
 
@@ -110,6 +118,11 @@ humano y está denegado al agente.
   Agno que no elegimos.
 - **Cada test lleva por nombre la afirmación que fija.** La suite crece por un
   motivo concreto, nunca persiguiendo cobertura.
+- **`escritura` no tiene `DELETE`** salvo en `vaciar_indice()` —que solo llama
+  `ingerir --recrear`— y en `comunidades.detectar()`, que borra y recalcula la
+  partición de la época. Lo segundo es una derivada reconstruible, no
+  conocimiento; se dice porque la frase anterior era un absoluto y dejó de
+  serlo sin que nadie lo anotara.
 - Un `try/except` alrededor de trabajo de base de datos **no es** manejo de
   errores: deja la transacción abortada y convierte el COMMIT en un ROLLBACK
   silencioso. Usa `almacen.punto_de_guardado()`.

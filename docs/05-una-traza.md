@@ -21,40 +21,40 @@ Cada carril busca a su manera y produce su propio orden. Este es el dato
 que deja de existir en cuanto se fusiona, y sin él `peso_carril`, el
 embedder y el analizador léxico son tres movimientos indistinguibles.
 
-**denso** — respaldó 12 de los 12 fragmentos que acabaron entrando
+**denso** — respaldó 11 de los 12 fragmentos que acabaron entrando
 
 | puesto que tenía aquí | artefacto |
 |---:|---|
-| 1 | `2026-08-12-el-carril-de-grafo-construido-y-sin-encender` |
-| 2 | `2026-08-12-rrf-k-60-de-donde-sale-el-sesenta` |
-| 4 | `2026-08-12-epocas-para-medir-un-corpus-que-crece` |
-| 9 | `2026-08-12-agno-hybrid-search-predicado-comentado` |
-| 11 | `2026-08-12-agno-pgvector-indices-decorativos` |
-| 14 | `2026-08-12-getpass-no-falla-se-cuelga` |
-| 15 | `2026-08-12-epocas-para-medir-un-corpus-que-crece` |
-| 17 | `2026-08-12-agno-filtros-operadores-anunciados-no-implementados` |
-| 20 | `2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento` |
-| 22 | `2026-08-12-ragchecker-la-aritmetica-no-la-dependencia` |
+| 8 | `2026-08-12-rrf-k-60-de-donde-sale-el-sesenta` |
+| 12 | `2026-08-12-agno-pgvector-indices-decorativos` |
+| 13 | `2026-08-12-el-carril-de-grafo-construido-y-sin-encender` |
+| 14 | `2026-08-12-agno-pgvector-indices-decorativos` |
+| 15 | `2026-08-12-plainto-tsquery-hace-and-y-devuelve-cero` |
+| 18 | `2026-08-12-rrf-k-60-de-donde-sale-el-sesenta` |
+| 21 | `2026-08-12-agno-filtros-operadores-anunciados-no-implementados` |
 | 23 | `2026-08-12-agno-hybrid-search-predicado-comentado` |
-| 26 | `2026-08-12-agno-pgvector-indices-decorativos` |
+| 24 | `2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento` |
+| 25 | `2026-08-12-ragchecker-la-aritmetica-no-la-dependencia` |
+| 30 | `2026-08-12-agno-env-fingerprint-ciego-al-corpus` |
 
 _Los puestos que faltan son candidatos que este carril colocaba por delante y que el otro no respaldó, así que no sobrevivieron a la fusión._
 
-**lexico** — respaldó 11 de los 12 fragmentos que acabaron entrando
+**lexico** — respaldó 12 de los 12 fragmentos que acabaron entrando
 
 | puesto que tenía aquí | artefacto |
 |---:|---|
-| 1 | `2026-08-12-rrf-k-60-de-donde-sale-el-sesenta` |
-| 4 | `2026-08-12-agno-hybrid-search-predicado-comentado` |
-| 7 | `2026-08-12-agno-hybrid-search-predicado-comentado` |
-| 9 | `2026-08-12-agno-pgvector-indices-decorativos` |
-| 11 | `2026-08-12-agno-filtros-operadores-anunciados-no-implementados` |
-| 12 | `2026-08-12-ragchecker-la-aritmetica-no-la-dependencia` |
-| 13 | `2026-08-12-getpass-no-falla-se-cuelga` |
-| 15 | `2026-08-12-epocas-para-medir-un-corpus-que-crece` |
-| 17 | `2026-08-12-epocas-para-medir-un-corpus-que-crece` |
-| 27 | `2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento` |
-| 29 | `2026-08-12-agno-pgvector-indices-decorativos` |
+| 1 | `2026-08-12-agno-hybrid-search-predicado-comentado` |
+| 2 | `2026-08-12-agno-hybrid-search-predicado-comentado` |
+| 3 | `2026-08-12-rrf-k-60-de-donde-sale-el-sesenta` |
+| 5 | `2026-08-12-rrf-k-60-de-donde-sale-el-sesenta` |
+| 6 | `2026-08-12-agno-pgvector-indices-decorativos` |
+| 10 | `2026-08-12-agno-filtros-operadores-anunciados-no-implementados` |
+| 13 | `2026-08-12-plainto-tsquery-hace-and-y-devuelve-cero` |
+| 16 | `2026-08-12-ragchecker-la-aritmetica-no-la-dependencia` |
+| 19 | `2026-08-12-agno-pgvector-indices-decorativos` |
+| 21 | `2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento` |
+| 22 | `2026-08-12-agno-env-fingerprint-ciego-al-corpus` |
+| 26 | `2026-08-12-el-carril-de-grafo-construido-y-sin-encender` |
 
 _Los puestos que faltan son candidatos que este carril colocaba por delante y que el otro no respaldó, así que no sobrevivieron a la fusión._
 
@@ -67,18 +67,18 @@ puesto solitario.
 
 | # | artefacto · fragmento | RRF | puesto en cada carril |
 |---:|---|---:|---|
-| 1 | `2026-08-12-rrf-k-60-de-donde-sale-el-sesenta` · `…73b949` | 0.03252 | denso #2, lexico #1 |
-| 2 | `2026-08-12-agno-hybrid-search-predicado-comentado` · `…d445c8` | 0.02942 | denso #9, lexico #7 |
-| 3 | `2026-08-12-epocas-para-medir-un-corpus-que-crece` · `…72ed46` | 0.02896 | denso #4, lexico #15 |
-| 4 | `2026-08-12-agno-pgvector-indices-decorativos` · `…1b9133` | 0.02858 | denso #11, lexico #9 |
-| 5 | `2026-08-12-agno-hybrid-search-predicado-comentado` · `…24de86` | 0.02767 | denso #23, lexico #4 |
-| 6 | `2026-08-12-getpass-no-falla-se-cuelga` · `…9254a3` | 0.02721 | denso #14, lexico #13 |
-| 7 | `2026-08-12-agno-filtros-operadores-anunciados-no-implementados` · `…d7e783` | 0.02707 | denso #17, lexico #11 |
-| 8 | `2026-08-12-epocas-para-medir-un-corpus-que-crece` · `…32a65e` | 0.02632 | denso #15, lexico #17 |
-| 9 | `2026-08-12-ragchecker-la-aritmetica-no-la-dependencia` · `…72330d` | 0.02608 | denso #22, lexico #12 |
-| 10 | `2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento` · `…f158ec` | 0.02399 | denso #20, lexico #27 |
-| 11 | `2026-08-12-agno-pgvector-indices-decorativos` · `…5f6439` | 0.02286 | denso #26, lexico #29 |
-| 12 | `2026-08-12-el-carril-de-grafo-construido-y-sin-encender` · `…caa55c` | 0.01639 | denso #1 |
+| 1 | `2026-08-12-rrf-k-60-de-donde-sale-el-sesenta` · `…13ca98` | 0.03009 | denso #8, lexico #5 |
+| 2 | `2026-08-12-rrf-k-60-de-donde-sale-el-sesenta` · `…6164de` | 0.02869 | denso #18, lexico #3 |
+| 3 | `2026-08-12-agno-pgvector-indices-decorativos` · `…259f87` | 0.02866 | denso #14, lexico #6 |
+| 4 | `2026-08-12-agno-hybrid-search-predicado-comentado` · `…7ad543` | 0.02818 | denso #23, lexico #2 |
+| 5 | `2026-08-12-plainto-tsquery-hace-and-y-devuelve-cero` · `…094faa` | 0.02703 | denso #15, lexico #13 |
+| 6 | `2026-08-12-agno-filtros-operadores-anunciados-no-implementados` · `…09d1ab` | 0.02663 | denso #21, lexico #10 |
+| 7 | `2026-08-12-agno-pgvector-indices-decorativos` · `…d3eae8` | 0.02655 | denso #12, lexico #19 |
+| 8 | `2026-08-12-el-carril-de-grafo-construido-y-sin-encender` · `…10bcde` | 0.02533 | denso #13, lexico #26 |
+| 9 | `2026-08-12-ragchecker-la-aritmetica-no-la-dependencia` · `…1125d6` | 0.02492 | denso #25, lexico #16 |
+| 10 | `2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento` · `…5e097f` | 0.02425 | denso #24, lexico #21 |
+| 11 | `2026-08-12-agno-env-fingerprint-ciego-al-corpus` · `…95dd0e` | 0.02331 | denso #30, lexico #22 |
+| 12 | `2026-08-12-agno-hybrid-search-predicado-comentado` · `…c0f1d8` | 0.01639 | lexico #1 |
 
 De un pool de 40 candidatos por carril salen los **12** que llegan al prompt.
 
@@ -107,7 +107,7 @@ Las reglas R3, R5 las decide el juez LLM, no el código: dependen de criterio y 
 
 Y lo que solo se ve aquí: **un artefacto puede ganar sin ser el primero de ningún carril.** RRF suma `1/(k+puesto)` de cada carril, así que el acuerdo entre dos formas distintas de buscar pesa más que la convicción de una sola.
 
-En esta corrida lo hace el número **2**: salió 9.º en denso y 7.º en lexico, sin ser primero en ninguno, y aun así entra por delante de candidatos mejor situados en un solo carril.
+En esta corrida lo hace el número **2**: salió 18.º en denso y 3.º en lexico, sin ser primero en ninguno, y aun así entra por delante de candidatos mejor situados en un solo carril.
 
 Después de fusionar, esta información ya no existe. Por eso se captura **en el instante de la búsqueda** y se guarda en la tabla `consulta`: sin ella, mover `peso_carril`, cambiar de embedder y tocar el analizador léxico son tres movimientos indistinguibles.
 

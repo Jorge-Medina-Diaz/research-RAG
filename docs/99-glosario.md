@@ -268,3 +268,107 @@ basta para probar que la fontanería funciona.
 **MSYS / Git Bash** · El entorno POSIX sobre Windows donde `isatty()` devuelve
 `True` aunque la entrada esté redirigida. Aparece en el glosario porque costó
 una tarde.
+
+---
+
+## De las fases 2, 3 y 4
+
+Este bloque no existía, y el glosario describía un sistema de dos carriles
+mientras [06](06-fases-2-3-4.md) usaba diecisiete términos sin definir. Lo
+encontró una auditoría comparando los dos documentos.
+
+**HyDE** · *Hypothetical Document Embeddings*. Le pides al modelo que **escriba
+la nota que respondería** a tu pregunta, y buscas con esa nota. Funciona porque
+una pregunta y una respuesta viven en zonas distintas del espacio de embeddings
+y tu corpus está lleno de respuestas. Su defecto: la nota inventada puede
+alucinar términos, y en un corpus pequeño eso arrastra la búsqueda. Por eso aquí
+la consulta original sobrevive dentro del señuelo.
+
+**Enrutado** · Ajustar los pesos de los carriles según la **forma** de la
+consulta. Aquí es por reglas escritas a mano, no por un clasificador aprendido:
+cero latencia, auditable, y la regla que disparó viaja en la traza.
+
+**PPR** · *Personalized PageRank*. PageRank que en vez de reiniciar en cualquier
+nodo reinicia en unas **semillas**. Aquí las semillas son lo que encontró el
+carril denso: el grafo no busca, **amplía**. Sin semillas devuelve vacío en vez
+de un PageRank global, que sería un ranking de popularidad disfrazado de
+relevancia.
+
+**α (alfa) del PPR** · La probabilidad de teletransporte, no confundir con la α
+de Krippendorff. Alta, el paseo se queda en las semillas; baja, se va al centro
+del grafo y devuelve siempre lo popular. Es la palanca `grafo_alfa`.
+
+**Comunidad** · Un grupo de artefactos que se conectan mucho entre sí y poco con
+el resto. Sirven para las preguntas de `aggregation`: servir **el resumen** de la
+comunidad devuelve una respuesta; servir sus doce miembros devuelve una lista y
+gasta el contexto.
+
+**Modularidad (Q)** · Cuánto mejor que el azar es una partición en comunidades.
+Entre −0,5 y 1. Por debajo de **0,30** la partición no dice nada y agrupar es
+imponerlo; el informe lo dice en vez de dibujar comunidades sobre ruido.
+
+**Propagación de etiquetas** · El algoritmo de comunidades que se usa aquí, en
+vez de Leiden: cada nodo adopta la etiqueta más pesada de sus vecinos hasta que
+nadie cambia. Peor que Leiden y sin dos dependencias binarias. Su defecto
+—particiones inestables— se ataca fijando el orden de recorrido, porque una
+comunidad que cambia entre dos corridas idénticas no sirve para medir.
+
+**Cohesión** · Qué fracción del peso de una comunidad se queda dentro. Distingue
+un grupo real de uno que el algoritmo tuvo que colocar en algún sitio.
+
+**Puente** · Un artefacto cuya invalidación partiría el grafo en dos. Conecta
+áreas que si no estarían separadas, y por eso es también el punto frágil.
+
+**Agujero estructural** · Un par de comunidades sin **ninguna** arista entre
+ellas. Es el concepto de Burt en redes sociales, aplicado a tus notas: donde una
+analogía valdría más, porque nadie la ha escrito todavía.
+
+**Deriva** · Qué cambió en la forma del corpus entre dos épocas. Devuelve `None`
+—no cero— la primera vez: «no hay cambio» y «no hay con qué comparar» son cosas
+distintas.
+
+**Rareza (IDF)** · Cuánto informa compartir algo. Compartir un tema que tienen
+once de trece artefactos no dice nada; compartir uno que solo tienen dos es casi
+una declaración. Es lo que pesa las aristas derivadas del grafo, y sin ello un
+corpus monotemático sale como un grafo casi completo.
+
+**Analogía cross-dominio** · Dos artefactos de **dominios distintos** que
+comparten una abstracción **que se puede nombrar en una frase**. Que compartan
+tema no basta: eso es el tema, no la abstracción.
+
+**Propuesta · cola de firma** · Nada que el sistema proponga entra al corpus sin
+que lo firmes. Una sola cola para analogías, aristas, probes e instrucciones,
+porque el acto es el mismo. **Un rechazo exige motivo**: es el dato más caro que
+produces y el primero que se pierde.
+
+**GEPA** · Evolución de instrucciones por reflexión sobre los fallos (Agrawal et
+al. 2025). Aquí **propone y no aplica**, porque `instrucciones` es generación y
+un golden set sintético no la ordena bien. Su puerta —n ≥ 120 y α ≥ 0,70— hoy
+está cerrada.
+
+**Benjamini-Hochberg** · Corrección para varias comparaciones a la vez. Controla
+la fracción esperada de falsos entre los rechazados, no la probabilidad de un
+solo falso. Con una sola comparación equivale a no corregir.
+
+**CUPED** · Reducir varianza usando una medida previa correlacionada. Aquí se
+**niega** con n < 150 o con métrica binaria: con n pequeño θ sale confiadamente
+equivocado y ajustar con él *aumenta* la varianza mientras el número parece más
+limpio.
+
+**Successive halving** · Repartir presupuesto entre muchos candidatos dando poco
+a todos y doblando a los supervivientes. Su primera ronda nunca baja del suelo
+de detección: descartar con menos probes de las que distinguen algo no es
+descartar, es sortear.
+
+**LearnedKnowledge · DecisionLog** · Los dos almacenes de aprendizaje de Agno
+que se usan. Lo aprendido **nunca se cita en una respuesta**: si lo hiciera, R1
+—«toda afirmación cita su artefacto»— dejaría de ser comprobable.
+
+**Suelo vacío** · Un suelo que aprueba porque su condición nunca ha tenido
+ocasión de fallar. R6 lleva 1,00 desde el primer día y el corpus tiene **cero**
+cadenas `supera:`, así que la regla no puede fallar. El arnés lo marca `VACÍO`,
+no `ok`: es la peor clase de verde porque es indistinguible del bueno.
+
+**Costura probada** · Un test que verifica que lo que una pieza **escribe** es lo
+que la siguiente **lee**, en vez de que cada pieza haga lo que promete. Trece
+defectos graves vivían en junturas mientras 124 tests de pieza estaban en verde.

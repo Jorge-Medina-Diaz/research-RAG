@@ -243,7 +243,24 @@ def _reader(p: Palancas, meta: dict[str, Any]):
                 d.meta_data = {**(d.meta_data or {}), **meta}
             return docs
 
-    return _R(chunking_strategy=construir_troceado(p))
+    # `meta=meta`: el troceado necesita los metadatos AL TROCEAR, y el
+    # envoltorio de abajo se los pega al documento después. Pasarlos por
+    # construcción es lo único que hace que `metadatos_prepend` anteponga
+    # algo de verdad.
+    return _R(chunking_strategy=construir_troceado(p, meta=meta))
+
+
+def _actualizar_ruta(artefacto_id: str | None, destino) -> None:
+    """La ruta del artefacto, después de moverlo al corpus."""
+    if not artefacto_id:
+        return
+    with conexion() as con:
+        con.execute(
+            f"update {ESQUEMA}.artefacto set ruta = %s "
+            "where id = %s and valido_hasta is null",
+            (str(destino.relative_to(RAIZ)).replace("\\", "/"), artefacto_id),
+        )
+        con.commit()
 
 
 def _contar_fragmentos(artefacto_id: str, p: Palancas) -> int:
@@ -305,7 +322,18 @@ def ingerir_bandeja(p: Palancas = PALANCAS, *, mover: bool = True) -> list[Resul
             else:
                 anio = str(date.today().year)
                 (CORPUS / anio).mkdir(parents=True, exist_ok=True)
-                shutil.move(str(r.ruta), CORPUS / anio / r.ruta.name)
+                destino = CORPUS / anio / r.ruta.name
+                shutil.move(str(r.ruta), destino)
+                # Y se ACTUALIZA la ruta en la tabla. Sin esto, `artefacto.ruta`
+                # se queda apuntando a `artefactos/entrada/…`, donde el fichero
+                # ya no está: 14 de 14 rutas inexistentes.
+                #
+                # Consecuencia concreta y silenciosa: `grafo.construir()` abre
+                # el fichero para buscar citas, se come un OSError por cada
+                # artefacto, hace `continue`, y la clase de arista `cita` —una
+                # de las tres que el módulo llama HECHOS frente a inferencias—
+                # no produce ni una fila. Nunca. En el corpus actual serían 18.
+                _actualizar_ruta(r.artefacto_id, destino)
 
     if any(r.estado in ("nuevo", "actualizado") for r in resultados):
         for linea in crear_indices(p):

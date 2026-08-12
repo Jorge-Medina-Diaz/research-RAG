@@ -45,6 +45,11 @@ PESO_POR_TIPO = {
     "dominio_compartido": 0.3,
     "tema_compartido": 0.6,
     "co_recuperado": 1.0,    # el tráfico real los trajo juntos
+    # Firmada por una persona tras revisar la abstracción compartida. No la
+    # deriva `construir()` —la escribe `analogias.resolver`— pero tiene que
+    # estar aquí: sin la entrada, pasar "analogia" por `anota()` sería un
+    # KeyError, y hoy solo no explota porque los dos caminos no se cruzan.
+    "analogia": 2.0,
 }
 
 
@@ -72,6 +77,18 @@ def construir(*, epoca: int | None = None, p: Palancas = PALANCAS) -> dict[str, 
         ).fetchall()
 
         vivos = {a["id"] for a in arts}
+        #: La época de CADA artefacto. Una arista pertenece a la época en la que
+        #: los dos extremos ya existen, o sea al máximo de las dos — no a la
+        #: época abierta.
+        #:
+        #: Sellarlas todas con `epoca_abierta()` es lo que hacía la primera
+        #: versión, y el efecto era que **el carril de grafo estaba muerto en
+        #: toda corrida medida**: los artefactos vivían en la época 0, las
+        #: aristas nacían con la 1, y medir filtra a la última CERRADA. El grafo
+        #: se construía, se describía, tenía sus 14 nodos en `rag grafo`… y
+        #: devolvía cero en cuanto el arnés lo consultaba. Sin excepción y sin
+        #: aviso, que es la firma de este tipo de avería.
+        epoca_de = {a["id"]: int(a["epoca"]) for a in arts}
         aristas: dict[tuple[str, str, str], dict[str, Any]] = {}
 
         def anota(
@@ -82,6 +99,7 @@ def construir(*, epoca: int | None = None, p: Palancas = PALANCAS) -> dict[str, 
             aristas[(o, d, tipo)] = {
                 "peso": PESO_POR_TIPO[tipo] if peso is None else peso,
                 "detalle": detalle,
+                "epoca": epoca_de_arista(o, d, epoca_de),
             }
 
         # --- 1 · declaradas: están en el frontmatter, las escribió una persona
@@ -159,7 +177,12 @@ def construir(*, epoca: int | None = None, p: Palancas = PALANCAS) -> dict[str, 
             f"""select hits from {ESQUEMA}.consulta
                 where voto = 1 and jsonb_array_length(hits) between 2 and 40"""
         ).fetchall():
-            ids = {h.get("meta", {}).get("artefacto_id") for h in (fila["hits"] or [])}
+            # `artefacto`, no `meta.artefacto_id`: la traza escribe cada hit
+            # como {doc_id, rango_fusion, score_fusion, por_carril, artefacto,
+            # devuelto} y no hay ninguna clave `meta`. El set salía {None},
+            # se filtraba contra `vivos`, y la quinta clase de arista —la
+            # única que aprende del tráfico real— no producía nunca nada.
+            ids = {h.get("artefacto") for h in (fila["hits"] or [])}
             ids = {i for i in ids if i in vivos}
             for o in ids:
                 for d in ids:
@@ -167,11 +190,19 @@ def construir(*, epoca: int | None = None, p: Palancas = PALANCAS) -> dict[str, 
                         anota(o, d, "co_recuperado")
                         anota(d, o, "co_recuperado")
 
-        # --- escritura: se cierran las que ya no se derivan, no se borran
+        # --- escritura: se cierran las DERIVADAS y se reabren las que siguen
+        # derivándose. Las FIRMADAS no se tocan nunca.
+        #
+        # `construir()` recalcula el grafo desde el corpus, y una analogía
+        # aceptada no está en el corpus: está en tu firma. Cerrarlas todas sin
+        # excepción —lo que hacía la versión anterior— destruía cada noche el
+        # resultado del flujo entero de analogías: tres filtros, una llamada de
+        # LLM, una cola de revisión y una firma humana, deshechos por el job
+        # nocturno. Es el `SET`-tras-`MERGE` de Apache AGE que este repositorio
+        # cita como su cicatriz, reproducido dentro del módulo que lo cita.
         con.execute(
-            f"""update {ESQUEMA}.arista set valido_hasta = now()
-                where valido_hasta is null and epoca <= %s""",
-            (ep,),
+            f"update {ESQUEMA}.arista set valido_hasta = now() "
+            "where valido_hasta is null and procedencia <> 'firmada'"
         )
         for (o, d, tipo), v in aristas.items():
             import json
@@ -184,15 +215,45 @@ def construir(*, epoca: int | None = None, p: Palancas = PALANCAS) -> dict[str, 
                       peso = excluded.peso, epoca = excluded.epoca,
                       detalle = excluded.detalle, valido_hasta = null,
                       valido_desde = now()""",
-                (o, d, tipo, v["peso"],
-                 _procedencia(tipo), ep, json.dumps(v["detalle"], default=str)),
+                (o, d, tipo, v["peso"], _procedencia(tipo), v["epoca"],
+                 json.dumps(v["detalle"], default=str)),
             )
         con.commit()
 
     por_tipo: dict[str, int] = defaultdict(int)
     for (_, _, tipo) in aristas:
         por_tipo[tipo] += 1
-    return {"nodos": len(vivos), "aristas": len(aristas), **por_tipo}
+
+    # Cuántas de esas aristas ve el ARNÉS, que filtra a la última época cerrada.
+    # Si son cero mientras hay aristas vivas, el carril de grafo está muerto en
+    # toda corrida medida —construido, descrito, con nodos en `rag grafo`, y
+    # devolviendo vacío en cuanto el arnés lo consulta—. Pasó exactamente así, y
+    # no lo dijo nadie porque no hay excepción que lanzar cuando un carril
+    # simplemente no encuentra nada.
+    from cerebro.almacen import epoca_medicion
+
+    em = epoca_medicion()
+    visibles = sum(1 for v in aristas.values() if v["epoca"] <= em)
+    return {
+        "nodos": len(vivos),
+        "aristas": len(aristas),
+        "epoca_medicion": em,
+        "visibles_al_medir": visibles,
+        **por_tipo,
+    }
+
+
+def epoca_de_arista(a: str, b: str, epocas: dict[str, int]) -> int:
+    """La época de una arista es la del ÚLTIMO de sus dos extremos en existir.
+
+    Una arista no puede existir antes que los dos artefactos que une, y no tiene
+    por qué esperar a la época abierta. Sellarlas todas con `epoca_abierta()`
+    —lo que hacía la primera versión— dejaba el carril de grafo MUERTO en toda
+    corrida medida: los artefactos en la época 0, las aristas en la 1, y el
+    arnés filtrando a la última cerrada. Ni excepción, ni aviso: solo un carril
+    que devolvía vacío siempre.
+    """
+    return max(epocas[a], epocas[b])
 
 
 def _procedencia(tipo: str) -> str:

@@ -33,7 +33,7 @@ import time
 from collections.abc import Callable
 from typing import Any
 
-from cerebro.almacen import ESQUEMA, conexion
+from cerebro.almacen import ESQUEMA, conexion, epoca_medicion
 from cerebro.config import INDEX_BOUND, PALANCAS, Palancas, huella, tabla_fragmentos
 from cerebro.embeddings import construir_embedder
 from cerebro.fusion import Fusionado, Hit, a_dicts, rrf
@@ -76,10 +76,22 @@ def _carril_denso(con, p: Palancas, vector: list[float], epoca: int | None) -> l
         umbral = f"and (1 - (embedding <=> %s::vector)) >= {float(p.umbral_similitud)}"
         args = args + [lit]
 
+    # `ef_search_eval` cuando hay filtro de época, `ef_search` al servir.
+    #
+    # Es la razón entera de que exista la palanca gemela, y no se usaba: el
+    # filtro de época es POST-filtrado sobre el grafo HNSW, así que estrecha el
+    # conjunto visitable y baja el recall efectivo. Medir con la ventana de
+    # producción confunde «el sistema recupera mal» con «el filtro de época
+    # dejó fuera lo que el grafo iba a visitar», que son dos diagnósticos
+    # distintos y llevan a dos palancas distintas.
+    #
+    # El docstring de `ef_search_eval` describía este comportamiento desde el
+    # primer día. El comportamiento no existía.
+    ef = p.ef_search_eval if epoca is not None else p.ef_search
     # En su propia sentencia: psycopg no admite varios comandos en un prepared
     # statement. Y sin LOCAL, porque con autocommit no hay transacción a la que
     # atarlo — la conexión es de una consulta, así que el alcance de sesión vale.
-    con.execute(f"set hnsw.ef_search = {int(p.ef_search)}")
+    con.execute(f"set hnsw.ef_search = {int(ef)}")
 
     filas = con.execute(
         f"select id, name, content, meta_data, "  # noqa: S608
@@ -252,6 +264,62 @@ def _semillas_de(ranking: list[Hit], cuantas: int) -> dict[str, float]:
     return peso
 
 
+def _resumen_de_comunidad(con, devueltos: list[Fusionado], epoca: int | None):
+    """El resumen de la comunidad que más aparece entre lo recuperado.
+
+    «La que más aparece» y no «la del primero»: si el pool trae cinco
+    fragmentos de la comunidad 2 y uno de la 0, la pregunta es sobre la 2
+    aunque el primer puesto sea de la 0. Un desempate por el puesto 1 haría que
+    una consulta de agregación dependiera del ruido de la cabeza del ranking.
+
+    Devuelve `None` —y no un resumen vacío— si no hay comunidad con resumen. Un
+    fragmento vacío en la primera posición del prompt es peor que ninguno:
+    ocupa el sitio y no dice nada.
+    """
+    from collections import Counter
+
+    arts = [(f.meta or {}).get("artefacto_id") for f in devueltos]
+    arts = [a for a in arts if a]
+    if not arts:
+        return None
+
+    ep = epoca if epoca is not None else epoca_medicion()
+    filas = con.execute(
+        f"""select id, etiqueta, resumen, miembros from {ESQUEMA}.comunidad
+            where epoca = %s and resumen is not null""",
+        (ep,),
+    ).fetchall()
+    if not filas:
+        return None
+
+    cuenta: Counter = Counter()
+    for f in filas:
+        cuenta[f["id"]] = sum(1 for a in arts if a in (f["miembros"] or []))
+    if not cuenta or cuenta.most_common(1)[0][1] < 2:
+        # Con un solo miembro coincidente la comunidad no es de lo que se
+        # pregunta: es donde cayó un artefacto suelto.
+        return None
+
+    mejor = next(f for f in filas if f["id"] == cuenta.most_common(1)[0][0])
+    return Fusionado(
+        doc_id=f"comunidad-{mejor['id']}",
+        contenido=(
+            f"[Resumen de comunidad · {mejor['etiqueta']}]\n{mejor['resumen']}\n\n"
+            f"Artefactos que la componen: {', '.join(mejor['miembros'])}.\n"
+            "Este resumen NO es citable: para citar, usa los fragmentos de abajo."
+        ),
+        score_fusion=1.0,
+        rango_final=0,
+        por_carril={"comunidad": {"rango": 0.0, "score": 1.0, "tipo": "resumen"}},
+        meta={
+            "artefacto_id": "",           # vacío a propósito: no es citable
+            "comunidad": mejor["id"],
+            "titulo": f"comunidad · {mejor['etiqueta']}",
+            "vigente": True,
+        },
+    )
+
+
 def _carril_grafo(p: Palancas, semillas: dict[str, float], epoca: int | None) -> list[Hit]:
     """El tercer carril: PPR sobre el grafo de artefactos.
 
@@ -281,7 +349,11 @@ def _carril_grafo(p: Palancas, semillas: dict[str, float], epoca: int | None) ->
                 f"""select id, content, meta_data from {ESQUEMA}.{tabla}
                     where meta_data->>'artefacto_id' = %s
                       and coalesce((meta_data->>'vigente')::bool, true)
-                    order by (meta_data->>'indice')::int nulls last
+                    -- `chunk`, no `indice`: la clave `indice` no la escribe
+                    -- nadie, así que este ORDER BY ordenaba por NULL en
+                    -- todas las filas y el carril devolvía un fragmento
+                    -- arbitrario del artefacto en vez del primero.
+                    order by (meta_data->>'chunk')::int nulls last
                     limit 1""",
                 (art,),
             ).fetchone()
@@ -361,7 +433,7 @@ def construir_recuperador(
 
             # --- el tercer carril, el de grafo. Va DESPUÉS de los otros dos
             # porque se siembra con lo que el denso encontró: no busca, amplía.
-            if pr.grafo_activo and rankings:
+            if "grafo" in pr.carriles and rankings:
                 t = time.perf_counter()
                 try:
                     semillas = _semillas_de(rankings[0], pr.grafo_semillas)
@@ -375,8 +447,12 @@ def construir_recuperador(
                 ms["grafo"] = round((time.perf_counter() - t) * 1000, 2)
 
             t = time.perf_counter()
-            pesos = dict(zip(pr.carriles, pr.peso_carril, strict=False))
-            pesos.setdefault("grafo", 1.0)
+            # strict=True: si alguien deja `carriles` y `peso_carril` de
+            # distinta longitud, `strict=False` descartaba el sobrante y un
+            # carril acababa pesando lo que no se había decidido. Hay un assert
+            # en config.py, pero el assert solo cubre PALANCAS: una copia con
+            # `replace()` —que es lo que hace el enrutado— se lo salta.
+            pesos = dict(zip(pr.carriles, pr.peso_carril, strict=True))
             pool = rrf(rankings, k=pr.k_rrf, top_k=pr.pool_fusion, pesos=pesos)
             ms["fusion"] = round((time.perf_counter() - t) * 1000, 2)
             ms["_ruta"] = ruta.regla  # type: ignore[assignment]
@@ -385,6 +461,23 @@ def construir_recuperador(
             t = time.perf_counter()
             devueltos = _reordenar(pr, pool, query)
             ms["rerank"] = round((time.perf_counter() - t) * 1000, 2)
+
+            # El resumen de comunidad, solo cuando el enrutado dice que esto es
+            # una agregación. Es el pago de haber construido las comunidades: la
+            # pregunta «¿qué he aprendido sobre X?» no tiene un fragmento que la
+            # responda, tiene doce, y servir los doce gasta el contexto para
+            # devolver una lista. El resumen devuelve una respuesta.
+            #
+            # Va DELANTE y no sustituye: los fragmentos siguen ahí, porque R1
+            # exige citar el artefacto de cada afirmación y un resumen no es
+            # citable. El resumen orienta; los fragmentos sostienen.
+            if pr.comunidades_en_respuesta and ruta.regla == "agregacion":
+                t2 = time.perf_counter()
+                resumen = _resumen_de_comunidad(con, devueltos, epoca)
+                if resumen is not None:
+                    devueltos = [resumen, *devueltos][: pr.top_k]
+                ms["comunidad"] = round((time.perf_counter() - t2) * 1000, 2)
+
             ms["total"] = round((time.perf_counter() - t0) * 1000, 2)
 
             _guardar_traza(

@@ -36,6 +36,7 @@ from cerebro.reglas import DEL_JUEZ, DETERMINISTAS, comprobar_deterministas
 RAIZ = Path(__file__).resolve().parent.parent
 SPEC = RAIZ / "cerebro" / "spec.md"
 REGLAS_PY = RAIZ / "cerebro" / "reglas.py"
+SUELOS_PY = RAIZ / "cerebro" / "suelos.py"
 
 
 def _sha(ruta: Path) -> str:
@@ -161,6 +162,11 @@ class JuezDeSpec:
             "instrucciones_juez": INSTRUCCIONES,
             "spec_sha": _sha(SPEC),
             "reglas_sha": _sha(REGLAS_PY),
+            # Los SUELOS. Sin esto, bajar `SUELO_RECALL` de 0,85 a 0,80 pasaba
+            # sin dejar rastro: la spec quedaba intacta, el digest igual, y la
+            # corrida con el listón más bajo se comparaba con las anteriores
+            # como si midieran lo mismo. Es el escalón 6 por la puerta de atrás.
+            "suelos_sha": _sha(SUELOS_PY),
             "deterministas": list(DETERMINISTAS),
             "del_juez": list(DEL_JUEZ),
         }

@@ -176,10 +176,11 @@ async def resumir(*, epoca: int | None = None, p: Palancas = PALANCAS) -> int:
     coste entre esto y GraphRAG, y la razón de que sea asumible en un proyecto
     personal. Con una docena de comunidades son doce llamadas al mes.
     """
-    from cerebro.agente import construir_modelo
+    from cerebro.agente import SISTEMA, construir_modelo
 
     ep = epoca if epoca is not None else epoca_abierta()
-    modelo = construir_modelo(p)
+    # SISTEMA, no `p`. Ver el mismo arreglo en `analogias.minar`.
+    modelo = construir_modelo(SISTEMA)
     if modelo is None:
         return 0
 
