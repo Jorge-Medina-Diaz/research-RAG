@@ -4,7 +4,7 @@
 > que mide, después el sistema que se mide**.
 
 [![ci](https://github.com/Jorge-Medina-Diaz/research-RAG/actions/workflows/ci.yml/badge.svg)](https://github.com/Jorge-Medina-Diaz/research-RAG/actions/workflows/ci.yml)
-![tests](https://img.shields.io/badge/tests-141-brightgreen)
+![tests](https://img.shields.io/badge/tests-145-brightgreen)
 ![agno](https://img.shields.io/badge/agno-2.8.6-blue)
 ![python](https://img.shields.io/badge/python-3.12-blue)
 ![license](https://img.shields.io/badge/license-MIT-lightgrey)
@@ -528,12 +528,14 @@ uv run rag grafo       construye el grafo de artefactos y lo describe
 uv run rag comunidades detecta comunidades. --resumir gasta LLM
 uv run rag analogias   la cola cross-dominio. --minar propone
 uv run rag topologia   puentes, agujeros y deriva. Cero llamadas
+uv run rag disparadores  ¿qué costura pide construirse? Por recall, y con
+                       la cobertura del golden set al lado
 uv run rag propuestas  todo lo que espera tu firma
 uv run rag gepa        evolución de instrucciones. Propone; no aplica
 uv run rag jobs        --nocturno (gratis) · --mensual (gasta)
 uv run rag traza       una consulta de punta a punta. Genera docs/05
 uv run rag verificar   comprueba el entorno y la versión de Agno
-uv run rag test        141 tests. Sin red, sin claves, sin base de datos.
+uv run rag test        145 tests. Sin red, sin claves, sin base de datos.
 ```
 
 </details>
@@ -577,7 +579,7 @@ uv run rag test        141 tests. Sin red, sin claves, sin base de datos.
 | Mover **una** palanca → comparar | comparable, y el informe **nombra** la palanca: `top_k 12 → 20` |
 | Mover **dos** palancas → comparar | **NO COMPARABLE**: el delta no se puede atribuir a ninguna |
 | `SELECT` al holdout desde Python arbitrario | **permission denied** |
-| Tests / ruff / diagramas / enlaces | **141 pasan**, de los que **17 prueban COSTURAS** y no piezas / limpio / 31 de 31 mermaid / 50 de 50 enlaces. Los cuatro, comprobados en CI |
+| Tests / ruff / diagramas / enlaces | **145 pasan**, de los que **17 prueban COSTURAS** y no piezas / limpio / 31 de 31 mermaid / 50 de 50 enlaces. Los cuatro, comprobados en CI |
 
 **No hecho, y es lo que decide si esto sirve:**
 

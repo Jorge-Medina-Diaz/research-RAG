@@ -355,8 +355,11 @@ camino de fallo es la mitad del valor de un doble de pruebas.
 
 | Costura | Se construye cuando |
 |---|---|
-| Carril de grafo (PPR con igraph) | `multi_hop` < 0,60 tras agotar grada 1-2 |
-| Comunidades (Leiden + resúmenes) | `aggregation` < 0,60 **y** corpus > 5M tokens |
+
+> **Estos disparadores viven en código desde 2026-08-12.** Estaban escritos en cuatro documentos y habían divergido: el de comunidades pedía además «corpus > 5M tokens», que con ~11.400 es inalcanzable por construcción, y «por debajo de 0,60» admitía dos lecturas —tasa de aprobación o recall— con resultados **opuestos**. Se resuelven por **recall**, porque son costuras de recuperación y la tasa mezcla recuperación con generación. La tabla de abajo se conserva como referencia; la fuente es `evals/disparadores.py` y se consulta con **`uv run rag disparadores`**.
+
+| Carril de grafo (PPR **propio**, sin igraph) | `multi_hop` < 0,60 **por recall** |
+| Comunidades (propagación de etiquetas) | `aggregation` < 0,60 por recall. El «y corpus > 5M tokens» se retira: hacía el disparador inalcanzable |
 | Reescritura / expansión de consulta | `single_hop` falla por formulación, no por cobertura. El hook ya existe |
 | Analogías cross-dominio | Fase 1 estable dos semanas, **y** ≥12 de las 20 primeras propuestas sobreviven a revisión humana |
 | Contexto situacional | ≥5 fallos de cobertura atribuibles a fragmentos que perdieron el marco de su artefacto. Ya existe como palanca, apagada |

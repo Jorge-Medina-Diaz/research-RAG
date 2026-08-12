@@ -25,7 +25,7 @@ categoría cayendo, no una corazonada:
 
 | Costura | Se construye cuando |
 |---|---|
-| Carril de grafo (PPR con igraph, dos tablas) | `multi_hop` < 0,60 tras agotar grada 1-2 |
+| Carril de grafo (ya construido) | `multi_hop` < 0,60 **por recall** — compruébalo con `uv run rag disparadores`, no leyendo esta tabla |
 | Comunidades (Leiden + resúmenes) | `aggregation` < 0,60 **y** el corpus > 5M tokens. Por debajo de eso el índice global cabe en un prompt: 450 artefactos son ~11k tokens |
 | Reescritura/expansión de consulta | `single_hop` falla por formulación, no por cobertura. El hook ya existe: `reescritura` en config |
 | Analogías cross-dominio | Fase 1 estable dos semanas. Y con su propia puerta: de las 20 primeras propuestas, ≥12 sobreviven a tu revisión. Por debajo, la precisión es tan baja que envenenar el corpus |

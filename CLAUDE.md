@@ -50,6 +50,8 @@ evals/
                   successive halving. Los tres últimos se NIEGAN fuera de
                   su régimen en vez de devolver un número. Denegado.
   gepa.py         evolución de instrucciones. Propone y NO aplica.
+  disparadores.py los triggers de las costuras EN CÓDIGO. Por recall, no por
+                  tasa: las dos lecturas daban resultados opuestos.
 
 scripts/
   traza.py        una consulta de punta a punta. Genera docs/05-una-traza.md.

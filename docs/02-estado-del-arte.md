@@ -165,7 +165,8 @@ común —el fragmento 7 llega al índice sin decir de qué artefacto es—.
 | **LazyGraphRAG** | Difiere la sumarización al momento de la consulta | Es la arquitectura correcta **si** llega el grafo. Está anotada como la opción por defecto para ese día |
 
 **El trigger, escrito y no negociable:** el carril de grafo se construye si la
-categoría `multi_hop` cae por debajo de 0,60 **tras agotar las palancas de grada
+categoría `multi_hop` cae por debajo de 0,60 **medida por recall** (ver
+`uv run rag disparadores`) **tras agotar las palancas de grada
 1-2**. Las comunidades, si `aggregation` cae y el corpus supera los 5M tokens.
 El trigger es una categoría del golden set cayendo, no una corazonada.
 

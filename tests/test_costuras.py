@@ -369,3 +369,87 @@ def test_los_modulos_que_usan_modelo_importan_el_ID_y_no_las_palancas(mod):
         encoding="utf-8"
     )
     assert "SISTEMA" in src
+
+
+# --------------------------------------------------------------------------- #
+# los disparadores ↔ el informe
+# --------------------------------------------------------------------------- #
+
+
+def test_el_disparador_se_lee_por_RECALL_y_no_por_tasa_de_aprobacion():
+    """«`multi_hop` por debajo de 0,60» admitía dos lecturas con resultados
+    OPUESTOS: tasa 0,43 (saltado) frente a recall 0,86 (no saltado). En un
+    repositorio cuya tesis es «el disparador es una categoría cayendo, no una
+    corazonada», eso era una corazonada con formato de número.
+
+    Se resuelve por recall porque estas costuras son de RECUPERACIÓN, y la tasa
+    de aprobación mezcla recuperación con generación: una probe puede fallar con
+    recall 1,0 porque el modelo respondió mal.
+    """
+    from evals.disparadores import evaluar
+
+    informe = {
+        "probes": [
+            # tasa de aprobación 0/3, recall perfecto: NO pide un grafo.
+            {"id": f"P-{i}", "categoria": "multi_hop", "recall": 1.0,
+             "pass_rate": 0.0}
+            for i in range(6)
+        ]
+    }
+    fila = next(f for f in evaluar(informe) if f["categoria"] == "multi_hop")
+    assert fila["estado"] == "no", fila
+
+
+def test_un_estrato_pequeno_es_NO_EVALUABLE_y_no_un_aprobado():
+    """Con 4 probes, un umbral de 0,60 cae entre dos valores posibles del recall
+    medio y el disparador sería un sorteo. Decir «no ha saltado» sería tan falso
+    como decir que sí."""
+    from evals.disparadores import evaluar
+
+    informe = {
+        "probes": [
+            {"id": f"P-{i}", "categoria": "aggregation", "recall": 1.0}
+            for i in range(4)
+        ]
+    }
+    fila = next(f for f in evaluar(informe) if f["categoria"] == "aggregation")
+    assert fila["estado"] == "no evaluable"
+
+
+def test_la_cobertura_del_set_se_MIDE_y_no_se_estima_por_vocabulario():
+    """La primera versión comparaba las palabras de la consulta con el título y
+    contaba «saltos reales» cuando no solapaban: daba 10 sobre 7 probes, un
+    falso positivo tranquilizador —«fingerprint» no casa con «env_fingerprint»
+    aunque el carril denso los una sin dificultad—.
+
+    Lo bueno ya estaba medido: si el recall de una probe sin grafo es 1,0, el
+    grafo no puede mejorarla, y punto.
+    """
+    from evals.disparadores import cobertura_del_set
+
+    todo_perfecto = {
+        "probes": [
+            {"id": f"P-{i}", "categoria": "multi_hop", "recall": 1.0} for i in range(7)
+        ]
+    }
+    c = cobertura_del_set(todo_perfecto)
+    assert c["con_margen"] == []
+    assert "NINGUNA" in c["veredicto"]
+
+    con_hueco = {
+        "probes": [
+            {"id": "P-01", "categoria": "multi_hop", "recall": 0.5},
+            {"id": "P-02", "categoria": "multi_hop", "recall": 1.0},
+        ]
+    }
+    assert [x["probe"] for x in cobertura_del_set(con_hueco)["con_margen"]] == ["P-01"]
+
+
+def test_todo_disparador_dice_COMO_encender_su_costura():
+    """«Saltó» sin decir qué tocar no es accionable, y el disparador acaba
+    siendo un aviso que nadie sigue."""
+    from evals.disparadores import COSTURAS
+
+    for d in COSTURAS:
+        assert d.encender and "=" in d.encender, d
+        assert d.modulo.endswith(".py")
