@@ -472,8 +472,31 @@ def test_una_mutacion_de_orden_se_juzga_por_RANGO_y_no_por_recall():
 
     por_nombre = {m.nombre: m for m in MUTACIONES}
     assert por_nombre["barajar"].metrica == "rango"
-    for n in ("recortar", "descartar", "apagar_denso", "apagar_lexico"):
+    for n in ("recortar", "descartar"):
         assert por_nombre[n].metrica == "recall", n
+
+
+def test_apagar_un_carril_NO_es_una_mutacion_del_resultado():
+    """Filtrar del top-k lo que un carril respaldaba en solitario daba Δ=0,00
+    con 15 artefactos y con 55, y parecía insensibilidad brutal del arnés.
+
+    Era un defecto de la mutación: **RRF premia el acuerdo**, así que coloca
+    sistemáticamente al fondo lo que solo un carril trae, y filtrarlo del top-k
+    quita casi nada POR CONSTRUCCIÓN. La mutación medía una propiedad de RRF y
+    la llamaba ceguera.
+
+    Una caída real cambia lo que se FUSIONA. Eso es un cambio de configuración,
+    no una mutación del resultado, y el arnés ya sabe compararlo porque
+    `carriles` es una palanca."""
+    from evals.mutar import CARRILES_APAGADOS, MUTACIONES
+
+    nombres = {m.nombre for m in MUTACIONES}
+    assert "apagar_denso" not in nombres
+    assert "apagar_lexico" not in nombres
+
+    por_nombre = {n: c for n, _, c in CARRILES_APAGADOS}
+    assert por_nombre["apagar_denso"] == ("lexico",)
+    assert por_nombre["apagar_lexico"] == ("denso",)
 
 
 def test_una_deteccion_en_curva_NO_monotona_no_cuenta():

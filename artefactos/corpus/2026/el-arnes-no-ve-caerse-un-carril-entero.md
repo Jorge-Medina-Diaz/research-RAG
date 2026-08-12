@@ -18,10 +18,26 @@ afirmaciones:
       documentado como reales.
     estado: probado
   - texto: >-
-      La causa es que el 90 % de los fragmentos devueltos vienen de LOS DOS
-      carriles. Con top_k_por_carril=30 sobre 74 fragmentos, cada carril ve el
-      40 % del corpus y los dos se solapan casi por completo. El hibrido no
-      compra nada a esta escala.
+      Corregido - la primera version de la mutacion "apagar carril" filtraba del
+      top-k lo que ese carril respaldaba en solitario, y daba delta 0,00 tanto
+      con 15 artefactos como con 55. Era un defecto de la mutacion, no del
+      arnes - RRF premia el ACUERDO, asi que coloca al fondo lo que solo un
+      carril trae, y filtrarlo quita casi nada por construccion.
+    estado: probado
+  - texto: >-
+      Apagando el carril de VERDAD -cambiando `carriles` y re-fusionando- el
+      resultado es que apagar el DENSO SUBE el recall de 0,815 a 0,830. El
+      carril denso esta estorbando - el lexico solo es mejor que el hibrido.
+    estado: probado
+  - texto: >-
+      Son tres mediciones independientes apuntando a lo mismo - el mock (denso
+      aleatorio) daba 0,87, el local (denso real) da 0,81, y apagar el denso da
+      0,83. Con este embedder y este corpus, el carril denso es un lastre.
+    estado: probado
+  - texto: >-
+      Y el delta es de 3 vuelcos con un suelo de 6, asi que el arnes dice "no se
+      puede saber". La direccion es consistente y la magnitud no es exigible -
+      las dos cosas a la vez, y decir solo una seria mentir.
     estado: probado
   - texto: >-
       Tirar el 70 % de los resultados al azar mueve el recall de 0,815 a 0,722 y
@@ -42,9 +58,14 @@ afirmaciones:
       defecto del arnes: es el tamano del golden set.
     estado: probado
   - texto: >-
-      Extrapolacion - la salida no es mas codigo sino mas probes, y sobre todo
-      probes cuyo artefacto exigido NO sea alcanzable trivialmente por los dos
-      carriles a la vez.
+      Multiplicar el CORPUS por 3,7 -de 15 a 55 artefactos- no cambio la
+      sensibilidad en nada. Sigue ciego a todo. La sensibilidad depende del
+      numero de PROBES, no del tamano del corpus, y ahora esta medido en vez de
+      supuesto.
+    estado: probado
+  - texto: >-
+      Extrapolacion - la salida es mas probes, y sobre todo probes cuyo
+      artefacto exigido NO sea alcanzable trivialmente por los dos carriles.
     estado: extrapolacion
     verificable_por: >-
       Repetir el estudio con 120 probes y comprobar si el umbral de deteccion
@@ -103,18 +124,53 @@ la intensidad en la que la moneda salió cara, no una detección. La comprobaci�
 de monotonía está en el propio estudio, y es lo que lo convierte en una medición
 en vez de en una tabla.
 
-## Y de paso, un hallazgo sobre el sistema
+## Un defecto de la propia mutación, y lo que apareció al arreglarlo
 
-Que apagar un carril entero no mueva nada no es solo sensibilidad mala: es que
-**el 90 % de los fragmentos devueltos vienen de los dos carriles a la vez**.
+La primera versión de «apagar un carril» filtraba del top-k lo que ese carril
+respaldaba en solitario. Daba Δ=0,00 con 15 artefactos y Δ=0,00 con 55, y
+parecía una insensibilidad brutal.
 
-Con `top_k_por_carril = 30` sobre 74 fragmentos, cada carril ve el 40 % del
-corpus. El solape es casi total, así que la fusión híbrida no está comprando
-nada a esta escala — y `peso_carril`, que es una palanca de grada 1, no puede
-mover un resultado que los dos carriles ya traen.
+Era un defecto de la mutación. **RRF premia el acuerdo**, así que coloca
+sistemáticamente al fondo lo que solo un carril trae: filtrar eso del top-k
+quita casi nada *por construcción*. La mutación estaba midiendo una propiedad de
+RRF y llamándola ceguera del arnés.
 
-La frase honesta sobre la recuperación de este repositorio, hoy, es: *no hay dos
-carriles; hay un carril con dos nombres.*
+Una caída real cambia lo que se **fusiona**, y el top-k resultante es otro. Eso
+no es una mutación del resultado: es un cambio de configuración, y el arnés ya
+sabe compararlo porque `carriles` es una palanca. Se corre como tal.
+
+Y entonces aparece el hallazgo:
+
+```
+  apagar_denso    recall 0.830   Δ +0.02   3 vuelcos
+  apagar_lexico   recall 0.815   Δ  0.00   0 vuelcos
+```
+
+**Apagar el carril denso SUBE el recall.** El carril denso está estorbando: el
+léxico solo es mejor que el híbrido.
+
+Son tres mediciones independientes apuntando a lo mismo:
+
+| | recall |
+|---|---|
+| mock — carril denso aleatorio | 0,870 |
+| local — carril denso real | 0,815 |
+| solo léxico — carril denso apagado | **0,830** |
+
+Con este embedder —un MiniLM multilingüe de 384 dimensiones— y este corpus, el
+carril denso es un lastre. Y el delta son 3 vuelcos con un suelo de 6, así que
+el arnés dice **«no se puede saber»**: la dirección es consistente y la magnitud
+no es exigible, y decir solo una de las dos cosas sería mentir.
+
+## Multiplicar el corpus no compra sensibilidad
+
+El corpus pasó de 15 a 55 artefactos —3,7×, ingiriendo documentación ajena— y el
+estudio se repitió entero. **La sensibilidad no cambió en nada.** Sigue ciego a
+todas las mutaciones graduadas.
+
+Es la confirmación empírica de lo que el propio informe decía como suposición:
+la sensibilidad depende del número de **probes**, no del tamaño del corpus. Más
+material que buscar no hace más fino el instrumento que mide la búsqueda.
 
 ## Lo que esto invalida, y lo que no
 

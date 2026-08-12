@@ -136,23 +136,22 @@ def _descartar(intensidad: float):
     return aplicar
 
 
-def _apagar_carril(carril: str):
-    def fabrica(_intensidad: float):
-        def aplicar(docs: list[dict]) -> list[dict]:
-            # Fuera todo lo que ese carril respaldaba en solitario. Lo que los
-            # dos carriles traían sobrevive, que es exactamente lo que pasa
-            # cuando un carril se cae de verdad.
-            fuera = []
-            for d in docs:
-                pc = (d.get("meta_data") or {}).get("por_carril") or {}
-                otros = [c for c in pc if c != carril and c != "rerank"]
-                if otros:
-                    fuera.append(d)
-            return fuera
-
-        return aplicar
-
-    return fabrica
+# Apagar un carril NO se simula filtrando el resultado.
+#
+# La primera versión quitaba del top-k lo que ese carril respaldaba en solitario,
+# y daba Δ=0,00 tanto con 15 artefactos como con 55. Parecía una insensibilidad
+# brutal del arnés y era un defecto de la mutación: RRF premia el ACUERDO, así
+# que coloca sistemáticamente al fondo lo que solo un carril trae. Filtrar eso
+# del top-k quita casi nada por construcción, y la mutación medía la propiedad
+# de RRF en vez de la caída del carril.
+#
+# Una caída real cambia lo que se FUSIONA, y el top-k resultante es otro. Eso no
+# es una mutación del resultado: es un cambio de configuración, y el arnés ya
+# sabe compararlo — `carriles` es una palanca. Se corre como tal.
+CARRILES_APAGADOS: tuple[tuple[str, str, tuple[str, ...]], ...] = (
+    ("apagar_denso", "embedder mal configurado o HNSW ausente", ("lexico",)),
+    ("apagar_lexico", "GIN sin crear, o plainto_tsquery con AND", ("denso",)),
+)
 
 
 MUTACIONES: tuple[Mutacion, ...] = (
@@ -162,22 +161,28 @@ MUTACIONES: tuple[Mutacion, ...] = (
              (0.25, 0.50, 0.75), _recortar),
     Mutacion("descartar", "carril intermitente, timeouts",
              (0.15, 0.30, 0.50, 0.70), _descartar),
-    Mutacion("apagar_denso", "embedder mal configurado o HNSW ausente",
-             (), _apagar_carril("denso")),
-    Mutacion("apagar_lexico", "GIN sin crear, o plainto_tsquery con AND",
-             (), _apagar_carril("lexico")),
 )
 
 
 # --------------------------------------------------------------------------- #
 
 
-def _correr(envolver=None) -> dict[str, Any]:
+def _correr(envolver=None, carriles: tuple[str, ...] | None = None) -> dict[str, Any]:
     """Una corrida de nivel 0, con o sin mutación. Devuelve lo comparable."""
+    from dataclasses import replace as _replace
+
     from cerebro.almacen import epoca_medicion
-    from cerebro.config import PALANCAS  # noqa: F811
+    from cerebro.config import PALANCAS as _P
     from evals.correr import nivel0
     from evals.entorno import cargar, clasificar
+
+    PALANCAS = _P
+    if carriles is not None:
+        pesos = tuple(
+            _P.peso_carril[_P.carriles.index(c)] if c in _P.carriles else 1.0
+            for c in carriles
+        )
+        PALANCAS = _replace(_P, carriles=carriles, peso_carril=pesos)
 
     ep = epoca_medicion()
     activas, _ = clasificar(cargar(), epoca=ep, p=PALANCAS)
@@ -249,6 +254,20 @@ def estudiar() -> dict[str, Any]:
                 "p": mcnemar_exacto(b, c),
                 "detectada": detectada,
             })
+
+    # Los carriles se apagan DE VERDAD, cambiando la configuración y re-corriendo
+    # la fusión entera. Ver el comentario de CARRILES_APAGADOS.
+    for nombre, simula, carriles in CARRILES_APAGADOS:
+        r = _correr(carriles=carriles)
+        b, c, _ = vuelcos(base["por_probe"], r["por_probe"])
+        neto = abs(b - c)
+        filas.append({
+            "mutacion": nombre, "simula": simula, "metrica": "recall",
+            "intensidad": None, "valor": r["recall"],
+            "delta": r["recall"] - base["recall"], "recall": r["recall"],
+            "rango": r["rango"], "pasan": r["pasan"], "empeoran": b, "mejoran": c,
+            "neto": neto, "p": mcnemar_exacto(b, c), "detectada": neto >= suelo,
+        })
 
     return {"base": base, "suelo_vuelcos": suelo, "mutaciones": filas,
             "umbral": _umbral_de_deteccion(filas)}

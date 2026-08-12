@@ -4,7 +4,7 @@
 > que mide, después el sistema que se mide**.
 
 [![ci](https://github.com/Jorge-Medina-Diaz/research-RAG/actions/workflows/ci.yml/badge.svg)](https://github.com/Jorge-Medina-Diaz/research-RAG/actions/workflows/ci.yml)
-![tests](https://img.shields.io/badge/tests-150-brightgreen)
+![tests](https://img.shields.io/badge/tests-151-brightgreen)
 ![agno](https://img.shields.io/badge/agno-2.8.6-blue)
 ![python](https://img.shields.io/badge/python-3.12-blue)
 ![license](https://img.shields.io/badge/license-MIT-lightgrey)
@@ -36,6 +36,14 @@ no significaría nada.
 > de los resultados. Se ha medido rompiendo el recuperador a propósito en
 > cantidades controladas —`uv run rag mutar`— y ninguna degradación graduada
 > supera el suelo de detección.
+>
+> Y se ha comprobado que **multiplicar el corpus por 3,7 no cambia nada**: la
+> sensibilidad depende del número de probes, no del tamaño del corpus.
+>
+> De paso apareció otra cosa: **apagar el carril denso SUBE el recall**
+> (0,815 → 0,830). Con este embedder, el híbrido es peor que el léxico solo. Tres
+> mediciones independientes apuntan ahí, y el arnés dice «no se puede saber»
+> porque son 3 vuelcos con un suelo de 6. Las dos cosas a la vez.
 >
 > No es un defecto del arnés: es el tamaño del golden set diciendo lo que puede
 > sostener. Con 41 probes sobre 15 artefactos, el bucle **no puede distinguir
@@ -545,6 +553,7 @@ uv run rag grafo       construye el grafo de artefactos y lo describe
 uv run rag comunidades detecta comunidades. --resumir gasta LLM
 uv run rag analogias   la cola cross-dominio. --minar propone
 uv run rag topologia   puentes, agujeros y deriva. Cero llamadas
+uv run rag ajeno       ingiere un corpus que NO escribiste tú (Agno, offline)
 uv run rag mutar       rompe el recuperador a propósito y mide qué ve el arnés
 uv run rag disparadores  ¿qué costura pide construirse? Por recall, y con
                        la cobertura del golden set al lado
