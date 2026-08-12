@@ -107,10 +107,25 @@ un índice construido con otra configuración es imposible por construcción. Y 
 tabla anterior sigue viva: eso es el rollback.
 
 **4 · Nada se borra. Se invalida.** Un artefacto superado cierra su ventana y
-sus fragmentos pasan a `vigente: false`; siguen en la tabla porque una probe
-atada a una época anterior tiene que poder explicar por qué decía lo que decía.
-`escritura` no tiene `DELETE` salvo en `vaciar_indice()`, que solo llama
-`ingerir --recrear`.
+sus fragmentos pasan a `vigente: false`; siguen en la tabla. `escritura` no
+tiene `DELETE` salvo en `vaciar_indice()`, que solo llama `ingerir --recrear`.
+
+> **Y `supera` se salta la frontera de época.** Esta línea decía que los
+> fragmentos siguen en la tabla «porque una probe atada a una época anterior
+> tiene que poder explicar por qué decía lo que decía». Siguen en la tabla y
+> **no puede**: `vigente: false` no está fechado, así que la recuperación los
+> descarta también cuando se mide contra una época ya cerrada.
+>
+> Medido la primera vez que el mecanismo se usó de verdad
+> (`el-carril-denso-no-estorbaba-era-el-conjunto` superando a
+> `el-arnes-no-ve-caerse-un-carril-entero`): midiendo a la **misma** época 4,
+> el artefacto superado pasó de aparecer **10 veces** en los resultados a **0**,
+> y una probe se volcó de `ninguno` a `ordenacion` por un solo puesto.
+>
+> O sea que una medición a época cerrada **no está congelada** frente a un
+> `supera` posterior. Es reparable —`vigente` tendría que compararse contra la
+> época de medición, no leerse como booleano— y no se ha hecho. Está escrito
+> aquí en vez de descubrirse dentro de seis meses.
 
 **5 · Las épocas.** Servir no filtra; medir filtra a la última época cerrada.
 Eso es lo que hace medible un corpus que crece. Avanzar la época es un acto
