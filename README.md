@@ -431,6 +431,16 @@ uv run rag eval        # el golden set
 Si algo falla, lo dice con el motivo — es lo que hace `scripts/verificar.py`, y
 también comprueba que la versión de Agno siga siendo 2.8.6.
 
+> En su primera ejecución de verdad, el CI encontró que **este comando no
+> existía en un clon limpio**. Faltaba un `[build-system]` en `pyproject.toml`,
+> así que uv trataba el proyecto como virtual, no lo instalaba, y
+> `[project.scripts]` no creaba nada: `uv run rag up` fallaba con «Failed to
+> spawn: rag». En esta máquina funcionaba por estado histórico del `.venv`.
+>
+> Es el defecto que este repositorio persigue —una afirmación que se lee como
+> viva y no lo está— y estaba en la primera línea de las instrucciones de
+> arranque. Un badge que nadie comprueba no lo habría visto nunca.
+
 <details>
 <summary><b>Y un artefacto de ejemplo, para escribir el primero</b></summary>
 

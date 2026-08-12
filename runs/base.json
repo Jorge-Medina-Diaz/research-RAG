@@ -1,5 +1,5 @@
 {
- "fecha": "2026-08-12T13:42:34.484780+00:00",
+ "fecha": "2026-08-12T14:37:08.086654+00:00",
  "identidad": {
   "huella_config": "e5a02a35322e",
   "palancas": {
@@ -64,7 +64,7 @@
   "total": 27,
   "no_medibles": 14,
   "recall": 0.8518518518518519,
-  "p95_ms": 93
+  "p95_ms": 98
  },
  "reproducciones": {},
  "probes": [
@@ -74,7 +74,7 @@
    "clase": "dependiente",
    "recall": 1.0,
    "rango_primer_esperado": 3,
-   "ms": 114,
+   "ms": 76,
    "recuperados": [
     "2026-08-12-agno-env-fingerprint-ciego-al-corpus",
     "2026-08-12-agno-env-fingerprint-ciego-al-corpus",
@@ -93,7 +93,7 @@
    "clase": "dependiente",
    "recall": 0.0,
    "rango_primer_esperado": null,
-   "ms": 70,
+   "ms": 72,
    "recuperados": [
     "2026-08-12-rrf-k-60-de-donde-sale-el-sesenta",
     "2026-08-12-el-holdout-no-resiste-python-arbitrario",
@@ -112,7 +112,7 @@
    "clase": "dependiente",
    "recall": 1.0,
    "rango_primer_esperado": 1,
-   "ms": 91,
+   "ms": 98,
    "recuperados": [
     "2026-08-12-agno-pgvector-indices-decorativos",
     "2026-08-12-agno-hybrid-search-predicado-comentado",
@@ -131,7 +131,7 @@
    "clase": "dependiente",
    "recall": 1.0,
    "rango_primer_esperado": 1,
-   "ms": 72,
+   "ms": 73,
    "recuperados": [
     "2026-08-12-epocas-para-medir-un-corpus-que-crece",
     "2026-08-12-agno-env-fingerprint-ciego-al-corpus",
@@ -151,7 +151,7 @@
    "clase": "dependiente",
    "recall": 1.0,
    "rango_primer_esperado": 1,
-   "ms": 67,
+   "ms": 94,
    "recuperados": [
     "2026-08-12-agno-env-fingerprint-ciego-al-corpus",
     "2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento",
@@ -171,7 +171,7 @@
    "clase": "dependiente",
    "recall": 1.0,
    "rango_primer_esperado": 3,
-   "ms": 91,
+   "ms": 77,
    "recuperados": [
     "2026-08-12-el-holdout-no-resiste-python-arbitrario",
     "2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento",
@@ -191,7 +191,7 @@
    "clase": "dependiente",
    "recall": 1.0,
    "rango_primer_esperado": 5,
-   "ms": 76,
+   "ms": 97,
    "recuperados": [
     "2026-08-12-un-detector-que-siempre-dispara-esta-apagado",
     "2026-08-12-agno-hybrid-search-predicado-comentado",
@@ -210,7 +210,7 @@
    "clase": "dependiente",
    "recall": 1.0,
    "rango_primer_esperado": 5,
-   "ms": 92,
+   "ms": 80,
    "recuperados": [
     "2026-08-12-agno-env-fingerprint-ciego-al-corpus",
     "2026-08-12-agno-hybrid-search-predicado-comentado",
@@ -372,7 +372,7 @@
    "clase": "dependiente",
    "recall": 1.0,
    "rango_primer_esperado": 2,
-   "ms": 71,
+   "ms": 65,
    "recuperados": [
     "2026-08-12-agno-filtros-operadores-anunciados-no-implementados",
     "2026-08-12-agno-hybrid-search-predicado-comentado",
@@ -391,7 +391,7 @@
    "clase": "dependiente",
    "recall": 1.0,
    "rango_primer_esperado": 3,
-   "ms": 96,
+   "ms": 86,
    "recuperados": [
     "2026-08-12-epocas-para-medir-un-corpus-que-crece",
     "2026-08-12-rrf-k-60-de-donde-sale-el-sesenta",
@@ -410,7 +410,7 @@
    "clase": "dependiente",
    "recall": 1.0,
    "rango_primer_esperado": 7,
-   "ms": 81,
+   "ms": 71,
    "recuperados": [
     "2026-08-12-rrf-k-60-de-donde-sale-el-sesenta",
     "2026-08-12-agno-hybrid-search-predicado-comentado",
@@ -429,7 +429,7 @@
    "clase": "dependiente",
    "recall": 1.0,
    "rango_primer_esperado": 1,
-   "ms": 92,
+   "ms": 87,
    "recuperados": [
     "2026-08-12-rrf-k-60-de-donde-sale-el-sesenta",
     "2026-08-12-rrf-k-60-de-donde-sale-el-sesenta",
@@ -448,7 +448,7 @@
    "clase": "dependiente",
    "recall": 1.0,
    "rango_primer_esperado": 2,
-   "ms": 89,
+   "ms": 109,
    "recuperados": [
     "2026-08-12-rrf-k-60-de-donde-sale-el-sesenta",
     "2026-08-12-ragchecker-la-aritmetica-no-la-dependencia",
@@ -467,7 +467,7 @@
    "clase": "dependiente",
    "recall": 1.0,
    "rango_primer_esperado": 1,
-   "ms": 90,
+   "ms": 70,
    "recuperados": [
     "2026-08-12-getpass-no-falla-se-cuelga",
     "2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento",
@@ -505,7 +505,7 @@
    "clase": "dependiente",
    "recall": 1.0,
    "rango_primer_esperado": 1,
-   "ms": 69,
+   "ms": 70,
    "recuperados": [
     "2026-08-12-ragchecker-la-aritmetica-no-la-dependencia",
     "2026-08-12-ragchecker-la-aritmetica-no-la-dependencia",
@@ -524,7 +524,7 @@
    "clase": "dependiente",
    "recall": 1.0,
    "rango_primer_esperado": 8,
-   "ms": 83,
+   "ms": 87,
    "recuperados": [
     "2026-08-12-el-holdout-no-resiste-python-arbitrario",
     "2026-08-12-el-holdout-no-resiste-python-arbitrario",
@@ -543,7 +543,7 @@
    "clase": "dependiente",
    "recall": 1.0,
    "rango_primer_esperado": 1,
-   "ms": 82,
+   "ms": 106,
    "recuperados": [
     "2026-08-12-agno-filtros-operadores-anunciados-no-implementados",
     "2026-08-12-agno-hybrid-search-predicado-comentado",
@@ -562,7 +562,7 @@
    "clase": "dependiente",
    "recall": 1.0,
    "rango_primer_esperado": 1,
-   "ms": 93,
+   "ms": 77,
    "recuperados": [
     "2026-08-12-rrf-k-60-de-donde-sale-el-sesenta",
     "2026-08-12-agno-hybrid-search-predicado-comentado",
@@ -582,7 +582,7 @@
    "clase": "dependiente",
    "recall": 1.0,
    "rango_primer_esperado": 4,
-   "ms": 78,
+   "ms": 71,
    "recuperados": [
     "2026-08-12-rrf-k-60-de-donde-sale-el-sesenta",
     "2026-08-12-rrf-k-60-de-donde-sale-el-sesenta",
@@ -622,7 +622,7 @@
    "clase": "dependiente",
    "recall": 0.5,
    "rango_primer_esperado": 5,
-   "ms": 80,
+   "ms": 69,
    "recuperados": [
     "2026-08-12-un-detector-que-siempre-dispara-esta-apagado",
     "2026-08-12-ragchecker-la-aritmetica-no-la-dependencia",
@@ -642,7 +642,7 @@
    "clase": "dependiente",
    "recall": 0.5,
    "rango_primer_esperado": 3,
-   "ms": 88,
+   "ms": 92,
    "recuperados": [
     "2026-08-12-agno-env-fingerprint-ciego-al-corpus",
     "2026-08-12-un-detector-que-siempre-dispara-esta-apagado",
@@ -662,7 +662,7 @@
    "clase": "dependiente",
    "recall": 0.5,
    "rango_primer_esperado": 8,
-   "ms": 80,
+   "ms": 73,
    "recuperados": [
     "2026-08-12-rrf-k-60-de-donde-sale-el-sesenta",
     "2026-08-12-agno-hybrid-search-predicado-comentado",
@@ -682,7 +682,7 @@
    "clase": "dependiente",
    "recall": 0.5,
    "rango_primer_esperado": 10,
-   "ms": 81,
+   "ms": 93,
    "recuperados": [
     "2026-08-12-el-holdout-no-resiste-python-arbitrario",
     "2026-08-12-epocas-para-medir-un-corpus-que-crece",
@@ -702,7 +702,7 @@
    "clase": "dependiente",
    "recall": 0.0,
    "rango_primer_esperado": null,
-   "ms": 86,
+   "ms": 71,
    "recuperados": [
     "2026-08-12-epocas-para-medir-un-corpus-que-crece",
     "2026-08-12-plainto-tsquery-hace-and-y-devuelve-cero",
@@ -722,7 +722,7 @@
    "clase": "dependiente",
    "recall": 1.0,
    "rango_primer_esperado": 2,
-   "ms": 74,
+   "ms": 77,
    "recuperados": [
     "2026-08-12-agno-hybrid-search-predicado-comentado",
     "2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento",

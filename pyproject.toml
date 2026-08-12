@@ -41,6 +41,25 @@ dev = [
   "ruff>=0.8",
 ]
 
+# Sin esto, uv trata el proyecto como VIRTUAL: instala las dependencias y no
+# instala el proyecto, así que `[project.scripts]` no crea nada y `uv run rag`
+# falla con «Failed to spawn: rag».
+#
+# En esta máquina funcionaba igualmente, por estado histórico del `.venv`. En un
+# clon limpio no, y el único comando que documenta el README es precisamente
+# `uv run rag up`. Lo cazó el CI en su primera ejecución de verdad, que es
+# literalmente para lo que se montó.
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+# Disposición plana: no hay `src/`, así que hay que nombrar los paquetes. La
+# instalación es EDITABLE (lo que hace `uv sync` con el proyecto raíz), y eso
+# importa aquí más de lo normal: el bucle edita `cerebro/config.py` en el árbol
+# de trabajo, y una copia en site-packages leería la configuración de ayer.
+packages = ["cerebro", "evals", "ingesta", "scripts"]
+
 [tool.ruff]
 line-length = 96
 target-version = "py312"
