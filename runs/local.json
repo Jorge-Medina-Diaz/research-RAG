@@ -1,0 +1,344 @@
+{
+ "fecha": "2026-08-12T17:23:25.457945+00:00",
+ "identidad": {
+  "huella_config": "620a40e2c8c6",
+  "palancas": {
+   "top_k": 12,
+   "carriles": [
+    "denso",
+    "lexico"
+   ],
+   "top_k_por_carril": 30,
+   "peso_carril": [
+    1.0,
+    1.0
+   ],
+   "k_rrf": 60,
+   "pool_fusion": 40,
+   "umbral_similitud": null,
+   "idioma_fts": "spanish",
+   "fts_modo": "or",
+   "solo_vigentes": true,
+   "filtro_tipo": null,
+   "filtro_dominio": null,
+   "ef_search": 64,
+   "ef_search_eval": 256,
+   "reranker": "none",
+   "reranker_top_n": 12,
+   "reescritura": "none",
+   "enrutado": "none",
+   "grafo_alfa": 0.15,
+   "grafo_top_k": 10,
+   "grafo_semillas": 5,
+   "comunidades_en_respuesta": false,
+   "analogia_min": 0.25,
+   "analogia_max": 0.55,
+   "aprendizaje": false,
+   "instrucciones": [
+    "Responde solo con lo que aparezca en el contexto recuperado.",
+    "Cita el identificador del artefacto de cada afirmación, así: [[art:mi-id]].",
+    "Si el contexto no contiene la respuesta, responde exactamente: «No lo tengo en la memoria.» y nada más.",
+    "Reproduce cifras, versiones e identificadores tal cual figuran. No redondees, no normalices, no abrevies.",
+    "Si dos artefactos dicen cosas distintas, preséntalos como dos, con sus fuentes y sus fechas. No los fundas en una síntesis que ninguno sostiene.",
+    "Si un artefacto posterior supera al que responde, da el vigente y nombra el que lo superó.",
+    "Marca el estatus epistémico cuando la afirmación no esté probada: di «extrapolación», «auto-reportado» o «sin verificar» según corresponda.",
+    "Empieza por el dato. Sin introducción ni resumen final. Máximo ocho frases, salvo que te pidan enumerar."
+   ],
+   "troceado": "recursive",
+   "tam_fragmento": 1200,
+   "solape": 150,
+   "contextualizar": false,
+   "metadatos_prepend": [
+    "titulo",
+    "tipo",
+    "temas"
+   ],
+   "embedder": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+   "embedder_dim": 384,
+   "distancia": "cosine",
+   "hnsw_m": 16,
+   "hnsw_ef_construction": 200
+  },
+  "epoca": 1,
+  "huella_juez": "f9f0848cb649",
+  "nivel": "nivel0",
+  "corpus_sha": "020fe0950eea",
+  "n_artefactos": 14,
+  "indice": "fragmento_b3eeeef79661"
+ },
+ "nivel": "0",
+ "resumen": {
+  "pasan": 0,
+  "total": 0,
+  "no_medibles": 14,
+  "recall": 0.0,
+  "p95_ms": 0
+ },
+ "reproducciones": {},
+ "probes": [
+  {
+   "id": "P-09",
+   "categoria": "lexical_exact",
+   "clase": "invariante",
+   "diagnostico": "no-medible",
+   "recall": null,
+   "rango_primer_esperado": null,
+   "ms": 0,
+   "recuperados": [],
+   "esperados": []
+  },
+  {
+   "id": "P-10",
+   "categoria": "temporal",
+   "clase": "invariante",
+   "diagnostico": "no-medible",
+   "recall": null,
+   "rango_primer_esperado": null,
+   "ms": 0,
+   "recuperados": [],
+   "esperados": []
+  },
+  {
+   "id": "P-11",
+   "categoria": "fuera_de_alcance",
+   "clase": "dependiente",
+   "diagnostico": "no-medible",
+   "recall": null,
+   "rango_primer_esperado": null,
+   "ms": 0,
+   "recuperados": [],
+   "esperados": []
+  },
+  {
+   "id": "P-12",
+   "categoria": "fuera_de_alcance",
+   "clase": "dependiente",
+   "diagnostico": "no-medible",
+   "recall": null,
+   "rango_primer_esperado": null,
+   "ms": 0,
+   "recuperados": [],
+   "esperados": []
+  },
+  {
+   "id": "P-13",
+   "categoria": "fuera_de_alcance",
+   "clase": "invariante",
+   "diagnostico": "no-medible",
+   "recall": null,
+   "rango_primer_esperado": null,
+   "ms": 0,
+   "recuperados": [],
+   "esperados": []
+  },
+  {
+   "id": "P-14",
+   "categoria": "fuera_de_alcance",
+   "clase": "invariante",
+   "diagnostico": "no-medible",
+   "recall": null,
+   "rango_primer_esperado": null,
+   "ms": 0,
+   "recuperados": [],
+   "esperados": []
+  },
+  {
+   "id": "P-15",
+   "categoria": "fuera_de_alcance",
+   "clase": "invariante",
+   "diagnostico": "no-medible",
+   "recall": null,
+   "rango_primer_esperado": null,
+   "ms": 0,
+   "recuperados": [],
+   "esperados": []
+  },
+  {
+   "id": "P-16",
+   "categoria": "fuera_de_alcance",
+   "clase": "invariante",
+   "diagnostico": "no-medible",
+   "recall": null,
+   "rango_primer_esperado": null,
+   "ms": 0,
+   "recuperados": [],
+   "esperados": []
+  },
+  {
+   "id": "P-17",
+   "categoria": "fuera_de_alcance",
+   "clase": "invariante",
+   "diagnostico": "no-medible",
+   "recall": null,
+   "rango_primer_esperado": null,
+   "ms": 0,
+   "recuperados": [],
+   "esperados": []
+  },
+  {
+   "id": "P-18",
+   "categoria": "fuera_de_alcance",
+   "clase": "invariante",
+   "diagnostico": "no-medible",
+   "recall": null,
+   "rango_primer_esperado": null,
+   "ms": 0,
+   "recuperados": [],
+   "esperados": []
+  },
+  {
+   "id": "P-19",
+   "categoria": "fuera_de_alcance",
+   "clase": "invariante",
+   "diagnostico": "no-medible",
+   "recall": null,
+   "rango_primer_esperado": null,
+   "ms": 0,
+   "recuperados": [],
+   "esperados": []
+  },
+  {
+   "id": "P-20",
+   "categoria": "fuera_de_alcance",
+   "clase": "invariante",
+   "diagnostico": "no-medible",
+   "recall": null,
+   "rango_primer_esperado": null,
+   "ms": 0,
+   "recuperados": [],
+   "esperados": []
+  },
+  {
+   "id": "P-21",
+   "categoria": "fuera_de_alcance",
+   "clase": "invariante",
+   "diagnostico": "no-medible",
+   "recall": null,
+   "rango_primer_esperado": null,
+   "ms": 0,
+   "recuperados": [],
+   "esperados": []
+  },
+  {
+   "id": "P-41",
+   "categoria": "temporal",
+   "clase": "invariante",
+   "diagnostico": "no-medible",
+   "recall": null,
+   "rango_primer_esperado": null,
+   "ms": 0,
+   "recuperados": [],
+   "esperados": []
+  }
+ ],
+ "suspendidas": [
+  {
+   "id": "P-01",
+   "motivo": "artefacto(s) no vigente(s) en esta época: ['2026-08-12-agno-pgvector-indices-decorativos']"
+  },
+  {
+   "id": "P-02",
+   "motivo": "artefacto(s) no vigente(s) en esta época: ['2026-08-12-epocas-para-medir-un-corpus-que-crece']"
+  },
+  {
+   "id": "P-03",
+   "motivo": "artefacto(s) no vigente(s) en esta época: ['2026-08-12-agno-pgvector-indices-decorativos']"
+  },
+  {
+   "id": "P-04",
+   "motivo": "artefacto(s) no vigente(s) en esta época: ['2026-08-12-agno-env-fingerprint-ciego-al-corpus', '2026-08-12-epocas-para-medir-un-corpus-que-crece']"
+  },
+  {
+   "id": "P-05",
+   "motivo": "artefacto(s) no vigente(s) en esta época: ['2026-08-12-agno-pgvector-indices-decorativos', '2026-08-12-agno-env-fingerprint-ciego-al-corpus']"
+  },
+  {
+   "id": "P-06",
+   "motivo": "artefacto(s) no vigente(s) en esta época: ['2026-08-12-agno-pgvector-indices-decorativos', '2026-08-12-agno-env-fingerprint-ciego-al-corpus']"
+  },
+  {
+   "id": "P-07",
+   "motivo": "artefacto(s) no vigente(s) en esta época: ['2026-08-12-agno-pgvector-indices-decorativos']"
+  },
+  {
+   "id": "P-08",
+   "motivo": "artefacto(s) no vigente(s) en esta época: ['2026-08-12-agno-pgvector-indices-decorativos']"
+  },
+  {
+   "id": "P-22",
+   "motivo": "artefacto(s) no vigente(s) en esta época: ['2026-08-12-agno-hybrid-search-predicado-comentado']"
+  },
+  {
+   "id": "P-23",
+   "motivo": "artefacto(s) no vigente(s) en esta época: ['2026-08-12-agno-filtros-operadores-anunciados-no-implementados']"
+  },
+  {
+   "id": "P-24",
+   "motivo": "artefacto(s) no vigente(s) en esta época: ['2026-08-12-plainto-tsquery-hace-and-y-devuelve-cero']"
+  },
+  {
+   "id": "P-25",
+   "motivo": "artefacto(s) no vigente(s) en esta época: ['2026-08-12-rrf-k-60-de-donde-sale-el-sesenta']"
+  },
+  {
+   "id": "P-26",
+   "motivo": "artefacto(s) no vigente(s) en esta época: ['2026-08-12-ragchecker-la-aritmetica-no-la-dependencia']"
+  },
+  {
+   "id": "P-27",
+   "motivo": "artefacto(s) no vigente(s) en esta época: ['2026-08-12-getpass-no-falla-se-cuelga']"
+  },
+  {
+   "id": "P-28",
+   "motivo": "artefacto(s) no vigente(s) en esta época: ['2026-08-12-plainto-tsquery-hace-and-y-devuelve-cero']"
+  },
+  {
+   "id": "P-29",
+   "motivo": "artefacto(s) no vigente(s) en esta época: ['2026-08-12-ragchecker-la-aritmetica-no-la-dependencia']"
+  },
+  {
+   "id": "P-30",
+   "motivo": "artefacto(s) no vigente(s) en esta época: ['2026-08-12-getpass-no-falla-se-cuelga']"
+  },
+  {
+   "id": "P-31",
+   "motivo": "artefacto(s) no vigente(s) en esta época: ['2026-08-12-agno-filtros-operadores-anunciados-no-implementados']"
+  },
+  {
+   "id": "P-32",
+   "motivo": "artefacto(s) no vigente(s) en esta época: ['2026-08-12-agno-hybrid-search-predicado-comentado', '2026-08-12-rrf-k-60-de-donde-sale-el-sesenta']"
+  },
+  {
+   "id": "P-33",
+   "motivo": "artefacto(s) no vigente(s) en esta época: ['2026-08-12-plainto-tsquery-hace-and-y-devuelve-cero', '2026-08-12-un-detector-que-siempre-dispara-esta-apagado']"
+  },
+  {
+   "id": "P-34",
+   "motivo": "artefacto(s) no vigente(s) en esta época: ['2026-08-12-suelos-en-recuento-no-en-tasa', '2026-08-12-ragchecker-la-aritmetica-no-la-dependencia']"
+  },
+  {
+   "id": "P-35",
+   "motivo": "artefacto(s) no vigente(s) en esta época: ['2026-08-12-agno-env-fingerprint-ciego-al-corpus', '2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento']"
+  },
+  {
+   "id": "P-36",
+   "motivo": "artefacto(s) no vigente(s) en esta época: ['2026-08-12-epocas-para-medir-un-corpus-que-crece', '2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento']"
+  },
+  {
+   "id": "P-37",
+   "motivo": "artefacto(s) no vigente(s) en esta época: ['2026-08-12-plainto-tsquery-hace-and-y-devuelve-cero', '2026-08-12-un-detector-que-siempre-dispara-esta-apagado']"
+  },
+  {
+   "id": "P-38",
+   "motivo": "artefacto(s) no vigente(s) en esta época: ['2026-08-12-agno-hybrid-search-predicado-comentado', '2026-08-12-agno-env-fingerprint-ciego-al-corpus']"
+  },
+  {
+   "id": "P-39",
+   "motivo": "artefacto(s) no vigente(s) en esta época: ['2026-08-12-suelos-en-recuento-no-en-tasa', '2026-08-12-ragchecker-la-aritmetica-no-la-dependencia']"
+  },
+  {
+   "id": "P-40",
+   "motivo": "artefacto(s) no vigente(s) en esta época: ['2026-08-12-la-configuracion-es-el-tratamiento-no-el-instrumento']"
+  }
+ ]
+}

@@ -257,8 +257,13 @@ class Palancas:
     #: entero: el vector store debe contener vectores de exactamente una
     #: configuración, y un re-embedding parcial no lanza ningún error, solo hace
     #: que las distancias dejen de significar lo mismo.
-    embedder: str = "text-embedding-3-small"
-    embedder_dim: int = 1536
+    #: El modelo y su dimensión. Los dos tienen que casar con
+    #: EMBEDDINGS_PROVIDER: la dimensión es una propiedad del modelo, no una
+    #: preferencia, y  lo comprueba al
+    #: construir el embedder. Para volver a OpenAI:
+    #:     embedder = "text-embedding-3-small" · embedder_dim = 1536
+    embedder: str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+    embedder_dim: int = 384
 
     distancia: Literal["cosine", "l2", "max_inner_product"] = "cosine"
     hnsw_m: int = 16

@@ -250,7 +250,17 @@ def medible_en_nivel0(pr: dict) -> bool:
     return pr["categoria"] != "fuera_de_alcance" and bool(pr.get("requiere"))
 
 
-def nivel0(probes: list[dict], *, epoca: int | None, p: Palancas) -> list[dict]:
+def nivel0(
+    probes: list[dict], *, epoca: int | None, p: Palancas, envolver=None
+) -> list[dict]:
+    """El nivel 0. `envolver` es la costura del estudio de mutación.
+
+    Recibe el recuperador y devuelve otro: es por donde `evals/mutar.py` mete
+    una degradación controlada sin tocar el camino de producción ni parchear
+    módulos por debajo. Sin este parámetro, el estudio de sensibilidad tendría
+    que monkeypatchear el recuperador desde fuera, y entonces mediría un sistema
+    que no es el que corre.
+    """
     from cerebro.recuperador import construir_recuperador
 
     filas = []
@@ -265,6 +275,8 @@ def nivel0(probes: list[dict], *, epoca: int | None, p: Palancas) -> list[dict]:
             })
             continue
         r = construir_recuperador(p, epoca=epoca, es_probe=True, probe_id=pr["id"])
+        if envolver is not None:
+            r = envolver(r)
         t0 = time.perf_counter()
         docs = r(pr["consulta"], num_documents=p.top_k)
         ms = (time.perf_counter() - t0) * 1000

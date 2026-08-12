@@ -50,6 +50,8 @@ evals/
                   successive halving. Los tres últimos se NIEGAN fuera de
                   su régimen en vez de devolver un número. Denegado.
   gepa.py         evolución de instrucciones. Propone y NO aplica.
+  mutar.py        ESTUDIO DE SENSIBILIDAD. Rompe el recuperador a propósito
+                  y mide qué ve el arnés. Hoy: no ve caerse un carril.
   disparadores.py los triggers de las costuras EN CÓDIGO. Por recall, no por
                   tasa: las dos lecturas daban resultados opuestos.
 

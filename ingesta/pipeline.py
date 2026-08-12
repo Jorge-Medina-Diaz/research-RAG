@@ -181,7 +181,20 @@ def ingerir_fichero(
 
     with conexion() as con:
         previo = artefacto_vigente(con, a.id)
-        if previo and previo["sha_contenido"] == sha:
+        # «Sin cambios» exige DOS cosas: que el contenido no haya cambiado Y que
+        # el artefacto esté de verdad en la tabla de fragmentos ACTUAL.
+        #
+        # La segunda faltaba, y el agujero es exactamente el que este mecanismo
+        # existe para evitar. El nombre de la tabla deriva de las palancas de
+        # índice, así que cambiar `embedder` apunta a una tabla nueva y vacía —
+        # eso es el blue-green y está bien—. Pero la idempotencia miraba solo el
+        # hash del contenido: el contenido no había cambiado, así que la ingesta
+        # decía «sin cambios» y no poblaba nada. El sistema quedaba sirviendo
+        # contra un índice VACÍO, sin una sola excepción.
+        #
+        # Se descubrió al encender el embedder local: `rag ingerir` dijo
+        # «14 artefactos» y la tabla tenía cero fragmentos.
+        if previo and previo["sha_contenido"] == sha and _contar_fragmentos(a.id, p):
             return Resultado(ruta, "sin-cambios", a.id)
 
         version = (previo["version"] + 1) if previo else 1

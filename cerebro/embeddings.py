@@ -85,8 +85,72 @@ class EmbedderMalConfigurado(RuntimeError):
     """Se pidió un proveedor real sin su clave. No se degrada en silencio."""
 
 
+#: Qué modelo y qué dimensión espera cada proveedor.
+#:
+#: La dimensión **no es una preferencia, es una propiedad del modelo**, y un
+#: desajuste es de la peor clase: no lanza error. Crea una columna `vector(1536)`
+#: y la rellena con 384 números —o revienta a mitad de la ingesta, según el
+#: driver—, y en el mejor caso acabas con un índice cuyo contenido no significa
+#: lo que dice su nombre.
+#:
+#: `mock` acepta cualquiera: es SHA-256 y produce tantos números como le pidas.
+#: Por eso el desajuste no se veía: el único proveedor que se usaba se adaptaba
+#: a lo que le dijeran.
+MODELOS: dict[str, tuple[str | None, int | None]] = {
+    "mock": (None, None),
+    "local": ("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2", 384),
+    "openai": ("text-embedding-3-small", 1536),
+}
+
+
+def comprobar_coherencia(p: Palancas = PALANCAS) -> None:
+    """El modelo y la dimensión de las palancas tienen que casar con el proveedor.
+
+    Se comprueba al construir el embedder y no en un `assert` de import, porque
+    el proveedor vive en el entorno y las palancas en el fichero: el mismo
+    `config.py` es correcto con `EMBEDDINGS_PROVIDER=mock` e incorrecto con
+    `local`, y un assert de import haría imposible tener las dos cosas.
+    """
+    proveedor = proveedor_embeddings()
+    modelo, dim = MODELOS.get(proveedor, (None, None))
+    if modelo is None:
+        return
+    if p.embedder != modelo or p.embedder_dim != dim:
+        raise EmbedderMalConfigurado(
+            f"EMBEDDINGS_PROVIDER={proveedor!r} espera "
+            f"embedder={modelo!r} con embedder_dim={dim}, y las palancas dicen "
+            f"embedder={p.embedder!r} con embedder_dim={p.embedder_dim}.\n\n"
+            "La dimensión es una propiedad del modelo, no una preferencia: un "
+            "desajuste NO lanza error por sí solo, crea un índice cuyo contenido "
+            "no significa lo que dice su nombre. Ajusta las dos palancas en "
+            "`cerebro/config.py` — son de grada 3, así que hay que reindexar."
+        )
+
+
+#: Un embedder por (proveedor, modelo, dimensión). No es una optimización
+#: cosmética: `construir_embedder` se llama una vez por probe, y con el
+#: proveedor local eso significaba cargar 470 MB de pesos cuarenta y una veces
+#: por corrida. Con `mock` y con `openai` no se notaba —uno es aritmética y el
+#: otro es una llamada HTTP— y por eso nadie lo vio hasta encender el local.
+#:
+#: La clave incluye el modelo y la dimensión, no solo el proveedor: si alguien
+#: cambia la palanca a mitad de proceso —el bucle lo hace— tiene que salir un
+#: embedder nuevo, no el de antes con otro nombre.
+_CACHE: dict[tuple[str, str, int], Embedder] = {}
+
+
 def construir_embedder(p: Palancas = PALANCAS) -> Embedder:
     proveedor = proveedor_embeddings()
+    comprobar_coherencia(p)
+
+    clave = (proveedor, p.embedder, p.embedder_dim)
+    if (cacheado := _CACHE.get(clave)) is not None:
+        return cacheado
+    _CACHE[clave] = embedder = _construir(proveedor, p)
+    return embedder
+
+
+def _construir(proveedor: str, p: Palancas) -> Embedder:
 
     if proveedor == "mock":
         return MockEmbedder(dimensions=p.embedder_dim)
@@ -104,8 +168,43 @@ def construir_embedder(p: Palancas = PALANCAS) -> Embedder:
 
         return OpenAIEmbedder(id=p.embedder, dimensions=p.embedder_dim)
 
+    if proveedor == "local":
+        # Un modelo de embeddings que corre en CPU, sin clave y sin coste.
+        #
+        # Es el tercer proveedor y llegó tarde, pero cambia lo que el
+        # repositorio puede hacer sin gastar un euro. El `mock` es SHA-256
+        # normalizado: sirve para probar la fontanería y sus vectores son casi
+        # ortogonales, así que la distancia entre dos artefactos cualesquiera
+        # ronda 1,0 **por construcción**. Con eso:
+        #
+        #   · la minería de analogías no es que no encuentre nada — es que la
+        #     pregunta «¿están estos dos a media distancia?» no se puede ni
+        #     formular;
+        #   · el carril denso devuelve ruido, así que cualquier medición de
+        #     recuperación mide la suerte del hash;
+        #   · el grafo se apoya en semillas que no significan nada.
+        #
+        # `paraphrase-multilingual-MiniLM-L12-v2` es de los pocos con español
+        # decente a 384 dimensiones. Ocupa ~470 MB la primera vez y después es
+        # instantáneo. No es tan bueno como `text-embedding-3-small`, y eso es
+        # exactamente lo que hay que decir: es «real» en el sentido de que las
+        # distancias significan algo, no en el de que sean las mejores.
+        try:
+            from agno.knowledge.embedder.sentence_transformer import (
+                SentenceTransformerEmbedder,
+            )
+        except ImportError as e:
+            raise EmbedderMalConfigurado(
+                "EMBEDDINGS_PROVIDER=local necesita sentence-transformers. "
+                "Instálalo con `uv run rag extras`."
+            ) from e
+
+        return SentenceTransformerEmbedder(id=p.embedder, dimensions=p.embedder_dim)
+
     raise EmbedderMalConfigurado(
-        f"EMBEDDINGS_PROVIDER={proveedor!r} no reconocido. Válidos: mock, openai."
+        f"EMBEDDINGS_PROVIDER={proveedor!r} no reconocido. "
+        "Válidos: mock (SHA-256, para la fontanería), local (CPU, sin clave, "
+        "distancias reales) y openai (con clave)."
     )
 
 

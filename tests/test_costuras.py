@@ -453,3 +453,75 @@ def test_todo_disparador_dice_COMO_encender_su_costura():
     for d in COSTURAS:
         assert d.encender and "=" in d.encender, d
         assert d.modulo.endswith(".py")
+
+
+# --------------------------------------------------------------------------- #
+# el estudio de mutación ↔ el arnés
+# --------------------------------------------------------------------------- #
+
+
+def test_una_mutacion_de_orden_se_juzga_por_RANGO_y_no_por_recall():
+    """`recall@k` es invariante al orden **por definición**: mide qué documentos
+    están entre los k, no en qué posición. Juzgar una mutación que solo reordena
+    con recall da siempre Δ=0, y el informe diría «ciego» cuando lo correcto es
+    «esta métrica no puede verlo, y eso está bien».
+
+    Un estudio de sensibilidad que confunde «no lo detecta» con «no lo mide» es
+    el error que el estudio existe para encontrar en otros."""
+    from evals.mutar import MUTACIONES
+
+    por_nombre = {m.nombre: m for m in MUTACIONES}
+    assert por_nombre["barajar"].metrica == "rango"
+    for n in ("recortar", "descartar", "apagar_denso", "apagar_lexico"):
+        assert por_nombre[n].metrica == "recall", n
+
+
+def test_una_deteccion_en_curva_NO_monotona_no_cuenta():
+    """Más daño tiene que dar más señal. Si no, lo que se mide es ruido, y un
+    único «SÍ» dentro de una curva que sube y baja es la intensidad en la que la
+    moneda salió cara."""
+    from evals.mutar import _umbral_de_deteccion
+
+    no_monotona = [
+        {"mutacion": "x", "intensidad": 0.25, "delta": 0.0, "detectada": False},
+        {"mutacion": "x", "intensidad": 0.50, "delta": 1.1, "detectada": True},
+        {"mutacion": "x", "intensidad": 0.75, "delta": 0.6, "detectada": False},
+        {"mutacion": "x", "intensidad": 1.00, "delta": 0.4, "detectada": False},
+    ]
+    u = _umbral_de_deteccion(no_monotona)
+    assert u["monotonas"]["x"] is False
+    assert u["minimo_detectado"] is None
+    assert u["detecciones_no_creibles"] == ["x"]
+
+
+def test_una_curva_monotona_SI_cuenta():
+    from evals.mutar import _umbral_de_deteccion
+
+    monotona = [
+        {"mutacion": "y", "intensidad": 0.25, "delta": 0.1, "detectada": False},
+        {"mutacion": "y", "intensidad": 0.50, "delta": 0.6, "detectada": True},
+        {"mutacion": "y", "intensidad": 0.75, "delta": 1.4, "detectada": True},
+    ]
+    u = _umbral_de_deteccion(monotona)
+    assert u["monotonas"]["y"] is True
+    assert u["minimo_detectado"] == 0.50
+
+
+def test_la_mutacion_tiene_semilla_fija():
+    """Un estudio de sensibilidad irreproducible no mide la sensibilidad: mide
+    la suerte."""
+    from evals.mutar import SEMILLA, _descartar
+
+    docs = [{"i": i} for i in range(20)]
+    assert _descartar(0.5)(docs) == _descartar(0.5)(docs)
+    assert isinstance(SEMILLA, int)
+
+
+def test_recortar_al_cero_por_ciento_no_toca_nada():
+    """La intensidad 0 tiene que ser la identidad, o la línea base del estudio
+    no sería la línea base."""
+    from evals.mutar import _descartar, _recortar
+
+    docs = [{"i": i} for i in range(12)]
+    assert _recortar(0.0)(docs) == docs
+    assert _descartar(0.0)(docs) == docs

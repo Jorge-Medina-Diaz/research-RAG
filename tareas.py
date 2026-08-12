@@ -112,6 +112,11 @@ def topologia() -> None:
     _correr(PY, "scripts/fase3.py", "topologia", *sys.argv[2:])
 
 
+def mutar() -> None:
+    """Estudio de sensibilidad: rompe el recuperador a proposito y mide."""
+    _correr(PY, "evals/mutar.py", *sys.argv[2:])
+
+
 def disparadores() -> None:
     """Los disparadores de las costuras, evaluados contra el ultimo informe."""
     _correr(PY, "-c",
@@ -184,7 +189,7 @@ TAREAS = {
     for f in (
         up, ingerir, epoca, serve, falso, eval, traza, calibrar, holdout, sesiones,
         grafo, comunidades, analogias, topologia, gepa, propuestas, jobs,
-        disparadores,
+        disparadores, mutar,
         verificar, test, lint, extras, logs, down, limpiar,
     )
 }

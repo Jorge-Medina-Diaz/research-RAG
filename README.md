@@ -4,7 +4,7 @@
 > que mide, después el sistema que se mide**.
 
 [![ci](https://github.com/Jorge-Medina-Diaz/research-RAG/actions/workflows/ci.yml/badge.svg)](https://github.com/Jorge-Medina-Diaz/research-RAG/actions/workflows/ci.yml)
-![tests](https://img.shields.io/badge/tests-145-brightgreen)
+![tests](https://img.shields.io/badge/tests-150-brightgreen)
 ![agno](https://img.shields.io/badge/agno-2.8.6-blue)
 ![python](https://img.shields.io/badge/python-3.12-blue)
 ![license](https://img.shields.io/badge/license-MIT-lightgrey)
@@ -29,6 +29,23 @@ Este repositorio implementa un RAG sobre [Agno](https://agno.com) 2.8.6 cuya
 propiedad central es que **la medición se sostiene mientras el corpus crece**,
 mediante cuatro mecanismos que se niegan a producir un número cuando ese número
 no significaría nada.
+
+> ## El resultado que más importa de este repositorio
+>
+> **El arnés no detecta que se caiga un carril entero.** Ni que se tire el 70 %
+> de los resultados. Se ha medido rompiendo el recuperador a propósito en
+> cantidades controladas —`uv run rag mutar`— y ninguna degradación graduada
+> supera el suelo de detección.
+>
+> No es un defecto del arnés: es el tamaño del golden set diciendo lo que puede
+> sostener. Con 41 probes sobre 15 artefactos, el bucle **no puede distinguir
+> una mejora del ruido en ningún régimen probado**, y cualquier conclusión sobre
+> palancas obtenida hasta hoy queda en suspenso.
+>
+> Es también la razón de que este número exista: casi nadie publica la
+> sensibilidad de su eval. Ver
+> [el artefacto](artefactos/corpus/2026/el-arnes-no-ve-caerse-un-carril-entero.md)
+> y `docs/07-sensibilidad.md`.
 
 **Estado:** la infraestructura de medición está construida y verificada; el
 sistema **no ha pasado todavía su propia puerta de calidad**, y eso es
@@ -528,6 +545,7 @@ uv run rag grafo       construye el grafo de artefactos y lo describe
 uv run rag comunidades detecta comunidades. --resumir gasta LLM
 uv run rag analogias   la cola cross-dominio. --minar propone
 uv run rag topologia   puentes, agujeros y deriva. Cero llamadas
+uv run rag mutar       rompe el recuperador a propósito y mide qué ve el arnés
 uv run rag disparadores  ¿qué costura pide construirse? Por recall, y con
                        la cobertura del golden set al lado
 uv run rag propuestas  todo lo que espera tu firma
